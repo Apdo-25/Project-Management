@@ -6,9 +6,16 @@ import router from './router'
 
 import './assets/main.css'
 
-const app = createApp(App)
+//Create Pinia
+const pinia = createPinia()
 
-app.use(createPinia())
-app.use(router)
+//Create Vue app
+createApp(App).use(router).use(pinia).mount('#app')
 
-app.mount('#app')
+//Default title tag
+const defaultDocummentTitle = 'PM-Project'
+
+//Set title tag
+router.afterEach((to) => {
+  document.title = to.meta.title || defaultDocummentTitle
+})
