@@ -6,7 +6,7 @@ import {
 } from "@mdi/js";
 
 import SectionMain from "@/components/SectionMain.vue";
-import LayoutAuthenticated from "@/layouts/Layout.vue";
+import Layout from "@/layouts/Layout.vue";
 
 
 const mainStore = useMainStore();
@@ -18,11 +18,11 @@ const transactionBarItems = computed(() => mainStore.history);
 </script>
 
 <template>
-  <LayoutAuthenticated>
+  <Layout>
     <SectionMain>
    
  
 
     </SectionMain>
-  </LayoutAuthenticated>
+  </Layout>
 </template>

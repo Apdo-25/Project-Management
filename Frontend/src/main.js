@@ -7,13 +7,17 @@ import { useMainStore } from '@/stores/main.js'
 import { useStyleStore } from '@/stores/style.js'
 import { darkModeKey, styleKey } from '@/config.js'
 
-import './assets/main.css'
+import './css/main.css'
 
 //Create Pinia
 const pinia = createPinia()
 
 //Create Vue app
 createApp(App).use(router).use(pinia).mount('#app')
+
+//Get stores
+const mainStore = useMainStore()
+const styleStore = useStyleStore()
 
 /* App style */
 styleStore.setStyle(localStorage[styleKey] ?? 'basic')

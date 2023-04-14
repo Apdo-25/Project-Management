@@ -23,7 +23,7 @@ const asideLgCloseClick = (event) => {
 </script>
 
 <template>
-  <AsideMenuLayer
+  <SideBarMenuLayer
     :menu="menu"
     :class="[
       isAsideMobileExpanded ? 'left-0' : '-left-60 lg:left-0',
