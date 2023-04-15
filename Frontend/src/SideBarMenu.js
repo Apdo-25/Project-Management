@@ -22,9 +22,9 @@ export default [
     icon: mdiAccountCircle
   },
 
-  {
+  /*{
     to: '/login',
     label: 'Login',
     icon: mdiLock
-  }
+  }*/
 ]
