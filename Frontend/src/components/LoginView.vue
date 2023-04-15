@@ -9,7 +9,7 @@ import FormField from "@/components/FormField.vue";
 import FormControl from "@/components/FormControl.vue";
 import BaseButton from "@/components/BaseButton.vue";
 import BaseButtons from "@/components/BaseButtons.vue";
-import layouts from "@/layouts/layoutS.vue";
+import LayoutGuest from "@/layouts/LayoutGuest.vue";
 import axios from "axios";
 
 const form = reactive({
@@ -75,7 +75,7 @@ const submit = async () => {
 </script>
 
 <template>
-  <layouts>
+  <LayoutGuest>
     <SectionFullScreen v-slot="{ cardClass }" bg="purplePink">
       <CardBox
         :form-ref="formRef"
@@ -124,5 +124,5 @@ const submit = async () => {
         </template>
       </CardBox>
     </SectionFullScreen>
-  </layouts>
+  </LayoutGuest>
 </template>
