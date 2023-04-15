@@ -27,14 +27,14 @@ const routes = [
     component: () => import('@/views/TaskView.vue')
   },
 
-  {
+  /*{
     meta: {
       title: 'Profile'
     },
     path: '/profile',
     name: 'profile',
     component: () => import('@/views/ProfileView.vue')
-  },
+  },*/
 
   {
     meta: {
