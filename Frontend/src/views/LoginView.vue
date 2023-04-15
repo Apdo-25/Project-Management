@@ -76,7 +76,7 @@ const submit = async () => {
 
 <template>
   <layouts>
-    <SectionFullScreen v-slot="{ cardClass }" bg="purplePink">
+    <SectionFullScreen v-slot="{ cardClass }" bg="darkBg">
       <CardBox
         :form-ref="formRef"
         :class="cardClass"

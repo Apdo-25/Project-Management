@@ -35,7 +35,7 @@ async function registerUser() {
 
 <template>
   <LayoutS>
-    <SectionFullScreen v-slot="{ cardClass }" bg="purplePink">
+    <SectionFullScreen v-slot="{ cardClass }" bg="darkBg">
       <CardBox :class="cardClass" is-form @submit.prevent="registerUser">
         <FormField label="Name" help="Please enter your name">
           <FormControl v-model="form.name" :icon="mdiAccount" name="name" />
