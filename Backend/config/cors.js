@@ -1,4 +1,4 @@
-const cors = (req, res, next) => {
+const corsOptions = (req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Headers",
@@ -11,4 +11,4 @@ const cors = (req, res, next) => {
   next();
 };
 
-module.exports = cors;
+module.exports = corsOptions;
