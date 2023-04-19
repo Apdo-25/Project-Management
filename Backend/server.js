@@ -3,49 +3,46 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("./middleware/cors");
 const app = express();
+const Cookie = require("cookie-parser");
 const { errorHandler } = require("./middleware/error");
+const path = require("path");
+const connectDB = require("./config/database");
 
 require("dotenv-flow").config();
 
-// Routes task project and auth
-const authRoutes = require("./routes/auth");
-const projectRoutes = require("./routes/projects");
-const taskRoutes = require("./routes/tasks");
+// Connect to MongoDB
+connectDB();
 
 // Middleware
 app.use(cors);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
-mongoose.set("strictQuery", false);
-
-// Database Connection
-const dbUri = process.env.DBHOST;
-const dbOptions = {
-  useUnifiedTopology: true,
-  useNewUrlParser: true,
-  // remove these options
-  // useCreateIndex: true,
-  // useFindAndModify: false,
-};
-
-mongoose
-  .connect(dbUri, dbOptions)
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((error) => console.log("Error connecting to MongoDB:", error));
+app.use(Cookie());
 
 // Routes
 app.get("/", (req, res) => {
   res.status(200).send({ message: "Welcome to the PM REST API HOMEPAGE" });
 });
 
+//static fles
+app.use("/static", express.static(path.join(__dirname, "public")));
+
 // Mount your API routes
-app.use("/api/user", authRoutes);
-app.use("/api/projects", projectRoutes);
-app.use("/api/tasks", taskRoutes);
+app.use("/api/auth", require("./routes/api/auth"));
 
 //Error Handling Middleware
 app.use(errorHandler);
+
+// 404 Handler
+app.all("*", (req, res) => {
+  res.status(404);
+
+  if (req.accepts("json")) {
+    res.json({ error: "404 Not Found" });
+  } else {
+    res.type("text").send("404 Not Found");
+  }
+});
 
 // Start Server
 const PORT = process.env.PORT || 4000;
