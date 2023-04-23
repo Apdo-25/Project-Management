@@ -1,40 +1,49 @@
-require("dotenv-flow").config();
+require("dotenv").config();
+
 const express = require("express");
-const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
+const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const { errorHandler } = require("./middleware/error-handler");
+const mongoose = require("mongoose");
 const path = require("path");
-const connectDB = require("./config/database");
 const corsOptions = require("./config/cors");
+const connectDB = require("./config/database");
+const credentials = require("./middleware/credentials");
+const errorHandlerMiddleware = require("./middleware/error_handler");
+const authenticationMiddleware = require("./middleware/authentication");
 
-// Initialize Express
 const app = express();
+const PORT = 4000;
 
-// Connect to MongoDB
+// Connect to DB
 connectDB();
 
-// Middleware
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// CORS
+app.use(cors(corsOptions));
+
+// Allow Credentials
+app.use(credentials);
+
+// application.x-www-form-urlencoded
+app.use(express.urlencoded({ extended: true }));
+
+// application/json response
+app.use(express.json());
+
+// middleware for cookies
 app.use(cookieParser());
-app.use(corsOptions);
 
-// Root
-app.get("/", (req, res) => {
-  res.status(200).send({ message: "Welcome to the PM REST API HOMEPAGE" });
-});
+// authentication middleware
+app.use(authenticationMiddleware);
 
-//static fles
+// static files
 app.use("/static", express.static(path.join(__dirname, "public")));
 
-//Error Handling Middleware
-app.use(errorHandler);
+// Default error handler
+app.use(errorHandlerMiddleware);
 
-// Mount your API routes
+// Routes
 app.use("/api/auth", require("./routes/api/auth"));
 
-// 404 Handler
 app.all("*", (req, res) => {
   res.status(404);
 
@@ -45,12 +54,9 @@ app.all("*", (req, res) => {
   }
 });
 
-// Start Server
-const PORT = process.env.PORT || 4000;
-
 mongoose.connection.once("open", () => {
-  console.log("DB Connected");
+  console.log("DB connected");
   app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Listening on port ${PORT}`);
   });
 });
