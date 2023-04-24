@@ -1,13 +1,13 @@
 const allowedOrigins = require("./allowed_origins");
 
-const corsOptions = (req, res) => {
+const corsOptions = {
   origin: (origin, callback) => {
-    if (allowedOrigins.indexOf(origin) !== -1) {
+    if (allowedOrigins.includes(origin) || !origin) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(new Error("Not allowed by Cors"));
     }
-  };
+  },
 };
 
 module.exports = corsOptions;

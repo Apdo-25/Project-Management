@@ -17,14 +17,14 @@ const PORT = 4000;
 // Connect to DB
 connectDB();
 
-// CORS
+//CORS;
 app.use(cors(corsOptions));
 
-// Allow Credentials
+// middleware for credentials
 app.use(credentials);
 
 // application.x-www-form-urlencoded
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 
 // application/json response
 app.use(express.json());
@@ -35,15 +35,21 @@ app.use(cookieParser());
 // authentication middleware
 app.use(authenticationMiddleware);
 
-// static files
+//static files
 app.use("/static", express.static(path.join(__dirname, "public")));
 
 // Default error handler
 app.use(errorHandlerMiddleware);
 
+//root route
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
 // Routes
 app.use("/api/auth", require("./routes/api/auth"));
 
+// 404
 app.all("*", (req, res) => {
   res.status(404);
 
@@ -54,6 +60,7 @@ app.all("*", (req, res) => {
   }
 });
 
+// Listen on port
 mongoose.connection.once("open", () => {
   console.log("DB connected");
   app.listen(PORT, () => {

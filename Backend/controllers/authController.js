@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 async function register(req, res) {
   const { username, email, first_name, last_name, password, password_confirm } =
@@ -46,7 +47,7 @@ async function login(req, res) {
   if (!email || !password)
     return res.status(422).json({ message: "Invalid fields" });
 
-  const user = await User.findOne({ email }).exec();
+  const user = await User.findOne({ email });
 
   if (!user)
     return res.status(401).json({ message: "Email or password is incorrect" });
@@ -81,7 +82,8 @@ async function login(req, res) {
 
   res.cookie("refresh_token", refreshToken, {
     httpOnly: true,
-
+    // sameSite: "None",
+    // secure: true,
     maxAge: 24 * 60 * 60 * 1000,
   });
 
@@ -110,6 +112,8 @@ async function logout(req, res) {
   if (!user) {
     res.clearCookie("refresh_token", {
       httpOnly: true,
+      // sameSite: "None",
+      // secure: true,
     });
     return res.sendStatus(204);
   }
@@ -119,13 +123,10 @@ async function logout(req, res) {
 
   res.clearCookie("refresh_token", {
     httpOnly: true,
+    // sameSite: "None",
+    // secure: true,
   });
-
-  //send status 200
-  res.status(200).json({
-    success: true,
-    message: "Logout",
-  });
+  res.sendStatus(204);
 }
 async function refresh(req, res) {
   const cookies = req.cookies;
@@ -151,14 +152,20 @@ async function refresh(req, res) {
 }
 async function user(req, res) {
   const user = req.user;
-  res.status(200).json({
+
+  if (!user) return res.sendStatus(401);
+
+  return res.status(200).json({
     success: true,
     user: {
       id: user._id,
+      username: user.username,
+      email: user.email,
+      password: user.password,
       first_name: user.first_name,
       last_name: user.last_name,
+      full_name: user.full_name,
     },
-    message: "User",
   });
 }
 

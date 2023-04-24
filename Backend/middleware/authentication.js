@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
 function authentication(req, res, next) {
-  const authHeader = req.headers.authorization || req.headers.authorization;
+  const authHeader = req.headers.authorization;
 
   if (authHeader?.startsWith("Bearer ")) {
     const token = authHeader.split(" ")[1];
