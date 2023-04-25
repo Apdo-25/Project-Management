@@ -112,8 +112,8 @@ async function logout(req, res) {
   if (!user) {
     res.clearCookie("refresh_token", {
       httpOnly: true,
-      // sameSite: "None",
-      // secure: true,
+      sameSite: "None",
+      secure: true,
     });
     return res.sendStatus(204);
   }
@@ -123,8 +123,8 @@ async function logout(req, res) {
 
   res.clearCookie("refresh_token", {
     httpOnly: true,
-    // sameSite: "None",
-    // secure: true,
+    sameSite: "None",
+    secure: true,
   });
   res.sendStatus(204);
 }

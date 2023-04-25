@@ -6,8 +6,8 @@ const taskControllers = require("../../controllers/taskController");
 
 router.post("/register", authControllers.register);
 router.post("/login", authControllers.login);
-router.get("/logout", authControllers.logout);
-router.get("/refresh", authControllers.refresh);
+router.post("/logout", authControllers.logout);
+router.post("/refresh", authControllers.refresh);
 router.get("/user", authControllers.user);
 
 //Projects

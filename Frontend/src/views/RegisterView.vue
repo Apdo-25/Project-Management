@@ -29,7 +29,9 @@ async function registerUser() {
     if (response.status === 201) {
       router.push("/");
     }
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+  }
 }
 </script>
 
