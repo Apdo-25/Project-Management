@@ -48,6 +48,8 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use("/api/auth", require("./routes/api/auth"));
+app.use("/api/project", require("./routes/api/project"));
+app.use("/api/task", require("./routes/api/task"));
 
 // 404
 app.all("*", (req, res) => {
