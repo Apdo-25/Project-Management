@@ -43,7 +43,7 @@ app.use(errorHandlerMiddleware);
 
 //root route
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.status(200).send({ message: "Hello World!" });
 });
 
 // Routes
@@ -69,3 +69,5 @@ mongoose.connection.once("open", () => {
     console.log(`Listening on port ${PORT}`);
   });
 });
+
+module.exports = app;
