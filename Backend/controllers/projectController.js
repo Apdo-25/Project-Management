@@ -35,8 +35,13 @@ async function updateProject(req, res) {
 }
 
 async function deleteProject(req, res) {
-  await Project.findByIdAndDelete(req.params.id).exec();
-  return res.sendStatus(204);
+  try {
+    await Project.findByIdAndDelete(req.params.id).exec();
+    return res.sendStatus(204);
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(500);
+  }
 }
 
 async function addTask(req, res) {

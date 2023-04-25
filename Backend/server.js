@@ -17,6 +17,14 @@ const PORT = 4000;
 // Connect to DB
 connectDB();
 
+//swagger deps
+const swaggerUi = require("swagger-ui-express");
+const yaml = require("yamljs");
+
+//swagger setup
+const swaggerDefinition = yaml.load("./swagger.yaml");
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDefinition));
+
 //CORS;
 app.use(cors(corsOptions));
 

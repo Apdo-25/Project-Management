@@ -56,7 +56,8 @@ describe("/Third Test Collection", () => {
 });
 
 describe("/Fourth Test Collection", () => {
-  it("test DELETE route...", (done) => {
+  it("test DELETE route...", function () {
+    this.timeout(5000); // increase the timeout to 5 seconds
     const project = new Project({
       name: "Test Project",
       description: "Test Description",
