@@ -80,6 +80,17 @@ async function removeMember(req, res) {
   return res.json(project);
 }
 
+//delete all projects
+async function deleteAllProjects(req, res) {
+  try {
+    await Project.deleteMany().exec();
+    return res.sendStatus(204);
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(500);
+  }
+}
+
 module.exports = {
   getProjects,
   getProject,
@@ -90,4 +101,5 @@ module.exports = {
   removeTask,
   addMember,
   removeMember,
+  deleteAllProjects,
 };

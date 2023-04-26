@@ -37,8 +37,24 @@ async function updateTask(req, res) {
 }
 
 async function deleteTask(req, res) {
-  await Task.findByIdAndDelete(req.params.id).exec();
-  return res.sendStatus(204);
+  try {
+    await Task.findByIdAndDelete(req.params.id).exec();
+    return res.sendStatus(204);
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(500);
+  }
+}
+
+//delete all tasks
+async function deleteAllTasks(req, res) {
+  try {
+    await Task.deleteMany().exec();
+    return res.sendStatus(204);
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(500);
+  }
 }
 
 module.exports = {
@@ -47,4 +63,5 @@ module.exports = {
   createTask,
   updateTask,
   deleteTask,
+  deleteAllTasks,
 };
