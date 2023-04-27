@@ -156,7 +156,6 @@ async function user(req, res) {
   if (!user) return res.sendStatus(401);
 
   return res.status(200).json({
-    success: true,
     user: {
       id: user._id,
       username: user.username,
@@ -164,7 +163,6 @@ async function user(req, res) {
       password: user.password,
       first_name: user.first_name,
       last_name: user.last_name,
-      full_name: user.full_name,
     },
   });
 }
