@@ -32,11 +32,11 @@ jobs:
           npm run 
           npm test
         env:
-        DBHOST: ${{ secrets.DBHOST }}
-        ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
-        REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET }}
-        PORT: ${{ secrets.PORT }}
-        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          DBHOST: ${{ secrets.DBHOST }}
+          ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
+          REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET }}
+          PORT: ${{ secrets.PORT }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
 
    # Heavily modified deploy job to fit render.com
