@@ -46,7 +46,7 @@ export const useMainStore = defineStore('main', () => {
   }
 
   return {
-    ...toRefs(state),
+    toRefs(state),
     setUser,
     fetchClients,
     getUser
