@@ -1,42 +1,24 @@
-import axios from 'axios'
+import { axiosInstance } from '../../utils/axios'
+import { useMainStore } from '../stores/main'
 
-const apiClient = axios.create({
-  baseURL: 'http://localhost:4000', // Replace with your backend API endpoint
-  headers: {
-    'Content-Type': 'application/json'
-  }
-})
+export default function useApi() {
+  const mainStore = useMainStore()
 
-export default {
-  async getProjects() {
-    return await apiClient.get('/projects')
-  },
-  async getProjectById(id) {
-    return await apiClient.get(`/projects/${id}`)
-  },
-  async createProject(project) {
-    return await apiClient.post('/projects', project)
-  },
-  async updateProject(id, project) {
-    return await apiClient.put(`/projects/${id}`, project)
-  },
-  async deleteProject(id) {
-    return await apiClient.delete(`/projects/${id}`)
-  },
+  axiosInstance.interceptors.request.use(
+    (config) => {
+      return config
+    },
 
-  async getTasks() {
-    return await apiClient.get('/tasks')
-  },
-  async getTaskById(id) {
-    return await apiClient.get(`/tasks/${id}`)
-  },
-  async createTask(task) {
-    return await apiClient.post('/tasks', task)
-  },
-  async updateTask(id, task) {
-    return await apiClient.put(`/tasks/${id}`, task)
-  },
-  async deleteTask(id) {
-    return await apiClient.delete(`/tasks/${id}`)
-  }
+    (error) => Promise.reject(error)
+  )
+
+  axiosInstance.interceptors.response.use(
+    (response) => response,
+
+    async (error) => {
+      return Promise.reject(error)
+    }
+  )
+
+  return axiosInstance
 }
