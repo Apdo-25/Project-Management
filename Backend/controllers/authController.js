@@ -151,7 +151,7 @@ async function refresh(req, res) {
   });
 }
 async function user(req, res) {
-  const user = req.user;
+  const user = await User.findById(req.user.id);
 
   if (!user) return res.sendStatus(401);
 
@@ -160,9 +160,9 @@ async function user(req, res) {
       id: user._id,
       username: user.username,
       email: user.email,
-      password: user.password,
       first_name: user.first_name,
       last_name: user.last_name,
+      full_name: user.full_name,
     },
   });
 }

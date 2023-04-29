@@ -42,7 +42,7 @@ const UserSchema = Schema(
     virtuals: {
       full_name: {
         get() {
-          return this.first_name + " " + this.last_name;
+          return this.first_name + "" + this.last_name;
         },
       },
 

@@ -9,6 +9,14 @@ const Project = require("../models/Project");
 
 chai.use(chaiHttp);
 
+//clear db after test
+after(function (done) {
+  Project.deleteMany({}, function (err) {
+    if (err) return done(err);
+    done();
+  });
+});
+
 describe("/First Test Collection", () => {
   it("test default API route...", (done) => {
     chai

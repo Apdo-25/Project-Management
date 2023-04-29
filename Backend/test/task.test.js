@@ -9,6 +9,14 @@ const Task = require("../models/Task");
 
 chai.use(chaiHttp);
 
+//clear db after test
+after(function (done) {
+  Task.deleteMany({}, function (err) {
+    if (err) return done(err);
+    done();
+  });
+});
+
 describe("/First Test Collection", () => {
   it("test default API route...", (done) => {
     chai
