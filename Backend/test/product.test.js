@@ -10,15 +10,16 @@ const Project = require("../models/Project");
 chai.use(chaiHttp);
 
 //clear db after test
-after(function (done) {
-  Project.deleteMany({}, function (err) {
-    if (err) return done(err);
-    done();
-  });
+after(async function () {
+  try {
+    await Project.deleteMany();
+  } catch (err) {
+    console.error(err);
+  }
 });
 
-describe("/First Test Collection", () => {
-  it("test default API route...", (done) => {
+describe("First Test Collection", () => {
+  it("should return a message from the default API route", (done) => {
     chai
       .request(server)
       .get("/")
@@ -31,8 +32,8 @@ describe("/First Test Collection", () => {
   });
 });
 
-describe("/Second Test Collection", () => {
-  it("test GET route...", (done) => {
+describe("Second Test Collection", () => {
+  it("should return all projects from the GET route", (done) => {
     chai
       .request(server)
       .get("/api/project/projects")
@@ -44,8 +45,8 @@ describe("/Second Test Collection", () => {
   });
 });
 
-describe("/Third Test Collection", () => {
-  it("test POST route...", (done) => {
+describe("Third Test Collection", () => {
+  it("should create a new project with the POST route", (done) => {
     chai
       .request(server)
       .post("/api/project/projects")
@@ -53,31 +54,36 @@ describe("/Third Test Collection", () => {
         name: "Test Project",
         description: "Test Description",
       })
-      .end((err, res) => {
+      .then((res) => {
         res.should.have.status(200);
         res.body.should.be.a("object");
         res.body.should.have.property("name").eql("Test Project");
         res.body.should.have.property("description").eql("Test Description");
         done();
-      });
+      })
+      .catch((err) => done(err));
   });
 });
 
-describe("/Fourth Test Collection", () => {
-  it("test DELETE route...", function () {
+describe("Fourth Test Collection", () => {
+  it("should delete a project with the DELETE route", function (done) {
     this.timeout(5000); // increase the timeout to 5 seconds
     const project = new Project({
       name: "Test Project",
       description: "Test Description",
     });
-    project.save((err, project) => {
-      chai
-        .request(server)
-        .delete("/api/project/projects/" + project.id)
-        .end((err, res) => {
-          res.should.have.status(204);
-          done();
-        });
-    });
+    project
+      .save()
+      .then((project) => {
+        chai
+          .request(server)
+          .delete("/api/project/projects/" + project.id)
+          .then((res) => {
+            res.should.have.status(204);
+            done();
+          })
+          .catch((err) => done(err));
+      })
+      .catch((err) => done(err));
   });
 });

@@ -10,11 +10,12 @@ const Task = require("../models/Task");
 chai.use(chaiHttp);
 
 //clear db after test
-after(function (done) {
-  Task.deleteMany({}, function (err) {
-    if (err) return done(err);
-    done();
-  });
+after(async function () {
+  try {
+    await Task.deleteMany();
+  } catch (err) {
+    console.error(err);
+  }
 });
 
 describe("/First Test Collection", () => {
