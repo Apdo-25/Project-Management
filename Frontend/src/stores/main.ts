@@ -16,7 +16,8 @@ export interface State {
 
 export const useMainStore = defineStore('main', () => ({
   state: () => ({
-    user: {} as User
+    user: {} as User,
+    accessToken: "" as String
   }),
 
   getters: {
