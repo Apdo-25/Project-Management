@@ -4,7 +4,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import SideMenu from "@/SideBarMenu.js";
 import NavBarMenu from "@/NavBarMenu.js";
-import { useMainStore } from "@/stores/main.js";
+import { useMainStore } from "@/stores/main.ts";
 import { useStyleStore } from "@/stores/style.js";
 import BaseIcon from "@/components/BaseIcon.vue";
 import NavBar from "@/components/NavBar.vue";
@@ -12,12 +12,7 @@ import NavBarItemPlain from "@/components/NavBarItemPlain.vue";
 import SideBarMenu from "@/components/SideBarMenu.vue";
 import FooterBar from "@/components/FooterBar.vue";
 
-useMainStore().setUser({
-  name: "",
-  email: "",
-  avatar:
-    "https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-});
+
 
 const layoutAsidePadding = "xl:pl-60";
 

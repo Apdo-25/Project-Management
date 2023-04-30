@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { reactive, ref, watch, computed } from "vue";
 import { useRouter } from "vue-router";
 import { mdiAccount, mdiAsterisk } from "@mdi/js";
@@ -11,92 +11,46 @@ import BaseButton from "@/components/BaseButton.vue";
 import BaseButtons from "@/components/BaseButtons.vue";
 import layouts from "@/layouts/layoutS.vue";
 import axios from "axios";
+import { useMainStore, type LoginData } from "../stores/main"
 
-const form = reactive({
-  login: "",
-  pass: "",
-  remember: false,
-  fields: {},
-});
+const mainStore = useMainStore()
+const router = useRouter()
 
+const loginData = reactive<LoginData>({
+  email: "",
+  password: "",
+})
 
-const router = useRouter();
+const errorMessage = ref<string>("")
+ 
 
-const formRef = ref(null);
-
-
-const validation = () => {
-  const errors = {};
-  if (!form.login) {
-    errors.login = "Please enter your login";
-  }
-  if (!form.pass) {
-    errors.pass = "Please enter your password";
-  }
-  return errors;
-};
-
-
-watch(form, () => {
-  const errors = validation();
-  form.fields.login = errors.login;
-  form.fields.pass = errors.pass;
-});
-
-const isFormValid = computed(() => {
-  const errors = validation();
-  return Object.keys(errors).length === 0;
-});
-
-const submit = async () => {
-  try {
-    // send POST request to API
-    const response = await axios.post("http://localhost:4000/api/user/login", {
-      email: form.login,
-      password: form.pass,
-    });
-    // get token from response
-    const token = response.data.data.token;
-    // save token to local storage
-    localStorage.setItem("auth-token", token);
-
-    //delete and reset form
-    form.login = "";
-    form.pass = "";
-    form.remember = false;
-    formRef.value.reset();
-
-    // redirect to homepage
-    router.push("/");
-  } catch (error) {
-    console.error(error);
-  }
-};
+async function submit(){
+  await mainStore.login(loginData)
+    .then(res => {
+      router.replace({name: "user"})
+    })
+    .catch(err => {
+      errorMessage.value = err.message
+    })
+}
 </script>
 
 <template>
   <layouts>
     <SectionFullScreen v-slot="{ cardClass }" bg="darkBg">
-      <CardBox
-        :form-ref="formRef"
-        :class="cardClass"
-        is-form
-        @submit.prevent="submit"
-      >
-        <FormField label="Login" help="Please enter your login">
-          <form ref="formRef"></form>
+      <CardBox :class="cardClass" is-form @submit.prevent="submit">
+        <FormField label="email" help="Please enter your email">
           <FormControl
-            v-model="form.login"
+            v-model="loginData.email"
             :icon="mdiAccount"
-            type="text"
-            name="login"
+            name="email"
             autocomplete="username"
           />
         </FormField>
 
         <FormField label="Password" help="Please enter your password">
           <FormControl
-            v-model="form.pass"
+            v-model="loginData.password"
             :icon="mdiAsterisk"
             type="password"
             name="password"
@@ -104,22 +58,10 @@ const submit = async () => {
           />
         </FormField>
 
-        <FormCheckRadio
-          v-model="form.remember"
-          name="remember"
-          label="Remember"
-          :input-value="true"
-        />
-
         <template #footer>
           <BaseButtons>
-            <BaseButton
-              type="submit"
-              color="success"
-              label="Login"
-              :disabled="!isFormValid"
-            />
-            <BaseButton to="/register" color="info" outline label="Register" />
+            <BaseButton type="submit" color="info" label="Login" />
+            <BaseButton to="/Register" color="info" outline label="Register" />
           </BaseButtons>
         </template>
       </CardBox>

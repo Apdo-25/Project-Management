@@ -1,74 +1,83 @@
-<script setup>
-import { reactive } from "vue";
+<script setup lang="ts">
+import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import { mdiAccount, mdiAsterisk } from "@mdi/js";
 import SectionFullScreen from "@/components/SectionFullScreen.vue";
 import CardBox from "@/components/CardBox.vue";
+import CardBoxComponentHeader from "@/components/CardBoxComponentHeader.vue";
 import FormCheckRadio from "@/components/FormCheckRadio.vue";
 import FormField from "@/components/FormField.vue";
 import FormControl from "@/components/FormControl.vue";
 import BaseButton from "@/components/BaseButton.vue";
 import BaseButtons from "@/components/BaseButtons.vue";
+import sectionTitle from "@/components/sectionTitle.vue";
 import LayoutS from "@/layouts/LayoutS.vue";
-import axios from "axios";
+import { useMainStore, type RegisterData } from "../stores/main"
 
-const form = reactive({
-  name: "",
+const mainStore = useMainStore()
+const router = useRouter()
+
+const registerData = reactive<RegisterData>({
+  username: "",
   email: "",
+  first_name: "",
+  last_name: "",
   password: "",
-});
+  password_confirm: "",
+})
 
-const router = useRouter();
+const errorMessage = ref<string>("")
+ 
 
-async function registerUser() {
-  try {
-    const response = await axios.post(
-      "http://localhost:4000/api/user/register",
-      form
-    );
-    if (response.status === 201) {
-      router.push("/");
-    }
-  } catch (error) {
-    console.log(error);
-  }
+async function submit(){
+  await mainStore.register(registerData)
+    .then(res => {
+      router.replace({name: "login"})
+    })
+    .catch(err => {
+      errorMessage.value = err.message
+    })
 }
+
 </script>
 
 <template>
   <LayoutS>
     <SectionFullScreen v-slot="{ cardClass }" bg="darkBg">
-      <CardBox :class="cardClass" is-form @submit.prevent="registerUser">
-        <FormField label="Name" help="Please enter your name">
-          <FormControl v-model="form.name" :icon="mdiAccount" name="name" />
+      <CardBox :class="cardClass" is-form @submit.prevent="submit">
+        <p v-if="errorMessage" class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert"> {{ errorMessage }}</p>
+        <FormField label="Username" help="Please enter your username">
+          <FormControl v-model="registerData.username" :icon="mdiAccount" name="name" />
         </FormField>
 
         <FormField label="Email" help="Please enter your email">
           <FormControl
-            v-model="form.email"
+            v-model="registerData.email"
             :icon="mdiAccount"
             name="email"
-            autocomplete="email"
           />
         </FormField>
 
         <FormField label="Password" help="Please enter your password">
           <FormControl
-            v-model="form.password"
+            v-model="registerData.password"
             :icon="mdiAsterisk"
             type="password"
             name="password"
-            autocomplete="new-password"
+         
           />
         </FormField>
 
-        <FormCheckRadio
-          v-model="form.agree"
-          name="agree"
-          label="I agree to the terms and conditions"
-          :input-value="true"
-        />
-
+        <FormField label="Confirm Password" help="Please Confirm your password">
+          <FormControl
+            v-model="registerData.password_confirm"
+            :icon="mdiAsterisk"
+            type="password"
+            name="password"
+        
+          />
+        </FormField>
+          
         <template #footer>
           <BaseButtons>
             <BaseButton type="submit" color="success" label="Register" />
