@@ -5,17 +5,20 @@ export interface User{
   id: number,
   username: string,
   email: string,
-  password: string,
   first_name: string,
   last_name: string,
-  full_name: string
+  full_name?: string
 }
 
-export interface State {
-  user: User
+export interface State{
+  user: User,
   accessToken: string,
-  authrReady: string,
+  authReady: boolean
+}
 
+export interface LoginData {
+  email: string,
+  password: string
 }
 
 export interface RegisterData {
@@ -27,77 +30,82 @@ export interface RegisterData {
   password_confirm: string,
 }
 
-export interface LoginData {
-  email: string,
-  password: string
-}
 
-
-
-export const useMainStore = defineStore('main', () => ({
-  state: () => ({
-    user: {} as User,
-    accessToken: "" as String,
-  }),
-
-  getters: {
-    getUser: (state) => state.user,
-
-    isAuthenticated: (state) => (state.user.id ? true : false)
+export const useAuthStore = defineStore('auth', {
+  state: (): State => {
+    return {
+      user: {} as User,
+      accessToken: "" as string,
+      authReady: false as boolean
+    }
   },
 
-  actions: {
-    async login(payload: LoginData) {
+  getters: {
+    userDetail: (state: State) => state.user,
+    isAuthenticated: (state: State) => state.accessToken ? true : false
+  },
+
+  actions:{
+    async attempt(){
       try {
-        const {data} = await useApi().post('/api/auth/login', payload);
-        this.accessToken = data?.access_token || "";
-        this.isAuthenticated = true
+        await this.refresh()
+        await this.getUser()
+      } catch (error) {
+        return
+      }
+      return
+    },
+
+
+    async login(payload: LoginData){
+      try {
+        const {data} = await useApi().post(`/api/auth/login`, payload);
+        this.accessToken = data.access_token
+        await this.getUser()
         return data
       } catch (error: Error | any) {
-        throw error.response.message
+        throw error.message
       }
     },
 
-    async logout() {
-      try { 
-        const {data} = await useApi().post('/api/auth/logout');
-        this.accessToken = ""
-        this.user = {} as User
-        this.isAuthenticated = false
-        return data
-      }
-      catch (error: Error | any) {
-        throw error.response.message
-      }
-    },
-
-    async register(payload: RegisterData) {
+    async register(payload: RegisterData){
       try {
-        const {data} = await useApi().post('/api/auth/register', payload);
+        const {data} = await useApi().post(`/api/auth/register`, payload);
         return data
       } catch (error: Error | any) {
-        throw error.response.message
+        throw error.message
       }
     },
 
-    async getUser() {
+    async getUser(){
       try {
-        const {data} = await useApi().get('/api/auth/user');
+        const {data} = await useApiPrivate().get(`/api/auth/user`);
         this.user = data
         return data
       } catch (error: Error | any) {
-        throw error.response.message
+        throw error.message
       }
-    }, 
+    },
 
-    async refresh() {
+    async logout(){
       try {
-        const {data} = await useApi().post('/api/auth/refresh');
-        this.accessToken = data?.access_token || "";
+        const {data} = await useApiPrivate().post(`/api/auth/logout`);
+        this.accessToken = ""
+        this.user = {} as User
         return data
       } catch (error: Error | any) {
-        throw error.response.message
+        throw error.message
+      }
+    },
+
+    async refresh(){
+      try {
+        const {data} = await useApi().post(`/api/auth/refresh`);
+        this.accessToken = data.access_token
+        return data
+      } catch (error: Error | any) {
+        throw error.message
       }
     }
   }
-}))
+})

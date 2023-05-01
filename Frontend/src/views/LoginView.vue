@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { reactive, ref, watch, computed } from "vue";
 import { useRouter } from "vue-router";
 import { mdiAccount, mdiAsterisk } from "@mdi/js";
@@ -10,9 +10,9 @@ import FormControl from "@/components/FormControl.vue";
 import BaseButton from "@/components/BaseButton.vue";
 import BaseButtons from "@/components/BaseButtons.vue";
 import layouts from "@/layouts/layoutS.vue";
-import { useMainStore, LoginData } from "@/stores/main.ts"
+import { useAuthStore, type LoginData } from "@/stores/main"
 
-const mainStore = useMainStore()
+const authStore = useAuthStore()
 const router = useRouter()
 
 const loginData = reactive<LoginData>({
@@ -24,11 +24,11 @@ const errorMessage = ref<string>("")
  
 
 async function submit(){
-  await mainStore.login(loginData)
-    .then(res => {
+  await authStore.login(loginData)
+    .then((res: any) => {
       router.replace({name: "user"})
     })
-    .catch(err => {
+    .catch((err: { message: string; }) => {
       errorMessage.value = err.message
     })
 }
@@ -37,8 +37,8 @@ async function submit(){
 <template>
   <layouts>
     <SectionFullScreen v-slot="{ cardClass }" bg="darkBg">
-      <CardBox :class="cardClass" is-form @submit.prevent="submit">
-        <FormField label="email" help="Please enter your email">
+      <CardBox :class="cardClass" is-form  @submit="submit">
+        <FormField label="Email" help="Please enter your email">
           <FormControl
             v-model="loginData.email"
             :icon="mdiAccount"
@@ -59,7 +59,8 @@ async function submit(){
 
         <template #footer>
           <BaseButtons>
-            <BaseButton type="submit" color="info" label="Login" />
+            <BaseButton type="submit" color="success" label="Login" />
+            <p>Or</p>
             <BaseButton to="/Register" color="info" outline label="Register" />
           </BaseButtons>
         </template>

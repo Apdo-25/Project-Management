@@ -12,9 +12,9 @@ import BaseButton from "@/components/BaseButton.vue";
 import BaseButtons from "@/components/BaseButtons.vue";
 import sectionTitle from "@/components/sectionTitle.vue";
 import LayoutS from "@/layouts/LayoutS.vue";
-import { useMainStore, type RegisterData } from "@/stores/main.ts"
+import { useAuthStore, type RegisterData } from "@/stores/main"
 
-const mainStore = useMainStore()
+const authStore = useAuthStore()
 const router = useRouter()
 
 const registerData = reactive<RegisterData>({
@@ -30,11 +30,11 @@ const errorMessage = ref<string>("")
  
 
 async function submit(){
-  await mainStore.register(registerData)
-    .then(res => {
+  await authStore.register(registerData)
+    .then((res: any) => {
       router.replace({name: "login"})
     })
-    .catch(err => {
+    .catch((err: { message: string; }) => {
       errorMessage.value = err.message
     })
 }
@@ -44,17 +44,23 @@ async function submit(){
 <template>
   <LayoutS>
     <SectionFullScreen v-slot="{ cardClass }" bg="darkBg">
-      <CardBox :class="cardClass" is-form @submit.prevent="submit">
+      <CardBox :class="cardClass" is-form  @submit="submit">
         <p v-if="errorMessage" class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert"> {{ errorMessage }}</p>
         <FormField label="Username" help="Please enter your username">
-          <FormControl v-model="registerData.username" :icon="mdiAccount" name="name" />
+          <FormControl v-model="registerData.username" :icon="mdiAccount" name="username" />
+        </FormField>
+        <FormField label="First Name" help="Please enter your first name">
+          <FormControl v-model="registerData.first_name" :icon="mdiAccount" name="firstname" />
+        </FormField>
+        <FormField label="Last Name" help="Please enter your last name">
+          <FormControl v-model="registerData.last_name" :icon="mdiAccount" name="lastname" />
         </FormField>
 
         <FormField label="Email" help="Please enter your email">
           <FormControl
             v-model="registerData.email"
             :icon="mdiAccount"
-            name="email"
+            name="Email"
           />
         </FormField>
 
@@ -81,6 +87,7 @@ async function submit(){
         <template #footer>
           <BaseButtons>
             <BaseButton type="submit" color="success" label="Register" />
+            <p>Or</p>
             <BaseButton to="/login" color="info" outline label="Login" />
           </BaseButtons>
         </template>

@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from "vue";
-import { useMainStore } from "@/stores/main";
+import { useAuthStore } from "@/stores/main";
 import {
 
 } from "@mdi/js";
@@ -9,11 +9,11 @@ import SectionMain from "@/components/SectionMain.vue";
 import Layout from "@/layouts/Layout.vue";
 
 
-const mainStore = useMainStore();
+const authStore = useAuthStore();
 
-const clientBarItems = computed(() => mainStore.clients.slice(0, 4));
+const clientBarItems = computed(() => authStore.clients.slice(0, 4));
 
-const transactionBarItems = computed(() => mainStore.history);
+const transactionBarItems = computed(() => authStore.history);
 
 </script>
 

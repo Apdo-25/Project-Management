@@ -3,7 +3,7 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
-import { useMainStore } from '@/stores/main.ts'
+import { useAuthStore } from '@/stores/main.ts'
 import { useStyleStore } from '@/stores/style.js'
 import { darkModeKey, styleKey } from '@/config.js'
 
@@ -16,7 +16,7 @@ const pinia = createPinia()
 createApp(App).use(router).use(pinia).mount('#app')
 
 //Get stores
-const mainStore = useMainStore()
+const authStore = useAuthStore()
 const styleStore = useStyleStore()
 
 /* App style */

@@ -1,15 +1,15 @@
 import { watchEffect } from 'vue'
 import { axiosInstance } from '../../utils/axios'
-import { useMainStore } from '../stores/main'
+import { useAuthStore } from '../stores/main'
 
 export default function useApi() {
-  const mainStore = useMainStore()
+  const authStore = useAuthStore()
 
   watchEffect(() => {
     axiosInstance.interceptors.request.use(
       (config) => {
         if (!config.headers['Authorization']) {
-          config.headers['Authorization'] = `Bearer ${mainStore.accessToken}`
+          config.headers['Authorization'] = `Bearer ${authStore.accessToken}`
         }
         return config
       },
@@ -28,9 +28,9 @@ export default function useApi() {
           !prevRequest.sent
         ) {
           prevRequest.sent = true
-          await mainStore.refreshTokens()
+          await authStore.refreshTokens()
 
-          prevRequest.headers['Authorization'] = mainStore.accessToken
+          prevRequest.headers['Authorization'] = authStore.accessToken
 
           return axiosInstance(prevRequest)
         }

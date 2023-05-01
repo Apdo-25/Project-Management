@@ -4,7 +4,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import SideMenu from "@/SideBarMenu.js";
 import NavBarMenu from "@/NavBarMenu.js";
-import { useMainStore } from "@/stores/main.ts";
+import { useAuthStore } from "@/stores/main.ts";
 import { useStyleStore } from "@/stores/style.js";
 import BaseIcon from "@/components/BaseIcon.vue";
 import NavBar from "@/components/NavBar.vue";
