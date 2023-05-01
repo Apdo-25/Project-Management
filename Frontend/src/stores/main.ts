@@ -50,10 +50,11 @@ export const useMainStore = defineStore('main', () => ({
     async login(payload: LoginData) {
       try {
         const {data} = await useApi().post('/api/auth/login', payload);
-        this.accessToken = data?.access_token
+        this.accessToken = data?.access_token || "";
+        this.isAuthenticated = true
         return data
       } catch (error: Error | any) {
-        throw error.respone.message
+        throw error.response.message
       }
     },
 
@@ -62,10 +63,11 @@ export const useMainStore = defineStore('main', () => ({
         const {data} = await useApi().post('/api/auth/logout');
         this.accessToken = ""
         this.user = {} as User
+        this.isAuthenticated = false
         return data
       }
       catch (error: Error | any) {
-        throw error.respone.message
+        throw error.response.message
       }
     },
 
@@ -74,7 +76,7 @@ export const useMainStore = defineStore('main', () => ({
         const {data} = await useApi().post('/api/auth/register', payload);
         return data
       } catch (error: Error | any) {
-        throw error.respone.message
+        throw error.response.message
       }
     },
 
@@ -84,17 +86,17 @@ export const useMainStore = defineStore('main', () => ({
         this.user = data
         return data
       } catch (error: Error | any) {
-        throw error.respone.message
+        throw error.response.message
       }
     }, 
 
     async refresh() {
       try {
         const {data} = await useApi().post('/api/auth/refresh');
-        this.accessToken = data?.access_token
+        this.accessToken = data?.access_token || "";
         return data
       } catch (error: Error | any) {
-        throw error.respone.message
+        throw error.response.message
       }
     }
   }

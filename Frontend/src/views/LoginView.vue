@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { reactive, ref, watch, computed } from "vue";
 import { useRouter } from "vue-router";
 import { mdiAccount, mdiAsterisk } from "@mdi/js";
@@ -10,8 +10,7 @@ import FormControl from "@/components/FormControl.vue";
 import BaseButton from "@/components/BaseButton.vue";
 import BaseButtons from "@/components/BaseButtons.vue";
 import layouts from "@/layouts/layoutS.vue";
-import axios from "axios";
-import { useMainStore, type LoginData } from "../stores/main"
+import { useMainStore, LoginData } from "@/stores/main.ts"
 
 const mainStore = useMainStore()
 const router = useRouter()

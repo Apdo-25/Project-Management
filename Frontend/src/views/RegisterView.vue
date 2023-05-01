@@ -12,7 +12,7 @@ import BaseButton from "@/components/BaseButton.vue";
 import BaseButtons from "@/components/BaseButtons.vue";
 import sectionTitle from "@/components/sectionTitle.vue";
 import LayoutS from "@/layouts/LayoutS.vue";
-import { useMainStore, type RegisterData } from "../stores/main"
+import { useMainStore, type RegisterData } from "@/stores/main.ts"
 
 const mainStore = useMainStore()
 const router = useRouter()
