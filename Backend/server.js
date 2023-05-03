@@ -26,13 +26,13 @@ const swaggerDefinition = yaml.load("./swagger.yaml");
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDefinition));
 
 //CORS;
-app.use(cors(corsOptions));
+app.use(cors);
 
 // middleware for credentials
 app.use(credentials);
 
 // application.x-www-form-urlencoded
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 
 // application/json response
 app.use(express.json());
