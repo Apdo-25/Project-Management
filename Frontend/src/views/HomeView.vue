@@ -1,28 +1,20 @@
 <script setup>
-import { computed } from "vue";
-import { useAuthStore } from "@/stores/main";
-import {
+import { computed } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import {} from '@mdi/js'
 
-} from "@mdi/js";
+import SectionMain from '@/components/SectionMain.vue'
+import Layout from '@/layouts/Layout.vue'
 
-import SectionMain from "@/components/SectionMain.vue";
-import Layout from "@/layouts/Layout.vue";
+const authStore = useAuthStore()
 
+const clientBarItems = computed(() => authStore.clients.slice(0, 4))
 
-const authStore = useAuthStore();
-
-const clientBarItems = computed(() => authStore.clients.slice(0, 4));
-
-const transactionBarItems = computed(() => authStore.history);
-
+const transactionBarItems = computed(() => authStore.history)
 </script>
 
 <template>
   <Layout>
-    <SectionMain>
-   
- 
-
-    </SectionMain>
+    <SectionMain> </SectionMain>
   </Layout>
 </template>

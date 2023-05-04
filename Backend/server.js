@@ -14,25 +14,16 @@ const authenticationMiddleware = require("./middleware/authentication");
 const app = express();
 const PORT = 4000;
 
-// Connect to DB
 connectDB();
 
-//swagger deps
-const swaggerUi = require("swagger-ui-express");
-const yaml = require("yamljs");
-
-//swagger setup
-const swaggerDefinition = yaml.load("./swagger.yaml");
-app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDefinition));
-
-//CORS;
-app.use(cors);
-
-// middleware for credentials
+// Allow Credentials
 app.use(credentials);
 
+// CORS
+app.use(cors(corsOptions));
+
 // application.x-www-form-urlencoded
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 
 // application/json response
 app.use(express.json());
@@ -40,10 +31,9 @@ app.use(express.json());
 // middleware for cookies
 app.use(cookieParser());
 
-// authentication middleware
 app.use(authenticationMiddleware);
 
-//static files
+// static files
 app.use("/static", express.static(path.join(__dirname, "public")));
 
 // Default error handler
@@ -70,12 +60,9 @@ app.all("*", (req, res) => {
   }
 });
 
-// Listen on port
 mongoose.connection.once("open", () => {
   console.log("DB connected");
   app.listen(PORT, () => {
     console.log(`Listening on port ${PORT}`);
   });
 });
-
-module.exports = app;

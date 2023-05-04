@@ -1,51 +1,56 @@
 <script setup lang="ts">
-import { reactive, ref } from "vue";
-import { useRouter } from "vue-router";
-import { mdiAccount, mdiAsterisk } from "@mdi/js";
-import SectionFullScreen from "@/components/SectionFullScreen.vue";
-import CardBox from "@/components/CardBox.vue";
-import CardBoxComponentHeader from "@/components/CardBoxComponentHeader.vue";
-import FormCheckRadio from "@/components/FormCheckRadio.vue";
-import FormField from "@/components/FormField.vue";
-import FormControl from "@/components/FormControl.vue";
-import BaseButton from "@/components/BaseButton.vue";
-import BaseButtons from "@/components/BaseButtons.vue";
-import sectionTitle from "@/components/sectionTitle.vue";
-import LayoutS from "@/layouts/LayoutS.vue";
-import { useAuthStore, type RegisterData } from "@/stores/main"
+import { reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { mdiAccount, mdiAsterisk } from '@mdi/js'
+import SectionFullScreen from '@/components/SectionFullScreen.vue'
+import CardBox from '@/components/CardBox.vue'
+import CardBoxComponentHeader from '@/components/CardBoxComponentHeader.vue'
+import FormCheckRadio from '@/components/FormCheckRadio.vue'
+import FormField from '@/components/FormField.vue'
+import FormControl from '@/components/FormControl.vue'
+import BaseButton from '@/components/BaseButton.vue'
+import BaseButtons from '@/components/BaseButtons.vue'
+import sectionTitle from '@/components/sectionTitle.vue'
+import LayoutS from '@/layouts/LayoutS.vue'
+import { useAuthStore, type RegisterData } from '@/stores/auth'
 
 const authStore = useAuthStore()
 const router = useRouter()
 
 const registerData = reactive<RegisterData>({
-  username: "",
-  email: "",
-  first_name: "",
-  last_name: "",
-  password: "",
-  password_confirm: "",
+  username: '',
+  email: '',
+  first_name: '',
+  last_name: '',
+  password: '',
+  password_confirm: ''
 })
 
-const errorMessage = ref<string>("")
- 
+const errorMessage = ref<string>('')
 
-async function submit(){
-  await authStore.register(registerData)
+async function submit() {
+  await authStore
+    .register(registerData)
     .then((res: any) => {
-      router.replace({name: "login"})
+      router.replace({ name: 'login' })
     })
-    .catch((err: { message: string; }) => {
+    .catch((err: { message: string }) => {
       errorMessage.value = err.message
     })
 }
-
 </script>
 
 <template>
   <LayoutS>
     <SectionFullScreen v-slot="{ cardClass }" bg="darkBg">
-      <CardBox :class="cardClass" is-form  @submit="submit">
-        <p v-if="errorMessage" class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert"> {{ errorMessage }}</p>
+      <CardBox :class="cardClass" is-form @submit="submit">
+        <p
+          v-if="errorMessage"
+          class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400"
+          role="alert"
+        >
+          {{ errorMessage }}
+        </p>
         <FormField label="Username" help="Please enter your username">
           <FormControl v-model="registerData.username" :icon="mdiAccount" name="username" />
         </FormField>
@@ -57,11 +62,7 @@ async function submit(){
         </FormField>
 
         <FormField label="Email" help="Please enter your email">
-          <FormControl
-            v-model="registerData.email"
-            :icon="mdiAccount"
-            name="Email"
-          />
+          <FormControl v-model="registerData.email" :icon="mdiAccount" name="Email" />
         </FormField>
 
         <FormField label="Password" help="Please enter your password">
@@ -70,7 +71,6 @@ async function submit(){
             :icon="mdiAsterisk"
             type="password"
             name="password"
-         
           />
         </FormField>
 
@@ -80,10 +80,9 @@ async function submit(){
             :icon="mdiAsterisk"
             type="password"
             name="password"
-        
           />
         </FormField>
-          
+
         <template #footer>
           <BaseButtons>
             <BaseButton type="submit" color="success" label="Register" />
