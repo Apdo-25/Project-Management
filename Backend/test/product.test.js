@@ -2,7 +2,7 @@ process.env.NODE_ENV = "test";
 
 const chai = require("chai");
 const chaiHttp = require("chai-http");
-const server = require("../server");
+const app = require("../server");
 const should = chai.should();
 const expect = chai.expect;
 const Project = require("../models/Project");
@@ -21,7 +21,7 @@ after(async function () {
 describe("First Test Collection", () => {
   it("should return a message from the default API route", (done) => {
     chai
-      .request(server)
+      .request(app)
       .get("/")
       .end((err, res) => {
         res.should.have.status(200);
@@ -35,7 +35,7 @@ describe("First Test Collection", () => {
 describe("Second Test Collection", () => {
   it("should return all projects from the GET route", (done) => {
     chai
-      .request(server)
+      .request(app)
       .get("/api/project/projects")
       .end((err, res) => {
         res.should.have.status(200);
@@ -48,7 +48,7 @@ describe("Second Test Collection", () => {
 describe("Third Test Collection", () => {
   it("should create a new project with the POST route", (done) => {
     chai
-      .request(server)
+      .request(app)
       .post("/api/project/projects")
       .send({
         name: "Test Project",
@@ -76,7 +76,7 @@ describe("Fourth Test Collection", () => {
       .save()
       .then((project) => {
         chai
-          .request(server)
+          .request(app)
           .delete("/api/project/projects/" + project.id)
           .then((res) => {
             res.should.have.status(204);
