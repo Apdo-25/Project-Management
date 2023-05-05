@@ -36,6 +36,12 @@ const UserSchema = Schema(
       min: 6,
     },
 
+    //last login
+    last_login: {
+      type: Date,
+      default: Date.now,
+    },
+
     refresh_token: String,
   },
   {

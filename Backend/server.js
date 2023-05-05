@@ -11,7 +11,8 @@ const credentials = require("./middleware/credentials");
 const errorHandlerMiddleware = require("./middleware/error_handler");
 const authenticationMiddleware = require("./middleware/authentication");
 
-const app = express();
+const server = express();
+const app = server;
 const PORT = 4000;
 
 connectDB();
