@@ -1,16 +1,13 @@
+<script setup>
+import SectionMain from '@/components/SectionMain.vue'
+import Layout from '@/layouts/Layout.vue'
+import layoutS from '@/layouts/LayoutS.vue'
+</script>
+
 <template>
-    <div class="about">
-      <h1>This is an projectDetail page</h1>
-    </div>
-  </template>
-  
-  <style>
-  @media (min-width: 1024px) {
-    .about {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-    }
-  }
-  </style>
-  
+  <Layout>
+    <layoutS>
+      <SectionMain> </SectionMain>
+    </layoutS>
+  </Layout>
+</template>

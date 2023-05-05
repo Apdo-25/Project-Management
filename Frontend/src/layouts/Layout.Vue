@@ -26,6 +26,8 @@ router.beforeEach(() => {
   isAsideLgActive.value = false
 })
 
+const authStore = useAuthStore()
+
 const menuClick = (event, item) => {
   if (item.isToggleLightDark) {
     styleStore.setDarkMode()
@@ -33,7 +35,7 @@ const menuClick = (event, item) => {
 
   if (item.isLogout) {
     // logout
-
+    authStore.logout()
     router.push('/login')
   }
 }

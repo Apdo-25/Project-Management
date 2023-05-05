@@ -78,7 +78,10 @@ export const useAuthStore = defineStore('auth', {
     async getUser() {
       try {
         const { data } = await useApiPrivate().get('/api/auth/user')
-        this.user = data
+        this.user = {
+          ...data,
+          lastLogin: new Date().toISOString() // or assign the actual last login value
+        }
         return data
       } catch (error: Error | any) {
         throw error.message

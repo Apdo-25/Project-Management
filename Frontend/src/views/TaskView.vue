@@ -1,16 +1,10 @@
+<script setup>
+import SectionMain from '@/components/SectionMain.vue'
+import Layout from '@/layouts/Layout.vue'
+</script>
+
 <template>
-    <div class="about">
-      <h1>This is an Task page</h1>
-    </div>
-  </template>
-  
-  <style>
-  @media (min-width: 1024px) {
-    .about {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-    }
-  }
-  </style>
-  
+  <Layout>
+    <SectionMain> This is the task overview page </SectionMain>
+  </Layout>
+</template>
