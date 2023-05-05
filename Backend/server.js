@@ -12,7 +12,7 @@ const errorHandlerMiddleware = require("./middleware/error_handler");
 const authenticationMiddleware = require("./middleware/authentication");
 
 const server = express();
-const app = server;
+
 const PORT = 4000;
 
 connectDB();
@@ -67,3 +67,5 @@ mongoose.connection.once("open", () => {
     console.log(`Listening on port ${PORT}`);
   });
 });
+
+module.exports = server;
