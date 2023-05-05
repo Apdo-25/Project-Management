@@ -13,6 +13,8 @@ const authenticationMiddleware = require("./middleware/authentication");
 
 const server = express();
 
+const app = server;
+
 const PORT = 4000;
 
 connectDB();
