@@ -8,7 +8,7 @@ import FormField from '@/components/FormField.vue'
 import FormControl from '@/components/FormControl.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
-import layouts from '@/layouts/layoutS.vue'
+import layouts from '@/layouts/LayoutS.vue'
 import { useAuthStore, type LoginData } from '@/stores/auth'
 
 const authStore = useAuthStore()
@@ -59,7 +59,7 @@ async function submit() {
 
         <template #footer>
           <BaseButtons>
-            <BaseButton type="submit" color="success" label="Login" />
+            <BaseButton type="button" color="success" label="Login" @click="submit" />
             <p>Or</p>
             <BaseButton to="/Register" color="info" outline label="Register" />
           </BaseButtons>

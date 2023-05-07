@@ -85,7 +85,7 @@ async function submit() {
 
         <template #footer>
           <BaseButtons>
-            <BaseButton type="submit" color="success" label="Register" />
+            <BaseButton type="button" color="success" label="Register" @click="submit" />
             <p>Or</p>
             <BaseButton to="/login" color="info" outline label="Login" />
           </BaseButtons>
