@@ -1,6 +1,6 @@
 const User = require("../models/User");
-const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 require("dotenv").config();
 
 async function register(req, res) {
@@ -22,7 +22,6 @@ async function register(req, res) {
     return res.status(422).json({ message: "Passwords do not match" });
 
   const userExists = await User.exists({ email }).exec();
-
   if (userExists) return res.sendStatus(409);
 
   try {
@@ -41,6 +40,7 @@ async function register(req, res) {
     return res.status(400).json({ message: "Could not register" });
   }
 }
+
 async function login(req, res) {
   const { email, password } = req.body;
 
@@ -82,25 +82,13 @@ async function login(req, res) {
 
   res.cookie("refresh_token", refreshToken, {
     httpOnly: true,
-    // sameSite: "None",
-    // secure: true,
+    sameSite: "None",
+    secure: true,
     maxAge: 24 * 60 * 60 * 1000,
   });
-
-  return res.status(200).json({
-    success: true,
-    accessToken,
-    user: {
-      id: user._id,
-      username: user.username,
-      email: user.email,
-      password: user.password,
-      first_name: user.first_name,
-      last_name: user.last_name,
-    },
-    message: "Login",
-  });
+  res.json({ access_token: accessToken });
 }
+
 async function logout(req, res) {
   const cookies = req.cookies;
 
@@ -112,8 +100,8 @@ async function logout(req, res) {
   if (!user) {
     res.clearCookie("refresh_token", {
       httpOnly: true,
-      // sameSite: "None",
-      // secure: true,
+      sameSite: "None",
+      secure: true,
     });
     return res.sendStatus(204);
   }
@@ -123,11 +111,12 @@ async function logout(req, res) {
 
   res.clearCookie("refresh_token", {
     httpOnly: true,
-    // sameSite: "None",
-    // secure: true,
+    sameSite: "None",
+    secure: true,
   });
   res.sendStatus(204);
 }
+
 async function refresh(req, res) {
   const cookies = req.cookies;
   if (!cookies.refresh_token) return res.sendStatus(401);
@@ -150,27 +139,11 @@ async function refresh(req, res) {
     res.json({ access_token: accessToken });
   });
 }
+
 async function user(req, res) {
-  const user = await User.findById(req.user.id);
+  const user = req.user;
 
-  if (!user) return res.sendStatus(401);
-
-  return res.status(200).json({
-    user: {
-      id: user._id,
-      username: user.username,
-      email: user.email,
-      first_name: user.first_name,
-      last_name: user.last_name,
-      full_name: user.full_name,
-    },
-  });
+  return res.status(200).json(user);
 }
 
-module.exports = {
-  register,
-  login,
-  logout,
-  refresh,
-  user,
-};
+module.exports = { register, login, logout, refresh, user };

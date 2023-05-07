@@ -1,34 +1,34 @@
 <script setup lang="ts">
-import { reactive, ref, watch, computed } from "vue";
-import { useRouter } from "vue-router";
-import { mdiAccount, mdiAsterisk } from "@mdi/js";
-import SectionFullScreen from "@/components/SectionFullScreen.vue";
-import CardBox from "@/components/CardBox.vue";
-import FormCheckRadio from "@/components/FormCheckRadio.vue";
-import FormField from "@/components/FormField.vue";
-import FormControl from "@/components/FormControl.vue";
-import BaseButton from "@/components/BaseButton.vue";
-import BaseButtons from "@/components/BaseButtons.vue";
-import layouts from "@/layouts/layoutS.vue";
-import { useAuthStore, type LoginData } from "@/stores/main"
+import { reactive, ref, watch, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { mdiAccount, mdiAsterisk } from '@mdi/js'
+import SectionFullScreen from '@/components/SectionFullScreen.vue'
+import CardBox from '@/components/CardBox.vue'
+import FormField from '@/components/FormField.vue'
+import FormControl from '@/components/FormControl.vue'
+import BaseButton from '@/components/BaseButton.vue'
+import BaseButtons from '@/components/BaseButtons.vue'
+import layouts from '@/layouts/LayoutS.vue'
+import { useAuthStore, type LoginData } from '@/stores/auth'
 
 const authStore = useAuthStore()
 const router = useRouter()
 
 const loginData = reactive<LoginData>({
-  email: "",
-  password: "",
+  email: '',
+  password: ''
 })
 
-const errorMessage = ref<string>("")
- 
+const errorMessage = ref<string>('')
 
-async function submit(){
-  await authStore.login(loginData)
+async function submit() {
+  await authStore
+    .login(loginData)
     .then((res: any) => {
-      router.replace({name: "user"})
+      router.replace({ name: 'dashboard' })
     })
-    .catch((err: { message: string; }) => {
+    .catch((err: { message: string }) => {
+      console.log(err)
       errorMessage.value = err.message
     })
 }
@@ -37,7 +37,7 @@ async function submit(){
 <template>
   <layouts>
     <SectionFullScreen v-slot="{ cardClass }" bg="darkBg">
-      <CardBox :class="cardClass" is-form  @submit="submit">
+      <CardBox :class="cardClass" is-form @submit="submit">
         <FormField label="Email" help="Please enter your email">
           <FormControl
             v-model="loginData.email"
@@ -59,7 +59,7 @@ async function submit(){
 
         <template #footer>
           <BaseButtons>
-            <BaseButton type="submit" color="success" label="Login" />
+            <BaseButton type="button" color="success" label="Login" @click="submit" />
             <p>Or</p>
             <BaseButton to="/Register" color="info" outline label="Register" />
           </BaseButtons>

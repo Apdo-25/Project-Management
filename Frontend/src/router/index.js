@@ -1,10 +1,12 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import Home from '@/views/HomeView.vue'
 
 const routes = [
   {
     meta: {
-      title: 'dashboard'
+      title: 'dashboard',
+      requiresAuth: true
     },
     path: '/',
     name: 'dashboard',
@@ -12,7 +14,8 @@ const routes = [
   },
   {
     meta: {
-      title: 'Projects'
+      title: 'Projects',
+      requiresAuth: true
     },
     path: '/projects',
     name: 'Projects',
@@ -20,7 +23,8 @@ const routes = [
   },
   {
     meta: {
-      title: 'Tasks'
+      title: 'Tasks',
+      requiresAuth: true
     },
     path: '/tasks',
     name: 'Tasks',
@@ -29,7 +33,8 @@ const routes = [
 
   {
     meta: {
-      title: 'Profile'
+      title: 'Profile',
+      requiresAuth: true
     },
     path: '/profile',
     name: 'profile',
@@ -38,7 +43,8 @@ const routes = [
 
   {
     meta: {
-      title: 'Login'
+      title: 'Login',
+      requiresGuest: true
     },
     path: '/login',
     name: 'login',
@@ -47,7 +53,8 @@ const routes = [
 
   {
     meta: {
-      title: 'Register'
+      title: 'Register',
+      requiresGuest: true
     },
     path: '/register',
     name: 'register',
@@ -60,6 +67,19 @@ const router = createRouter({
   routes,
   scrollBehavior(to, from, savedPosition) {
     return savedPosition || { top: 0 }
+  }
+})
+
+//navigation guard
+router.beforeEach((to, from, next) => {
+  const store = useAuthStore()
+
+  if (to.meta.requiresAuth && !store.isAuthenticated) {
+    next({ name: 'login', query: { redirect: to.fullPath } })
+  } else if (to.meta.requiresGuest && store.isAuthenticated) {
+    next({ name: 'dashboard' })
+  } else {
+    next()
   }
 })
 

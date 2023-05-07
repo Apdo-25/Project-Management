@@ -3,9 +3,11 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
-import { useAuthStore } from '@/stores/main.ts'
+
 import { useStyleStore } from '@/stores/style.js'
 import { darkModeKey, styleKey } from '@/config.js'
+import { useAuthStore } from '@/stores/auth.ts'
+import authentication from './plugins/authentication'
 
 import './css/main.css'
 
@@ -13,7 +15,7 @@ import './css/main.css'
 const pinia = createPinia()
 
 //Create Vue app
-createApp(App).use(router).use(pinia).mount('#app')
+createApp(App).use(router).use(pinia).use(authentication).mount('#app')
 
 //Get stores
 const authStore = useAuthStore()

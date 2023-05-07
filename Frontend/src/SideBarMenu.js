@@ -20,7 +20,7 @@ export default [
     to: '/profile',
     label: 'Profile',
     icon: mdiAccountCircle
-  },
+  }
 
   /*{
     to: '/login',
