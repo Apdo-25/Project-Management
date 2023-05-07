@@ -123,7 +123,7 @@ async function refresh(req, res) {
 
   const refreshToken = cookies.refresh_token;
 
-  const user = await User.findOne({ refresh_token: refreshToken }).exec();
+  const user = await User.findOne({ refresh_token: refreshToken });
 
   if (!user) return res.sendStatus(403);
 

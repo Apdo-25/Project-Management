@@ -6,7 +6,7 @@ const projectSchema = new Schema(
   {
     name: { type: String, required: true, max: 100 },
     description: { type: String, required: true, max: 100 },
-
+    projects: [{ type: Schema.Types.ObjectId, ref: "Project" }],
     tasks: [{ type: Schema.Types.ObjectId, ref: "Task" }],
     creator: {
       type: Schema.Types.ObjectId,

@@ -41,6 +41,10 @@ const UserSchema = Schema(
       type: Date,
       default: Date.now,
     },
+    avatar: {
+      type: String,
+      default: "https://loremflickr.com/640/360",
+    },
 
     refresh_token: String,
   },
