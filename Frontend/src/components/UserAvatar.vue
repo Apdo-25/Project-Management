@@ -1,10 +1,10 @@
 <script setup>
 import { computed } from 'vue'
-import { useAuthStore } from '@/stores/auth'
+import { useMainStore } from '@/stores/main'
 
-const authStore = useAuthStore()
+const mainStore = useMainStore()
 
-const username = computed(() => authStore.userDetail.username)
+const username = computed(() => mainStore.userDetail.username)
 const initials = computed(() => {
   const names = username.value.split(' ')
   let initials = ''

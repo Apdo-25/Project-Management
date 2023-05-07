@@ -44,7 +44,7 @@ app.use(errorHandlerMiddleware);
 
 //root route
 app.get("/", (req, res) => {
-  res.status(200).send({ message: "Hello World!" });
+    res.status(200).send({ message: "Hello World!" });
 });
 
 // Routes
@@ -54,20 +54,20 @@ app.use("/api/task", require("./routes/api/task"));
 
 // 404
 app.all("*", (req, res) => {
-  res.status(404);
+    res.status(404);
 
-  if (req.accepts("json")) {
-    res.json({ error: "404 Not Found" });
-  } else {
-    res.type("text").send("404 Not Found");
-  }
+    if (req.accepts("json")) {
+        res.json({ error: "404 Not Found" });
+    } else {
+        res.type("text").send("404 Not Found");
+    }
 });
 
 mongoose.connection.once("open", () => {
-  console.log("DB connected");
-  app.listen(PORT, () => {
-    console.log(`Listening on port ${PORT}`);
-  });
+    console.log("DB connected");
+    app.listen(PORT, () => {
+        console.log(`Listening on port ${PORT}`);
+    });
 });
 
 module.exports = server;
