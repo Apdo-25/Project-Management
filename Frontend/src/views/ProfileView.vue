@@ -75,7 +75,6 @@ const submitPass = () => {
           <template #footer>
             <BaseButtons>
               <BaseButton color="info" type="submit" label="Submit" />
-              <BaseButton color="info" label="Options" outline />
             </BaseButtons>
           </template>
         </CardBox>
@@ -115,6 +114,11 @@ const submitPass = () => {
               autocomplete="new-password"
             />
           </FormField>
+          <template #footer>
+            <BaseButtons>
+              <BaseButton color="info" type="submit" label="Submit" />
+            </BaseButtons>
+          </template>
         </CardBox>
       </div>
     </SectionMain>

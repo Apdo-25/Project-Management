@@ -1,20 +1,21 @@
 <script setup>
-import { computed } from 'vue'
-import { useAuthStore } from '@/stores/auth'
 import {} from '@mdi/js'
 
 import SectionMain from '@/components/SectionMain.vue'
 import Layout from '@/layouts/Layout.vue'
-
-const authStore = useAuthStore()
-
-const clientBarItems = computed(() => authStore.clients.slice(0, 4))
-
-const transactionBarItems = computed(() => authStore.history)
+import LayoutS from '@/layouts/LayoutS.vue'
+import sectionTitle from '@/components/SectionTitle.vue'
 </script>
 
 <template>
   <Layout>
-    <SectionMain> </SectionMain>
+    <LayoutS>
+      <SectionMain>
+        <sectionTitle>
+          Welcome to PM-Project Where you and your team can, easily manage all your project and task
+          in one place, with all kind of different features.
+        </sectionTitle>
+      </SectionMain>
+    </LayoutS>
   </Layout>
 </template>

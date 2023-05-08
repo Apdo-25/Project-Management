@@ -1,27 +1,35 @@
 <script setup>
 import { computed } from 'vue'
-import { useMainStore } from '@/stores/main'
 
-const mainStore = useMainStore()
+import { useAuthStore } from '@/stores/auth'
 
-const username = computed(() => mainStore.userDetail.username)
-const initials = computed(() => {
-  const names = username.value.split(' ')
-  let initials = ''
-  names.forEach((name) => {
-    initials += name.charAt(0).toUpperCase()
-  })
-  return initials
+const props = defineProps({
+  username: {
+    type: String,
+    required: true
+  },
+  avatar: {
+    type: String,
+    default: null
+  },
+  api: {
+    type: String,
+    default: 'avataaars'
+  }
 })
+
+const authStore = useAuthStore()
+
+const username = computed(() => authStore.userDetail.username)
 </script>
 
 <template>
-  <div class="relative">
-    <div
-      class="rounded-full block h-auto w-full max-w-full bg-gray-100 dark:bg-slate-800 flex justify-center items-center text-xl font-bold text-gray-700 dark:text-gray-100"
-    >
-      {{ initials }}
-    </div>
+  <div>
+    <img
+      :src="avatar"
+      :alt="username"
+      class="rounded-full block h-auto w-full max-w-full bg-gray-100 dark:bg-slate-800"
+    />
     <slot />
   </div>
 </template>
