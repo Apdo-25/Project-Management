@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { useApi, useApiPrivate } from '../services/useApi'
 
+const STORAGE_KEY = 'loginData'
+
 export interface User {
   id: number
   username: string
@@ -45,6 +47,16 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
+    initialize() {
+      // Check if login data exists in local storage and retrieve it
+      const loginData = localStorage.getItem(STORAGE_KEY)
+      if (loginData) {
+        const { accessToken, user } = JSON.parse(loginData)
+        this.accessToken = accessToken
+        this.user = user
+      }
+      this.authReady = true
+    },
     async attempt() {
       try {
         await this.refresh()
@@ -60,6 +72,11 @@ export const useAuthStore = defineStore('auth', {
         const { data } = await useApi().post('/api/auth/login', payload)
         this.accessToken = data.access_token
         await this.getUser()
+        // Store the login data in local storage
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({ accessToken: this.accessToken, user: this.user })
+        )
         return data
       } catch (error: Error | any) {
         throw error.message
@@ -80,7 +97,11 @@ export const useAuthStore = defineStore('auth', {
         const { data } = await useApiPrivate().get('/api/auth/user')
         this.user = {
           ...data,
-          lastLogin: new Date().toISOString() // or assign the actual last login value
+          lastLogin: new Date().toISOString(), // or assign the actual last login value
+          fullName: `${data.first_name} ${data.last_name}`,
+          avatar: 'https://i.pravatar.cc/300',
+          role: 'admin',
+          permissions: ['admin', 'user']
         }
         return data
       } catch (error: Error | any) {
@@ -92,7 +113,9 @@ export const useAuthStore = defineStore('auth', {
       try {
         const { data } = await useApiPrivate().post('/api/auth/logout')
         this.accessToken = ''
-        this.user = {} as User
+        ;(this.user = {} as User),
+          // Clear the login data from local storage
+          localStorage.removeItem(STORAGE_KEY)
         return data
       } catch (error: Error | any) {
         throw error.message
