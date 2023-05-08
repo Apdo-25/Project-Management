@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 
-const props = defineProps({
+defineProps({
   username: {
     type: String,
     required: true
@@ -10,10 +10,6 @@ const props = defineProps({
   avatar: {
     type: String,
     default: null
-  },
-  api: {
-    type: String,
-    default: 'avataaars'
   }
 })
 
