@@ -2,85 +2,98 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import Home from '@/views/HomeView.vue'
 
-const routes = [
-  {
-    meta: {
-      title: 'dashboard',
-      requiresAuth: true
+const routes = [{
+        meta: {
+            title: 'dashboard',
+            requiresAuth: true
+        },
+        path: '/',
+        name: 'dashboard',
+        component: Home
     },
-    path: '/',
-    name: 'dashboard',
-    component: Home
-  },
-  {
-    meta: {
-      title: 'Projects',
-      requiresAuth: true
+    {
+        meta: {
+            title: 'Projects',
+            requiresAuth: true
+        },
+        path: '/projects',
+        name: 'Projects',
+        component: () =>
+            import ('@/views/ProjectView.vue')
     },
-    path: '/projects',
-    name: 'Projects',
-    component: () => import('@/views/ProjectView.vue')
-  },
-  {
-    meta: {
-      title: 'Tasks',
-      requiresAuth: true
+    {
+        meta: {
+            title: 'Tasks',
+            requiresAuth: true
+        },
+        path: '/tasks',
+        name: 'Tasks',
+        component: () =>
+            import ('@/views/TaskView.vue')
     },
-    path: '/tasks',
-    name: 'Tasks',
-    component: () => import('@/views/TaskView.vue')
-  },
+    {
+        meta: {
+            title: 'Kanban',
+            requiresAuth: true
+        },
+        path: '/kanban',
+        name: 'kanban',
+        component: () =>
+            import ('@/views/Kanban.vue')
+    },
+    {
+        meta: {
+            title: 'Profile',
+            requiresAuth: true
+        },
+        path: '/profile',
+        name: 'profile',
+        component: () =>
+            import ('@/views/ProfileView.vue')
+    },
 
-  {
-    meta: {
-      title: 'Profile',
-      requiresAuth: true
+    {
+        meta: {
+            title: 'Login',
+            requiresGuest: true
+        },
+        path: '/login',
+        name: 'login',
+        component: () =>
+            import ('@/views/LoginView.vue')
     },
-    path: '/profile',
-    name: 'profile',
-    component: () => import('@/views/ProfileView.vue')
-  },
 
-  {
-    meta: {
-      title: 'Login',
-      requiresGuest: true
-    },
-    path: '/login',
-    name: 'login',
-    component: () => import('@/views/LoginView.vue')
-  },
-
-  {
-    meta: {
-      title: 'Register',
-      requiresGuest: true
-    },
-    path: '/register',
-    name: 'register',
-    component: () => import('@/views/RegisterView.vue')
-  }
+    {
+        meta: {
+            title: 'Register',
+            requiresGuest: true
+        },
+        path: '/register',
+        name: 'register',
+        component: () =>
+            import ('@/views/RegisterView.vue')
+    }
 ]
 
 const router = createRouter({
-  history: createWebHashHistory(),
-  routes,
-  scrollBehavior(to, from, savedPosition) {
-    return savedPosition || { top: 0 }
-  }
+    history: createWebHashHistory(),
+    routes,
+    scrollBehavior(to, from, savedPosition) {
+        return savedPosition || { top: 0 }
+    }
 })
 
 //navigation guard
 router.beforeEach((to, from, next) => {
-  const store = useAuthStore()
+    const store = useAuthStore()
 
-  if (to.meta.requiresAuth && !store.isAuthenticated) {
-    next({ name: 'login', query: { redirect: to.fullPath } })
-  } else if (to.meta.requiresGuest && store.isAuthenticated) {
-    next({ name: 'dashboard' })
-  } else {
-    next()
-  }
+    if (to.meta.requiresAuth && !store.isAuthenticated) {
+        next({ name: 'login', query: { redirect: to.fullPath } })
+    } else if (to.meta.requiresGuest && store.isAuthenticated) {
+        next({ name: 'dashboard' })
+    } else {
+        next()
+    }
 })
 
 export default router
