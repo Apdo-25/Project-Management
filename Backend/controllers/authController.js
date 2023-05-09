@@ -102,6 +102,7 @@ async function logout(req, res) {
       httpOnly: true,
       sameSite: "None",
       secure: true,
+      maxAge: 24 * 60 * 60 * 1000,
     });
     return res.sendStatus(204);
   }
@@ -113,6 +114,7 @@ async function logout(req, res) {
     httpOnly: true,
     sameSite: "None",
     secure: true,
+    maxAge: 24 * 60 * 60 * 1000,
   });
   res.sendStatus(204);
 }
