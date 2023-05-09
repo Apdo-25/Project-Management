@@ -29,26 +29,25 @@ if (accessToken) {
 }
 
 // Wait for the initialize action to complete before mounting the app
-authStore.initialize().then(() => {
-  // App style
-  styleStore.setStyle(localStorage[styleKey] ?? 'basic')
 
-  // Dark mode
-  if (
-    (!localStorage[darkModeKey] && window.matchMedia('(prefers-color-scheme: dark)').matches) ||
-    localStorage[darkModeKey] === '1'
-  ) {
-    styleStore.setDarkMode(true)
-  }
+// App style
+styleStore.setStyle(localStorage[styleKey] ?? 'basic')
 
-  // Default title tag
-  const defaultDocumentTitle = 'PM-Project'
+// Dark mode
+if (
+  (!localStorage[darkModeKey] && window.matchMedia('(prefers-color-scheme: dark)').matches) ||
+  localStorage[darkModeKey] === '1'
+) {
+  styleStore.setDarkMode(true)
+}
 
-  // Set title tag
-  router.afterEach((to) => {
-    document.title = to.meta.title || defaultDocumentTitle
-  })
+// Default title tag
+const defaultDocumentTitle = 'PM-Project'
 
-  // Mount the app
-  app.use(router).use(authentication).mount('#app')
+// Set title tag
+router.afterEach((to) => {
+  document.title = to.meta.title || defaultDocumentTitle
 })
+
+// Mount the app
+authStore.initialize().then(app.use(router).use(authentication).mount('#app'))
