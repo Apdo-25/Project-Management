@@ -1,239 +1,124 @@
 import { defineStore } from 'pinia'
-import { useApi } from '../services/useApi'
+import { User } from '@/stores/auth'
 
 export interface Project {
-  id: number
+  id: string
   name: string
   description: string
-  users: User[]
   tasks: Task[]
 }
 
-export interface User {
-  id: number
-  username: string
-  email: string
-  first_name: string
-  last_name: string
-  full_name?: string
-}
-
 export interface Task {
-  id: number
+  id: string
   name: string
   description: string
-  status: string
-  project: number
-  assigned_to: User
+  completed: boolean
 }
 
-export interface State {
+interface ProjectStoreState {
   projects: Project[]
-  project: Project | null
-  projectLoading: boolean
-  projectError: any
-  projectCreateLoading: boolean
-  projectCreateError: any
-  projectUpdateLoading: boolean
-  projectUpdateError: any
-  projectDeleteLoading: boolean
-  projectDeleteError: any
-  projectAddUserLoading: boolean
-  projectAddUserError: any
-  projectRemoveUserLoading: boolean
-  projectRemoveUserError: any
-  projectAddTaskLoading: boolean
-  projectAddTaskError: any
-  projectRemoveTaskLoading: boolean
-  projectRemoveTaskError: any
-  projectUpdateTaskLoading: boolean
-  projectUpdateTaskError: any
 }
 
 export const useProjectStore = defineStore('project', {
-  state: (): State => {
-    return {
-      projects: [],
-      project: null,
-      projectLoading: false,
-      projectError: null,
-      projectCreateLoading: false,
-      projectCreateError: null,
-      projectUpdateLoading: false,
-      projectUpdateError: null,
-      projectDeleteLoading: false,
-      projectDeleteError: null,
-      projectAddUserLoading: false,
-      projectAddUserError: null,
-      projectRemoveUserLoading: false,
-      projectRemoveUserError: null,
-      projectAddTaskLoading: false,
-      projectAddTaskError: null,
-      projectRemoveTaskLoading: false,
-      projectRemoveTaskError: null,
-      projectUpdateTaskLoading: false,
-      projectUpdateTaskError: null
-    }
-  },
-
-  getters: {
-    getProjectDetail: (state) => state.project,
-    getProjectLoading: (state) => state.projectLoading,
-    getProjectError: (state) => state.projectError,
-    getProjectCreateLoading: (state) => state.projectCreateLoading,
-    getProjectCreateError: (state) => state.projectCreateError,
-    getProjectUpdateLoading: (state) => state.projectUpdateLoading,
-    getProjectUpdateError: (state) => state.projectUpdateError,
-    getProjectDeleteLoading: (state) => state.projectDeleteLoading,
-    getProjectDeleteError: (state) => state.projectDeleteError,
-    getProjectAddUserLoading: (state) => state.projectAddUserLoading,
-    getProjectAddUserError: (state) => state.projectAddUserError,
-    getProjectRemoveUserLoading: (state) => state.projectRemoveUserLoading,
-    getProjectRemoveUserError: (state) => state.projectRemoveUserError,
-    getProjectAddTaskLoading: (state) => state.projectAddTaskLoading,
-    getProjectAddTaskError: (state) => state.projectAddTaskError,
-    getProjectRemoveTaskLoading: (state) => state.projectRemoveTaskLoading,
-    getProjectRemoveTaskError: (state) => state.projectRemoveTaskError,
-    getProjectUpdateTaskLoading: (state) => state.projectUpdateTaskLoading,
-    getProjectUpdateTaskError: (state) => state.projectUpdateTaskError
-  },
+  state: (): ProjectStoreState => ({
+    projects: []
+  }),
 
   actions: {
     async getProjects() {
-      this.projects = []
-
       try {
-        const { data } = await useApi().get('/api/project/projects')
-        this.projects = data
+        const response = await fetch('/api/projects')
+        if (response.ok) {
+          const projects = await response.json()
+          this.projects = projects
+        } else {
+          console.error('Failed to fetch projects')
+        }
       } catch (error) {
-        console.log(error)
+        console.error('Error while fetching projects', error)
       }
     },
 
-    async getProject(id) {
-      this.project = null
-      this.projectLoading = true
-      this.projectError = null
-
+    async getProject(id: string) {
       try {
-        const { data } = await useApi().get(`/api/project/projects/${id}`)
-        this.project = data || null
+        const response = await fetch(`/api/projects/${id}`)
+        if (response.ok) {
+          const project = await response.json()
+          // Do something with the project
+        } else {
+          console.error(`Failed to fetch project with id: ${id}`)
+        }
       } catch (error) {
-        this.projectError = error
-      } finally {
-        this.projectLoading = false
+        console.error(`Error while fetching project with id: ${id}`, error)
       }
     },
 
-    async createProject(payload) {
-      this.projectCreateLoading = true
-      this.projectCreateError = null
-
+    async createProject(project: Project) {
       try {
-        await useApi().post('/api/project/projects', payload)
-        await this.getProjects()
+        const response = await fetch('/api/projects', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(project)
+        })
+        if (response.ok) {
+          const createdProject = await response.json()
+          // Do something with the created project
+        } else {
+          console.error('Failed to create project')
+        }
       } catch (error) {
-        this.projectCreateError = error
-      } finally {
-        this.projectCreateLoading = false
+        console.error('Error while creating project', error)
       }
     },
 
-    async updateProject(payload) {
-      this.projectUpdateLoading = true
-      this.projectUpdateError = null
-
+    async updateProject(project: Project) {
       try {
-        await useApi().patch(`/api/project/projects/${payload.id}`, payload)
-        await this.getProject(payload.id)
+        const response = await fetch(`/api/projects/${project.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(project)
+        })
+        if (response.ok) {
+          const updatedProject = await response.json()
+          // Do something with the updated project
+        } else {
+          console.error(`Failed to update project with id: ${project.id}`)
+        }
       } catch (error) {
-        this.projectUpdateError = error
-      } finally {
-        this.projectUpdateLoading = false
+        console.error(`Error while updating project with id: ${project.id}`, error)
       }
     },
 
-    async deleteProject(id) {
-      this.projectDeleteLoading = true
-      this.projectDeleteError = null
-
+    async deleteProject(id: string) {
       try {
-        await useApi().delete(`/api/project/projects/${id}`)
-        await this.getProjects()
+        const response = await fetch(`/api/projects/${id}`, {
+          method: 'DELETE'
+        })
+        if (response.ok) {
+          // Project deleted successfully
+        } else {
+          console.error(`Failed to delete project with id: ${id}`)
+        }
       } catch (error) {
-        this.projectDeleteError = error
-      } finally {
-        this.projectDeleteLoading = false
+        console.error(`Error while deleting project with id: ${id}`, error)
       }
     },
 
-    async addUserToProject(payload) {
-      this.projectAddUserLoading = true
-      this.projectAddUserError = null
-
+    async addTask(projectId: string, task: Task) {
       try {
-        await useApi().post(`/api/project/projects/${payload.projectId}/add-user`, payload)
-        await this.getProject(payload.projectId)
+        const response = await fetch(`/api/projects/${projectId}/tasks`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(task)
+        })
+        if (response.ok) {
+          const updatedProject = await response.json()
+          // Do something with the updated project
+        } else {
+          console.error(`Failed to add task to project with id: ${projectId}`)
+        }
       } catch (error) {
-        this.projectAddUserError = error
-      } finally {
-        this.projectAddUserLoading = false
-      }
-    },
-
-    async removeUserFromProject(payload) {
-      this.projectRemoveUserLoading = true
-      this.projectRemoveUserError = null
-
-      try {
-        await useApi().post(`/api/project/projects/${payload.projectId}/remove-user`, payload)
-        await this.getProject(payload.projectId)
-      } catch (error) {
-        this.projectRemoveUserError = error
-      } finally {
-        this.projectRemoveUserLoading = false
-      }
-    },
-
-    async addTaskToProject(payload) {
-      this.projectAddTaskLoading = true
-      this.projectAddTaskError = null
-
-      try {
-        await useApi().post(`/api/project/projects/${payload.projectId}/add-task`, payload)
-        await this.getProject(payload.projectId)
-      } catch (error) {
-        this.projectAddTaskError = error
-      } finally {
-        this.projectAddTaskLoading = false
-      }
-    },
-
-    async removeTaskFromProject(payload) {
-      this.projectRemoveTaskLoading = true
-      this.projectRemoveTaskError = null
-
-      try {
-        await useApi().post(`/api/project/projects/${payload.projectId}/remove-task`, payload)
-        await this.getProject(payload.projectId)
-      } catch (error) {
-        this.projectRemoveTaskError = error
-      } finally {
-        this.projectRemoveTaskLoading = false
-      }
-    },
-
-    async updateTaskInProject(payload) {
-      this.projectUpdateTaskLoading = true
-      this.projectUpdateTaskError = null
-
-      try {
-        await useApi().post(`/api/project/projects/${payload.projectId}/update-task`, payload)
-        await this.getProject(payload.projectId)
-      } catch (error) {
-        this.projectUpdateTaskError = error
-      } finally {
-        this.projectUpdateTaskLoading = false
+        console.error(`Error while adding task to project with id: ${projectId}`, error)
       }
     }
   }

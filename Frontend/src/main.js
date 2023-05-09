@@ -11,31 +11,44 @@ import authentication from './plugins/authentication'
 
 import './css/main.css'
 
-//Create Pinia
+const app = createApp(App)
+
+// Create Pinia
 const pinia = createPinia()
+app.use(pinia) // Install Pinia
 
-//Create Vue app
-createApp(App).use(router).use(pinia).use(authentication).mount('#app')
-
-//Get stores
+// Get stores
 const authStore = useAuthStore()
 const styleStore = useStyleStore()
 
-/* App style */
-styleStore.setStyle(localStorage[styleKey] ?? 'basic')
-
-/* Dark mode */
-if (
-  (!localStorage[darkModeKey] && window.matchMedia('(prefers-color-scheme: dark)').matches) ||
-  localStorage[darkModeKey] === '1'
-) {
-  styleStore.setDarkMode(true)
+// Check if the access token exists in local storage
+const accessToken = localStorage.getItem('accessToken')
+if (accessToken) {
+  // Set the access token in the auth store
+  authStore.setAccessToken(accessToken)
 }
 
-//Default title tag
-const defaultDocummentTitle = 'PM-Project'
+// Wait for the initialize action to complete before mounting the app
+authStore.initialize().then(() => {
+  // App style
+  styleStore.setStyle(localStorage[styleKey] ?? 'basic')
 
-//Set title tag
-router.afterEach((to) => {
-  document.title = to.meta.title || defaultDocummentTitle
+  // Dark mode
+  if (
+    (!localStorage[darkModeKey] && window.matchMedia('(prefers-color-scheme: dark)').matches) ||
+    localStorage[darkModeKey] === '1'
+  ) {
+    styleStore.setDarkMode(true)
+  }
+
+  // Default title tag
+  const defaultDocumentTitle = 'PM-Project'
+
+  // Set title tag
+  router.afterEach((to) => {
+    document.title = to.meta.title || defaultDocumentTitle
+  })
+
+  // Mount the app
+  app.use(router).use(authentication).mount('#app')
 })

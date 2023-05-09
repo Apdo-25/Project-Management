@@ -16,6 +16,7 @@ export interface State {
   user: User
   accessToken: string
   authReady: boolean
+  isAuthenticated: boolean
 }
 
 export interface LoginData {
@@ -47,24 +48,35 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
+    setAccessToken(token: string) {
+      this.accessToken = token
+    },
+
     initialize() {
-      // Check if login data exists in local storage and retrieve it
       const loginData = localStorage.getItem(STORAGE_KEY)
       if (loginData) {
         const { accessToken, user } = JSON.parse(loginData)
-        this.accessToken = accessToken
-        this.user = user
+        if (accessToken) {
+          this.accessToken = accessToken
+          this.user = user
+          this.authReady = true
+          return this.getUser() // Retrieve the user details
+        }
       }
       this.authReady = true
+      return Promise.resolve() // Resolve immediately if there is no valid login data
     },
+
     async attempt() {
       try {
         await this.refresh()
         await this.getUser()
+        // Store the access token in local storage
+        localStorage.setItem('accessToken', this.accessToken)
       } catch (error) {
-        return
+        // Handle error
+        console.error(error)
       }
-      return
     },
 
     async login(payload: LoginData) {
@@ -72,7 +84,6 @@ export const useAuthStore = defineStore('auth', {
         const { data } = await useApi().post('/api/auth/login', payload)
         this.accessToken = data.access_token
         await this.getUser()
-        // Store the login data in local storage
         localStorage.setItem(
           STORAGE_KEY,
           JSON.stringify({ accessToken: this.accessToken, user: this.user })
@@ -113,9 +124,8 @@ export const useAuthStore = defineStore('auth', {
       try {
         const { data } = await useApiPrivate().post('/api/auth/logout')
         this.accessToken = ''
-        ;(this.user = {} as User),
-          // Clear the login data from local storage
-          localStorage.removeItem(STORAGE_KEY)
+        this.user = {} as User
+        localStorage.removeItem(STORAGE_KEY)
         return data
       } catch (error: Error | any) {
         throw error.message
@@ -123,6 +133,10 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async refresh() {
+      if (!this.accessToken) {
+        throw new Error('No access token found.') // Handle the case when there is no access token available.
+      }
+
       try {
         const { data } = await useApi().post('/api/auth/refresh')
         this.accessToken = data.access_token

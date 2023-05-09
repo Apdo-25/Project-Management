@@ -1,4 +1,4 @@
-import { axiosInstance, axiosPrivateInstance } from '../../utils/axios'
+import { axiosInstance, axiosPrivateInstance } from '../utils/axios'
 import { useAuthStore } from '../stores/auth'
 import { watchEffect } from 'vue'
 import type { AxiosInstance } from 'axios'
