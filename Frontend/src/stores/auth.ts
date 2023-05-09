@@ -76,6 +76,11 @@ export const useAuthStore = defineStore('auth', {
 
     async attempt() {
       try {
+        if (!this.accessToken) {
+          // No access token found, resolve immediately
+          return Promise.resolve()
+        }
+
         await this.refresh()
         await this.getUser()
         // Store the access token in local storage
