@@ -61,10 +61,17 @@ export const useAuthStore = defineStore('auth', {
           this.user = user
           this.authReady = true
           return this.getUser() // Retrieve the user details
+        } else {
+          // Access token not found, clear the login data
+          localStorage.removeItem(STORAGE_KEY)
         }
       }
-      this.authReady = true
-      return Promise.resolve() // Resolve immediately if there is no valid login data
+
+      // No login data found or access token is empty, resolve immediately
+      this.accessToken = ''
+      this.user = {} as User
+      this.authReady = false
+      return Promise.resolve()
     },
 
     async attempt() {
@@ -125,6 +132,7 @@ export const useAuthStore = defineStore('auth', {
         const { data } = await useApiPrivate().post('/api/auth/logout')
         this.accessToken = ''
         this.user = {} as User
+        this.authReady = false
         localStorage.removeItem(STORAGE_KEY)
         return data
       } catch (error: Error | any) {
@@ -134,7 +142,8 @@ export const useAuthStore = defineStore('auth', {
 
     async refresh() {
       if (!this.accessToken) {
-        throw new Error('No access token found.') // Handle the case when there is no access token available.
+        // No access token found, resolve immediately
+        return Promise.reject(new Error('No access token found.'))
       }
 
       try {
@@ -142,6 +151,8 @@ export const useAuthStore = defineStore('auth', {
         this.accessToken = data.access_token
         return data
       } catch (error: Error | any) {
+        // Handle error
+        console.error(error)
         throw error.message
       }
     }
