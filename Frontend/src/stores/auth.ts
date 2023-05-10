@@ -81,6 +81,7 @@ export const useAuthStore = defineStore('auth', {
           return Promise.resolve()
         }
 
+        localStorage.clear()
         await this.refresh()
         await this.getUser()
         // Store the access token in local storage
@@ -139,6 +140,7 @@ export const useAuthStore = defineStore('auth', {
         this.user = {} as User
         this.authReady = false
         localStorage.removeItem(STORAGE_KEY)
+        localStorage.clear()
         return data
       } catch (error: Error | any) {
         throw error.message
