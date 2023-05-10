@@ -39,7 +39,7 @@ const routes = [{
         path: '/kanban',
         name: 'kanban',
         component: () =>
-            import ('@/views/Kanban.vue')
+            import ('@/views/Kanban2.vue')
     },
     {
         meta: {
