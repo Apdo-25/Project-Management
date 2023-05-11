@@ -1,63 +1,67 @@
 <!-- src/components/Board.vue -->
 <template>
-    <div class="flex h-full space-x-4">
-      <Column
-        v-for="(column, columnIndex) in columns"
-        :key="column.id"
-        :column="column"
-        :columnIndex="columnIndex"
-        @addCard="addCard"
-        @moveCard="moveCard"
-        @deleteCard="deleteCard"
-      />
-      <button @click="addColumn" class="bg-blue-500 text-white px-2 py-1 mt-2 rounded">
-        Add Column
-      </button>
-    </div>
-  </template>
-  
-  <script>
-  import Column from "./Column.vue";
-  
-  export default {
-    components: {
-      Column,
+  <div class="flex h-full space-x-4">
+    <Column
+      v-for="(column, columnIndex) in columns"
+      :key="column.id"
+      :column="column"
+      :columnIndex="columnIndex"
+      @addCard="addCard"
+      @moveCard="moveCard"
+      @deleteCard="deleteCard"
+    />
+    <button @click="addColumn" class="bg-blue-500 text-white px-2 py-1 mt-2 rounded">
+      Add Column
+    </button>
+  </div>
+</template>
+
+<script>
+import { ref } from "vue";
+import { useKanbanStore } from "@/stores/kanban";
+import Column from "./Column.vue";
+
+export default {
+  components: {
+    Column,
+  },
+  props: {
+    columns: {
+      type: Array,
+      required: true,
     },
-    props: {
-      columns: {
-        type: Array,
-        default: () => [],
-      },
-    },
-    methods: {
-        addCard(columnIndex) {
-    const cardTitle = prompt("Enter card title");
-    if (!cardTitle) return;
-    const newCard = {
-      id: Date.now(),
-      title: cardTitle,
-      description: "",
+  },
+  setup() {
+    const kanbanStore = useKanbanStore();
+
+    const addCard = (columnIndex) => {
+      const cardTitle = prompt("Enter a card title:");
+      if (cardTitle) {
+        kanbanStore.addCard(columnIndex, cardTitle);
+      }
     };
-    this.columns[columnIndex].cards.push(newCard);
-  },
-  moveCard({ fromColumnIndex, fromCardIndex, toColumnIndex, toCardIndex }) {
-    const movedCard = this.columns[fromColumnIndex].cards.splice(fromCardIndex, 1)[0];
-    this.columns[toColumnIndex].cards.splice(toCardIndex, 0, movedCard);
-  },
-  deleteCard(columnIndex, cardIndex) {
-    this.columns[columnIndex].cards.splice(cardIndex, 1);
-  },
-  addColumn() {
-    const columnTitle = prompt("Enter column title");
-    if (!columnTitle) return;
-    const newColumn = {
-      id: Date.now(),
-      title: columnTitle,
-      cards: [],
+
+    const moveCard = (moveInfo) => {
+      kanbanStore.moveCard(moveInfo);
     };
-    this.columns.push(newColumn);
+
+    const deleteCard = (columnIndex, cardIndex) => {
+      kanbanStore.deleteCard(columnIndex, cardIndex);
+    };
+
+    const addColumn = () => {
+      const columnTitle = prompt("Enter a column title:");
+      if (columnTitle) {
+        kanbanStore.addColumn(columnTitle);
+      }
+    };
+
+    return {
+      addCard,
+      moveCard,
+      deleteCard,
+      addColumn,
+    };
   },
-    },
-  };
-  </script>
-  
+};
+</script>
