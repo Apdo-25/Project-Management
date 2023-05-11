@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { useApi, useApiPrivate } from '../services/useApi'
+import jwtDecode from 'jwt-decode'
 
 const STORAGE_KEY = 'loginData'
 
@@ -16,7 +17,6 @@ export interface State {
   user: User
   accessToken: string
   authReady: boolean
-  isAuthenticated: boolean
 }
 
 export interface LoginData {
@@ -37,19 +37,25 @@ export const useAuthStore = defineStore('auth', {
   state: (): State => {
     return {
       user: {} as User,
-      accessToken: '' as string,
-      authReady: false as boolean
+      accessToken: '',
+      authReady: false
     }
   },
 
   getters: {
     userDetail: (state: State) => state.user,
-    isAuthenticated: (state: State) => (state.accessToken ? true : false)
+    isAuthenticated: (state: State) => !!state.accessToken
   },
 
   actions: {
-    setAccessToken(token: string) {
-      this.accessToken = token
+    setAccessToken() {
+      const loginData = localStorage.getItem(STORAGE_KEY)
+      if (loginData) {
+        const { accessToken } = JSON.parse(loginData)
+        if (accessToken) {
+          this.accessToken = accessToken
+        }
+      }
     },
 
     initialize() {
@@ -57,59 +63,83 @@ export const useAuthStore = defineStore('auth', {
       if (loginData) {
         const { accessToken, user } = JSON.parse(loginData)
         if (accessToken) {
-          // Validate the access token here
-          return this.validateToken(accessToken)
-            .then(() => {
-              this.accessToken = accessToken
-              this.user = user
-              this.authReady = true
-              return this.getUser() // Retrieve the user details
-            })
+          this.accessToken = accessToken
+          this.user = user
+          this.authReady = true
+          return this.getUser() // Retrieve the user details
             .catch(() => {
-              // Access token is invalid, clear the login data
-              localStorage.removeItem(STORAGE_KEY)
-              throw new Error('Invalid access token. Please log in again.')
+              // Error retrieving user details, but continue without throwing an error
+              console.error('Error retrieving user details.')
             })
-        } else {
-          // Access token not found, clear the login data
-          localStorage.removeItem(STORAGE_KEY)
         }
       }
-
       // No login data found or access token is empty, resolve immediately
-      this.accessToken = ''
-      this.user = {} as User
-      this.authReady = false
       return Promise.resolve()
     },
 
-    validateToken(accessToken) {
-      // Send a request to the server to validate the token
-      // You can use an API endpoint to validate the token
-      return useApi().get('/api/auth/refresh', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
-      })
-    },
-
     async attempt() {
-      try {
-        console.log('Access Token:', this.accessToken) // Add this line
-        if (!this.accessToken) {
-          // No access token found, resolve immediately
-          return Promise.resolve()
-        }
+      if (!this.accessToken) {
+        // No access token found, resolve immediately
+        return Promise.resolve()
+      }
 
-        await this.refresh()
+      const currentTime = Date.now() / 1000 // Current time in seconds
+      const tokenExpiration = this.decodeTokenExpiration(this.accessToken) // Decode the token expiration time
+
+      if (tokenExpiration && tokenExpiration < currentTime) {
+        // Token has expired, renew the access token
+        try {
+          const { data } = await this.refreshToken()
+          this.accessToken = data.access_token
+          localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify({ accessToken: this.accessToken, user: this.user })
+          )
+        } catch (error) {
+          // Token refresh failed, handle the error
+          console.error('Token refresh failed:', error)
+        }
+      }
+
+      // Token is valid or renewed, continue with user retrieval
+      try {
         await this.getUser()
-        // Store the access token in local storage
-        localStorage.setItem('accessToken', this.accessToken)
       } catch (error) {
-        // Handle error
-        console.error(error)
+        // Handle error while retrieving user details
+        console.error('Error retrieving user details:', error)
       }
     },
+
+    async refreshToken() {
+      // Send a refresh token request to the server
+      // You can use an API endpoint to refresh the token
+      const refreshToken = localStorage.getItem('refreshToken')
+
+      try {
+        const { data } = await useApi().post('/api/auth/refresh-token', {
+          refresh_token: refreshToken
+        })
+        return data
+      } catch (error) {
+        // Token refresh failed, handle the error
+        throw new Error('Token refresh failed. Please log in again.')
+      }
+    },
+
+    decodeTokenExpiration(token) {
+      try {
+        const decodedToken = jwtDecode(token)
+        if (decodedToken && decodedToken.exp) {
+          return decodedToken.exp
+        }
+      } catch (error) {
+        console.error('Error decoding token:', error)
+      }
+
+      return null
+    },
+
+    // Rest of the actions...
 
     async login(payload: LoginData) {
       try {
@@ -140,7 +170,7 @@ export const useAuthStore = defineStore('auth', {
         const { data } = await useApiPrivate().get('/api/auth/user')
         this.user = {
           ...data,
-          lastLogin: new Date().toISOString(), // or assign the actual last login value
+          lastLogin: new Date().toISOString(),
           fullName: `${data.first_name} ${data.last_name}`,
           avatar: 'https://i.pravatar.cc/300',
           role: 'admin',
@@ -167,7 +197,6 @@ export const useAuthStore = defineStore('auth', {
 
     async refresh() {
       if (!this.accessToken) {
-        // No access token found, resolve immediately
         return Promise.reject(new Error('No access token found.'))
       }
 
@@ -176,7 +205,6 @@ export const useAuthStore = defineStore('auth', {
         this.accessToken = data.access_token
         return data
       } catch (error: Error | any) {
-        // Handle error
         throw error.message
       }
     }

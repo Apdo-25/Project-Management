@@ -7,11 +7,13 @@ const projectSchema = new Schema(
     name: { type: String, required: true, max: 100 },
     description: { type: String, required: true, max: 100 },
 
-    tasks: [{ type: Schema.Types.ObjectId, ref: "Task" }],
+    // creator is the user who created the project
     creator: {
       type: Schema.Types.ObjectId,
       ref: "User",
     },
+
+    // members are the users who are part of the project
     members: [
       {
         type: Schema.Types.ObjectId,
@@ -19,9 +21,8 @@ const projectSchema = new Schema(
       },
     ],
   },
-  {
-    timestamps: true,
-  }
+
+  { timestamps: true }
 );
 
 // Export the model

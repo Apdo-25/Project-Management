@@ -142,10 +142,34 @@ async function refresh(req, res) {
   });
 }
 
+//token validation asyn function
+async function validateToken(req, res) {
+  const cookies = req.cookies;
+  if (!cookies.refresh_token) return res.sendStatus(401);
+
+  const refreshToken = cookies.refresh_token;
+
+  const user = await User.findOne({ refresh_token: refreshToken });
+
+  if (!user) return res.sendStatus(403);
+
+  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
+    if (err || user.id !== decoded.id) return res.sendStatus(403);
+
+    const accessToken = jwt.sign(
+      { id: decoded.id },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: "1800s" }
+    );
+
+    res.json({ access_token: accessToken });
+  });
+}
+
 async function user(req, res) {
   const user = req.user;
 
   return res.status(200).json(user);
 }
 
-module.exports = { register, login, logout, refresh, user };
+module.exports = { register, login, logout, refresh, validateToken, user };
