@@ -57,10 +57,19 @@ export const useAuthStore = defineStore('auth', {
       if (loginData) {
         const { accessToken, user } = JSON.parse(loginData)
         if (accessToken) {
-          this.accessToken = accessToken
-          this.user = user
-          this.authReady = true
-          return this.getUser() // Retrieve the user details
+          // Validate the access token here
+          return this.validateToken(accessToken)
+            .then(() => {
+              this.accessToken = accessToken
+              this.user = user
+              this.authReady = true
+              return this.getUser() // Retrieve the user details
+            })
+            .catch(() => {
+              // Access token is invalid, clear the login data
+              localStorage.removeItem(STORAGE_KEY)
+              throw new Error('Invalid access token. Please log in again.')
+            })
         } else {
           // Access token not found, clear the login data
           localStorage.removeItem(STORAGE_KEY)
@@ -74,8 +83,19 @@ export const useAuthStore = defineStore('auth', {
       return Promise.resolve()
     },
 
+    validateToken(accessToken) {
+      // Send a request to the server to validate the token
+      // You can use an API endpoint to validate the token
+      return useApi().get('/api/auth/refresh', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      })
+    },
+
     async attempt() {
       try {
+        console.log('Access Token:', this.accessToken) // Add this line
         if (!this.accessToken) {
           // No access token found, resolve immediately
           return Promise.resolve()
@@ -157,7 +177,6 @@ export const useAuthStore = defineStore('auth', {
         return data
       } catch (error: Error | any) {
         // Handle error
-        console.error(error)
         throw error.message
       }
     }
