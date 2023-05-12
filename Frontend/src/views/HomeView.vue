@@ -1,16 +1,15 @@
 <script setup>
 import { ref } from 'vue'
-import { useProjectStore } from '@/stores/projectStore'
+
 import SectionMain from '@/components/SectionMain.vue'
 import Layout from '@/layouts/Layout.vue'
 import LayoutS from '@/layouts/LayoutS.vue'
 import sectionTitle from '@/components/SectionTitle.vue'
 import CardBox from '@/components/CardBox.vue'
 import CardBoxComponentBody from '@/components/CardBoxComponentBody.vue'
+import NavBar from '@/components/NavBar.vue'
 
 const currentTime = ref(getCurrentTime())
-
-const projectStore = useProjectStore()
 
 function getCurrentTime() {
   const now = new Date()
@@ -30,14 +29,13 @@ setInterval(() => {
           Time:
           {{ currentTime }}
         </div>
-        <sectionTitle> <h2 class="text-xl font-semibold">Projects</h2> </sectionTitle>
+        <sectionTitle> <h2 class="text-xl font-semibold">Welcome To PM-Project</h2> </sectionTitle>
         <CardBox>
           <CardBoxComponentBody>
-            <ul>
-              <li v-for="project in projectStore.projects" :key="project.id">
-                {{ project.name }}
-              </li>
-            </ul>
+            <p class="text-lg">
+              PM-Project is a project management tool that makes it easy to keep track of your
+              projects and stay on top of your deadlines.
+            </p>
           </CardBoxComponentBody>
         </CardBox>
       </SectionMain>

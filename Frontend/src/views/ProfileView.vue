@@ -1,5 +1,4 @@
 <script setup>
-import { reactive } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { mdiAccount, mdiMail, mdiAsterisk, mdiFormTextboxPassword } from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
@@ -13,6 +12,7 @@ import BaseButtons from '@/components/BaseButtons.vue'
 import UserCard from '@/components/UserCard.vue'
 import layout from '@/layouts/Layout.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
+import { reactive } from 'vue'
 
 const authStore = useAuthStore()
 
@@ -43,8 +43,7 @@ const submitPass = () => {
 <template>
   <layout>
     <SectionMain>
-      <SectionTitleLineWithButton :icon="mdiAccount" title="Profile" main>
-      </SectionTitleLineWithButton>
+      <SectionTitleLineWithButton :icon="mdiAccount" title="Profile" main />
       <UserCard class="mb-6" />
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <CardBox is-form @submit.prevent="submitProfile">

@@ -48,7 +48,12 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
-    setAccessToken() {
+    //setuser
+    async setUser(user: User) {
+      this.user = user
+    },
+
+    async setAccessToken() {
       const loginData = localStorage.getItem(STORAGE_KEY)
       if (loginData) {
         const { accessToken } = JSON.parse(loginData)
@@ -58,22 +63,24 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    initialize() {
+    async initialize() {
       const loginData = localStorage.getItem(STORAGE_KEY)
+
       if (loginData) {
         const { accessToken, user } = JSON.parse(loginData)
+
         if (accessToken) {
           this.accessToken = accessToken
           this.user = user
           this.authReady = true
-          return this.getUser() // Retrieve the user details
-            .catch(() => {
-              // Error retrieving user details, but continue without throwing an error
-              console.error('Error retrieving user details.')
-            })
+
+          return this.getUser().catch((error) => {
+            console.error('Error retrieving user details:', error)
+            return Promise.resolve()
+          })
         }
       }
-      // No login data found or access token is empty, resolve immediately
+
       return Promise.resolve()
     },
 
@@ -116,7 +123,7 @@ export const useAuthStore = defineStore('auth', {
       const refreshToken = localStorage.getItem('refreshToken')
 
       try {
-        const { data } = await useApi().post('/api/auth/refresh-token', {
+        const { data } = await useApi().post('/api/auth/refresh', {
           refresh_token: refreshToken
         })
         return data

@@ -10,8 +10,8 @@ router.put("/projects/:id", projectControllers.updateProject);
 router.delete("/projects/:id", projectControllers.deleteProject);
 
 //Tasks
-router.post("/projects/:id/tasks", projectControllers.addTask);
-router.delete("/projects/:id/tasks/:taskId", projectControllers.removeTask);
+router.post("/projects/:id/boards", projectControllers.addBoard);
+router.delete("/projects/:id/boards/:boardId", projectControllers.removeBoard);
 
 //Members
 router.post("/projects/:id/members", projectControllers.addMember);

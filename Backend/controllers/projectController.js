@@ -1,4 +1,5 @@
 const Project = require("../models/Project");
+const Board = require("../models/Board");
 
 async function getProjects(req, res) {
   const projects = await Project.find().exec();
@@ -44,23 +45,22 @@ async function deleteProject(req, res) {
   }
 }
 
-async function addTask(req, res) {
-  const { name, description, due_date, priority, status } = req.body;
+//add a board to project
+async function addBoard(req, res) {
+  const { name, tasks } = req.body;
   const project = await Project.findById(req.params.id).exec();
-  project.tasks.push({
+  const board = await Board.create({
     name,
-    description,
-    due_date,
-    priority,
-    status,
+    tasks,
   });
+  project.boards.push(board);
   await project.save();
   return res.json(project);
 }
 
-async function removeTask(req, res) {
+async function removeBoard(req, res) {
   const project = await Project.findById(req.params.id).exec();
-  project.tasks.pull(req.params.taskId);
+  project.boards.pull(req.params.boardId);
   await project.save();
   return res.json(project);
 }
@@ -83,7 +83,7 @@ async function removeMember(req, res) {
 //delete all projects
 async function deleteAllProjects(req, res) {
   try {
-    await Project.deleteMany().exec();
+    await Project.deleteMany();
     return res.sendStatus(204);
   } catch (error) {
     console.error(error);
@@ -97,8 +97,8 @@ module.exports = {
   createProject,
   updateProject,
   deleteProject,
-  addTask,
-  removeTask,
+  addBoard,
+  removeBoard,
   addMember,
   removeMember,
   deleteAllProjects,

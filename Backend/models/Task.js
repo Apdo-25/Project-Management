@@ -5,6 +5,10 @@ const Schema = mongoose.Schema;
 const taskSchema = new Schema(
   {
     project: { type: Schema.Types.ObjectId, ref: "Project" },
+    board: {
+      type: Schema.Types.ObjectId,
+      ref: "Board",
+    },
     name: { type: String, required: true, max: 100 },
     description: { type: String, required: true, max: 1000 },
     due_date: { type: Date, required: false },

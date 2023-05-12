@@ -1,49 +1,34 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const task = require("./Task");
 
-// Schema for kanban
+// Schema board
 
 const BoardSchema = new Schema({
-  name: { type: String, required: true },
-  description: { type: String, required: true },
-  lists: [
+  name: { type: String, required: true, max: 100 },
+  //ref project
+  project: {
+    type: Schema.Types.ObjectId,
+    ref: "Project",
+  },
+  // creator is the user who created the board
+  creator: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+  },
+  // ref User
+  members: [
     {
-      name: { type: String, required: true },
-      description: { type: String, required: true },
-      cards: [
-        {
-          name: { type: String, required: true },
-          description: { type: String, required: true },
-          dueDate: { type: Date, required: false },
-          comments: [
-            {
-              name: { type: String, required: true },
-              description: { type: String, required: true },
-              date: { type: Date, required: true },
-              user: { type: String, required: true },
-            },
-          ],
-          attachments: [
-            {
-              name: { type: String, required: true },
-              description: { type: String, required: true },
-              date: { type: Date, required: true },
-              user: { type: String, required: true },
-            },
-          ],
-          checklist: [
-            {
-              name: { type: String, required: true },
-              description: { type: String, required: true },
-              date: { type: Date, required: true },
-              user: { type: String, required: true },
-              checked: { type: Boolean, required: true },
-            },
-          ],
-          date: { type: Date, required: true },
-          user: { type: String, required: true },
-        },
-      ],
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
+  // ref Task
+  tasks: [
+    {
+      type: Schema.Types.ObjectId,
+
+      ref: "Task",
     },
   ],
 });
