@@ -11,6 +11,7 @@ export interface User {
   first_name: string
   last_name: string
   full_name?: string
+  avatar?: string
 }
 
 export interface State {
@@ -49,8 +50,22 @@ export const useAuthStore = defineStore('auth', {
 
   actions: {
     //setuser
-    async setUser(user: User) {
-      this.user = user
+    async setUser(payload: { name?: string; email?: string; avatar?: string }) {
+      if (payload.name) {
+        this.user.username = payload.name
+
+        const nameArray = payload.name.split(' ')
+        if (nameArray.length > 1) {
+          this.user.first_name = nameArray[0]
+          this.user.last_name = nameArray[1]
+        }
+      }
+      if (payload.email) {
+        this.user.email = payload.email
+      }
+      if (payload.avatar) {
+        this.user.avatar = payload.avatar
+      }
     },
 
     async setAccessToken() {
@@ -65,55 +80,47 @@ export const useAuthStore = defineStore('auth', {
 
     async initialize() {
       const loginData = localStorage.getItem(STORAGE_KEY)
-
       if (loginData) {
         const { accessToken, user } = JSON.parse(loginData)
-
         if (accessToken) {
           this.accessToken = accessToken
           this.user = user
           this.authReady = true
 
-          return this.getUser().catch((error) => {
+          try {
+            await this.getUser() // Retrieve the user details
+          } catch (error) {
+            // Handle error retrieving user details
             console.error('Error retrieving user details:', error)
-            return Promise.resolve()
-          })
+            // Clear the stored access token and user details
+            this.accessToken = ''
+            this.user = {} as User
+          }
         }
       }
 
+      // No access token found or error occurred, resolve immediately
+      this.authReady = true
       return Promise.resolve()
     },
 
     async attempt() {
-      if (!this.accessToken) {
-        // No access token found, resolve immediately
-        return Promise.resolve()
-      }
-
-      const currentTime = Date.now() / 1000 // Current time in seconds
-      const tokenExpiration = this.decodeTokenExpiration(this.accessToken) // Decode the token expiration time
-
-      if (tokenExpiration && tokenExpiration < currentTime) {
-        // Token has expired, renew the access token
-        try {
-          const { data } = await this.refreshToken()
-          this.accessToken = data.access_token
-          localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify({ accessToken: this.accessToken, user: this.user })
-          )
-        } catch (error) {
-          // Token refresh failed, handle the error
-          console.error('Token refresh failed:', error)
-        }
-      }
-
-      // Token is valid or renewed, continue with user retrieval
       try {
+        if (!this.accessToken) {
+          // No access token found, resolve immediately
+          return Promise.resolve()
+        }
+
+        await this.refresh()
         await this.getUser()
+        // Store the access token in local storage
+        localStorage.setItem('accessToken', this.accessToken)
       } catch (error) {
-        // Handle error while retrieving user details
-        console.error('Error retrieving user details:', error)
+        // Handle error
+        console.error(error)
+        // Clear the stored access token and user details
+        this.accessToken = ''
+        this.user = {} as User
       }
     },
 
@@ -217,3 +224,5 @@ export const useAuthStore = defineStore('auth', {
     }
   }
 })
+
+export type AuthStore = ReturnType<typeof useAuthStore>

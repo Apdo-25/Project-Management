@@ -17,6 +17,12 @@ const projectSchema = new Schema(
       ref: "User",
     },
 
+    status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active",
+    },
+
     // members are the users who are part of the project
     members: [
       {
@@ -26,7 +32,12 @@ const projectSchema = new Schema(
     ],
   },
 
-  { timestamps: true }
+  {
+    timestamps: {
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+    },
+  }
 );
 
 // Export the model

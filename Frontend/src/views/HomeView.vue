@@ -3,11 +3,10 @@ import { ref } from 'vue'
 
 import SectionMain from '@/components/SectionMain.vue'
 import Layout from '@/layouts/Layout.vue'
-import LayoutS from '@/layouts/LayoutS.vue'
+import LayoutGuest from '@/layouts/LayoutGuest.vue'
 import sectionTitle from '@/components/SectionTitle.vue'
 import CardBox from '@/components/CardBox.vue'
 import CardBoxComponentBody from '@/components/CardBoxComponentBody.vue'
-import NavBar from '@/components/NavBar.vue'
 
 const currentTime = ref(getCurrentTime())
 
@@ -23,7 +22,7 @@ setInterval(() => {
 </script>
 <template>
   <Layout>
-    <LayoutS>
+    <LayoutGuest>
       <SectionMain>
         <div class="clock text-right pr-4">
           Time:
@@ -39,6 +38,6 @@ setInterval(() => {
           </CardBoxComponentBody>
         </CardBox>
       </SectionMain>
-    </LayoutS>
+    </LayoutGuest>
   </Layout>
 </template>

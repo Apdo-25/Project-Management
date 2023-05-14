@@ -11,7 +11,7 @@ import FormControl from '@/components/FormControl.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
 import sectionTitle from '@/components/sectionTitle.vue'
-import LayoutS from '@/layouts/LayoutS.vue'
+import LayoutGuest from '@/layouts/LayoutGuest.vue'
 import { useAuthStore, type RegisterData } from '@/stores/auth'
 
 const authStore = useAuthStore()
@@ -41,7 +41,7 @@ async function submit() {
 </script>
 
 <template>
-  <LayoutS>
+  <LayoutGuest>
     <SectionFullScreen v-slot="{ cardClass }" bg="darkBg">
       <CardBox :class="cardClass" is-form @submit="submit">
         <p
@@ -92,5 +92,5 @@ async function submit() {
         </template>
       </CardBox>
     </SectionFullScreen>
-  </LayoutS>
+  </LayoutGuest>
 </template>

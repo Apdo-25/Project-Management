@@ -8,7 +8,7 @@ import FormField from '@/components/FormField.vue'
 import FormControl from '@/components/FormControl.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
-import layouts from '@/layouts/LayoutS.vue'
+import LayoutGuest from '@/layouts/LayoutGuest.vue'
 import { useAuthStore, type LoginData } from '@/stores/auth'
 
 const authStore = useAuthStore()
@@ -35,7 +35,7 @@ async function submit() {
 </script>
 
 <template>
-  <layouts>
+  <LayoutGuest>
     <SectionFullScreen v-slot="{ cardClass }" bg="darkBg">
       <CardBox :class="cardClass" is-form @submit="submit">
         <FormField label="Email" help="Please enter your email">
@@ -66,5 +66,5 @@ async function submit() {
         </template>
       </CardBox>
     </SectionFullScreen>
-  </layouts>
+  </LayoutGuest>
 </template>

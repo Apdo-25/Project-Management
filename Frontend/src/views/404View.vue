@@ -1,7 +1,7 @@
 <script setup>
 import SectionMain from '@/components/SectionMain.vue'
 import Layout from '@/layouts/Layout.vue'
-import LayoutS from '@/layouts/LayoutS.vue'
+import LayoutGuest from '@/layouts/LayoutGuest.vue'
 import sectionTitle from '@/components/SectionTitle.vue'
 import CardBox from '@/components/CardBox.vue'
 import CardBoxComponentBody from '@/components/CardBoxComponentBody.vue'
@@ -20,7 +20,7 @@ onMounted(() => {
 
 <template>
   <Layout>
-    <LayoutS>
+    <LayoutGuest>
       <SectionMain>
         <sectionTitle> <h2 class="text-xl font-semibold">404</h2> </sectionTitle>
         <CardBox>
@@ -39,6 +39,6 @@ onMounted(() => {
           </CardBoxComponentBody>
         </CardBox>
       </SectionMain>
-    </LayoutS>
+    </LayoutGuest>
   </Layout>
 </template>
