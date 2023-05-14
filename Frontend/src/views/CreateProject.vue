@@ -1,108 +1,115 @@
 <script setup>
-import { computed, ref, onMounted } from 'vue'
-import { mdiTableOff, mdiMonitorCellphone, mdiMonitor, mdiEye, mdiTrashCan } from '@mdi/js'
-import TableCheckboxCell from '@/components/TableCheckboxCell.vue'
-import CardBoxModal from '@/components/CardBoxModal.vue'
-import BaseLevel from '@/components/BaseLevel.vue'
-import BaseButtons from '@/components/BaseButtons.vue'
-import BaseButton from '@/components/BaseButton.vue'
-import UserAvatar from '@/components/UserAvatar.vue'
-import useProjectStore from '@/stores/project'
-import CardBox from '@/components/CardBox.vue'
-import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
-import NotificationBar from '@/components/NotificationBar.vue'
-import CardBoxComponentEmpty from '@/components/CardBoxComponentEmpty.vue'
-import layout from '@/layouts/Layout.vue'
+import { reactive, ref } from 'vue'
+import { mdiBallotOutline, mdiAccount, mdiMail, mdiGithub } from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
+import CardBox from '@/components/CardBox.vue'
+import FormCheckRadioGroup from '@/components/FormCheckRadioGroup.vue'
+import FormFilePicker from '@/components/FormFilePicker.vue'
+import FormField from '@/components/FormField.vue'
+import FormControl from '@/components/FormControl.vue'
+import BaseDivider from '@/components/BaseDivider.vue'
+import BaseButton from '@/components/BaseButton.vue'
+import BaseButtons from '@/components/BaseButtons.vue'
+import SectionTitle from '@/components/SectionTitle.vue'
+import Layout from '@/layouts/Layout.vue'
+import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
+import NotificationBarInCard from '@/components/NotificationBarInCard.vue'
 
-// Create reactive variables
-const isModalActive = ref(false)
-const currentPage = ref(0)
-const checkedRows = ref([])
+const selectOptions = [
+  { id: 1, label: 'in progress' },
+  { id: 2, label: 'Open' },
+  { id: 3, label: 'Closed' }
+]
+const selectOptions1 = [
+  { id: 1, label: 'Low' },
+  { id: 2, label: 'Medium' },
+  { id: 3, label: 'High' }
+]
+const form = reactive({
+  name: 'John Doe',
+  Description: 'john.doe@example.com',
+  status: selectOptions[0],
+  priority: selectOptions1[0],
+  deadline: ''
+})
 
-// Get the project store instance
-const projectStore = useProjectStore()
+const customElementsForm = reactive({
+  checkbox: ['lorem'],
+  radio: 'one',
+  switch: ['one'],
+  file: null
+})
 
-// Method to create a new project
-const createProject = async () => {
-  // Create a new project
-  const newProject = {
-    id: Date.now(), // Generate a unique ID
-    name: 'New Project',
-    description: 'Lorem ipsum',
-    members: 'John Doe',
-    progress: 50,
-    created: new Date().toISOString()
-  }
-
-  // Add the new project to the store
-  projectStore.createProject(newProject)
-
-  // Update the pagination
-  currentPage.value = Math.ceil((projectStore.projects.length + 1) / perPage.value) - 1
-  checkedRows.value = [] // Reset checked rows
-
-  // Close the modal
-  isModalActive.value = false
+const submit = () => {
+  //
 }
 
-onMounted(async () => {
-  await projectStore.fetchProjects()
-  console.log(projectStore.projects)
-})
+const formStatusWithHeader = ref(true)
+
+const formStatusCurrent = ref(0)
+
+const formStatusOptions = ['info', 'success', 'danger', 'warning']
+
+const formStatusSubmit = () => {
+  formStatusCurrent.value = formStatusOptions[formStatusCurrent.value + 1]
+    ? formStatusCurrent.value + 1
+    : 0
+}
 </script>
 
 <template>
-  <layout>
+  <Layout>
     <SectionMain>
-      <CardBox class="mb-6" has-table>
-        <!-- ... -->
-        <table>
-          <!-- ... -->
-          <tbody>
-            <tr v-for="project in projectStore.projectsPaginated" :key="project.id">
-              <!-- ... -->
-              <td class="before:hidden lg:w-1 whitespace-nowrap">
-                <BaseButtons type="justify-start lg:justify-end" no-wrap>
-                  <BaseButton color="info" :icon="mdiEye" small @click="isModalActive = true" />
-                  <BaseButton
-                    color="danger"
-                    :icon="mdiTrashCan"
-                    small
-                    @click="isModalDangerActive = true"
-                  />
-                </BaseButtons>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <!-- ... -->
-      </CardBox>
+      <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Create a Project" main>
+        <BaseButton
+          href="/"
+          :icon="mdiGithub"
+          label="Back Home"
+          color="contrast"
+          rounded-full
+          small
+        />
+      </SectionTitleLineWithButton>
+      <CardBox form @submit.prevent="submit">
+        <FormField label="Grouped with icons">
+          <FormControl v-model="form.name" :icon="mdiAccount" />
+          <FormControl v-model="form.Description" type="text" :icon="mdiMail" />
+          <FormField>
+            <FormControl
+              help="What is your project about. Max 255 characters"
+              label="Project Description"
+              v-model="form.Description"
+              type="textarea"
+              placeholder="Explain how we can help you"
+            />
+          </FormField>
+        </FormField>
 
-      <SectionTitleLineWithButton :icon="mdiTableOff" title="Empty variation" />
+        <FormField label="Checkbox">
+          <FormCheckRadioGroup
+            v-model="form.priority"
+            name="sample-checkbox"
+            :options="{ lorem: 'Low', ipsum: 'Medium', dolore: 'HIgh' }"
+          />
+        </FormField>
 
-      <NotificationBar color="danger" :icon="mdiTableOff">
-        <b>Empty table.</b> When there's nothing to show
-      </NotificationBar>
+        <FormField label="Checkbox">
+          <FormCheckRadioGroup
+            v-model="form.status"
+            name="sample-checkbox"
+            :options="{ lorem: 'Open', ipsum: 'In Progress', dolore: 'Closed' }"
+          />
+        </FormField>
 
-      <CardBox>
-        <CardBoxComponentEmpty />
-      </CardBox>
+        <BaseDivider />
 
-      <CardBoxModal
-        v-model:active="isModalActive"
-        title="New Project"
-        :danger="false"
-        @save="createProject"
-      >
-        <!-- ... -->
         <template #footer>
           <BaseButtons>
-            <BaseButton label="Create" color="info" @click="createProject" />
-            <BaseButton label="Cancel" color="whiteDark" @click="isModalActive = false" />
+            <BaseButton type="submit" color="info" label="Submit" />
+            <BaseButton type="reset" color="info" outline label="Reset" />
           </BaseButtons>
         </template>
-      </CardBoxModal>
+      </CardBox>
     </SectionMain>
-  </layout>
+  </Layout>
 </template>

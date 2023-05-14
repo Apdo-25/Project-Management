@@ -1,19 +1,18 @@
 <script setup>
 import { computed, ref, onMounted } from 'vue'
-import { mdiTableOff, mdiMonitorCellphone, mdiMonitor } from '@mdi/js'
+import { mdiMonitorCellphone, mdiTrashCan, mdiEye } from '@mdi/js'
 import TableCheckboxCell from '@/components/TableCheckboxCell.vue'
-import CardBoxModal from '@/components/CardBoxModal.vue'
+
 import BaseLevel from '@/components/BaseLevel.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
 import useProjectStore from '@/stores/project'
+import { useAuthStore } from '@/stores/auth'
 import CardBox from '@/components/CardBox.vue'
-import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
-import NotificationBar from '@/components/NotificationBar.vue'
-import CardBoxComponentEmpty from '@/components/CardBoxComponentEmpty.vue'
 
 const projectStore = useProjectStore()
+const authStore = useAuthStore()
 
 onMounted(async () => {
   await projectStore.fetchProjects()
@@ -22,8 +21,6 @@ onMounted(async () => {
   console.log(projectStore.projects)
 })
 
-const isModalActive = ref(false)
-const isModalDangerActive = ref(false)
 const perPage = ref(5)
 const currentPage = ref(0)
 const checkedRows = ref([])
@@ -61,6 +58,13 @@ const checked = (isChecked, project) => {
     checkedRows.value = remove(checkedRows.value, (row) => row.id === project.id)
   }
 }
+
+// const projectsPaginated = computed(() => {
+//   const currentUser = authStore.userDetail.id // Access the current user's ID from the auth store
+//   return projectStore.projects
+//     .filter((project) => project.createdBy === currentUser || project.members.includes(currentUser))
+//     .slice(perPage.value * currentPage.value, perPage.value * (currentPage.value + 1))
+// })
 
 const projectsPaginated = computed(() =>
   projectStore.projects.slice(
@@ -100,10 +104,27 @@ const projectsPaginated = computed(() =>
           <td data-label="City">
             {{ project.members }}
           </td>
-          <td data-label="Progress" class="lg:w-32">
-            <progress class="flex w-2/5 self-center lg:w-full" max="100" :value="project.status">
-              {{ project.status }}
-            </progress>
+          <td data-label="Status" class="lg:w-32">
+            <small class="flex w-2/5 self-center lg:w-full" max="100" :value="project.status">
+              <span
+                v-if="project.status === 'In progress'"
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+              >
+                In progress
+              </span>
+              <span
+                v-else-if="project.status === 'Closed'"
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"
+              >
+                Closed
+              </span>
+              <span
+                v-else-if="project.status === 'Open'"
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
+              >
+                Open
+              </span>
+            </small>
           </td>
           <td data-label="Created" class="lg:w-1 whitespace-nowrap">
             <small class="text-gray-500 dark:text-slate-400" :title="project.createdAt">
@@ -111,19 +132,30 @@ const projectsPaginated = computed(() =>
             </small>
           </td>
           <td class="before:hidden lg:w-1 whitespace-nowrap">
-            <BaseButtons type="justify-start lg:justify-end" no-wrap>
-              <BaseButton color="info" :icon="mdiEye" small @click="isModalActive = true" />
+            <BaseButtons>
               <BaseButton
-                color="danger"
-                :icon="mdiTrashCan"
+                :href="`/projects/${project.id}`"
+                :icon="mdiEye"
+                label="View"
+                color="info"
+                rounded-full
                 small
-                @click="deleteProject(project)"
               />
               <BaseButton
+                :to="`/EditProject/:id`"
+                :icon="mdiMonitorCellphone"
+                label="Edit"
                 color="primary"
-                :icon="mdiMonitor"
+                rounded-full
                 small
-                @click="updateProject(project)"
+              />
+              <BaseButton
+                :href="`/projects/${project.id}/delete`"
+                :icon="mdiTrashCan"
+                label="Delete"
+                color="danger"
+                rounded-full
+                small
               />
             </BaseButtons>
           </td>
@@ -146,15 +178,5 @@ const projectsPaginated = computed(() =>
         <small>Page {{ currentPageHuman }} of {{ numPages }}</small>
       </BaseLevel>
     </div>
-  </CardBox>
-
-  <SectionTitleLineWithButton :icon="mdiTableOff" title="Empty variation" />
-
-  <NotificationBar color="danger" :icon="mdiTableOff">
-    <b>Empty table.</b> When there's nothing to show
-  </NotificationBar>
-
-  <CardBox>
-    <CardBoxComponentEmpty />
   </CardBox>
 </template>

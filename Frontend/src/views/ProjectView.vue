@@ -3,7 +3,7 @@
     <SectionMain>
       <SectionTitleLineWithButton :icon="mdiTableBorder" title="My Projects" main>
         <BaseButton
-          href="/"
+          to="CreateProject"
           :icon="mdiMonitor"
           label="Back to Home"
           color="contrast"
@@ -11,9 +11,6 @@
           small
         />
       </SectionTitleLineWithButton>
-      <NotificationBar color="info" :icon="mdiMonitorCellphone">
-        <b>Responsive table.</b> Collapses on mobile
-      </NotificationBar>
 
       <TableProject />
     </SectionMain>
@@ -21,9 +18,8 @@
 </template>
 
 <script setup>
-import { mdiMonitorCellphone, mdiTableBorder, mdiMonitor } from '@mdi/js'
+import { mdiTableBorder, mdiMonitor } from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
-import NotificationBar from '@/components/NotificationBar.vue'
 import TableProject from '@/components/TableProject.vue'
 import Layout from '@/layouts/Layout.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'

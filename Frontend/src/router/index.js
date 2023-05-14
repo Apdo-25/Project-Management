@@ -55,6 +55,15 @@ const routes = [
   },
   {
     meta: {
+      title: 'Edit Project',
+      requiresAuth: true
+    },
+    path: '/EditProject/:id',
+    name: 'EditProject',
+    component: () => import('@/views/EditProjectView.vue')
+  },
+  {
+    meta: {
       title: 'Profile',
       requiresAuth: true
     },

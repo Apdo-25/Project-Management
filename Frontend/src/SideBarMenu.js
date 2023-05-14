@@ -8,7 +8,7 @@ export default [
   },
   {
     to: '/projects',
-    label: 'Projects',
+    label: 'My Projects',
     icon: mdiTable
   },
   {
@@ -29,6 +29,11 @@ export default [
   {
     to: '/CreateProject',
     label: 'CreateProject',
+    icon: mdiTable
+  },
+  {
+    to: '/EditProject/:id',
+    label: 'EditProject',
     icon: mdiTable
   }
 ]
