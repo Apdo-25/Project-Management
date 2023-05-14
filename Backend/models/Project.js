@@ -19,8 +19,8 @@ const projectSchema = new Schema(
 
     status: {
       type: String,
-      enum: ["active", "inactive"],
-      default: "active",
+      enum: ["In progress", "Open", "Closed"],
+      default: "In progress",
     },
 
     // members are the users who are part of the project
@@ -30,6 +30,15 @@ const projectSchema = new Schema(
         ref: "User",
       },
     ],
+    deadline: {
+      type: Date,
+      default: Date.now,
+    },
+    priority: {
+      type: String,
+      enum: ["Low", "Medium", "High"],
+      default: "Low",
+    },
   },
 
   {
