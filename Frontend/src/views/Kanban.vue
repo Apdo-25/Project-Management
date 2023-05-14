@@ -24,13 +24,11 @@ export default {
 
 <template>
   <Layout>
-    <LayoutS>
-      <SectionMain>
-        <div class="p-4">
-          <h1 class="text-3xl font-bold mb-4">Kanban Board</h1>
-          <Board :columns="columns" />
-        </div>
-      </SectionMain>
-    </LayoutS>
+    <SectionMain>
+      <div class="p-4">
+        <h1 class="text-3xl font-bold mb-4">Kanban Board</h1>
+        <Board :columns="columns" />
+      </div>
+    </SectionMain>
   </Layout>
 </template>

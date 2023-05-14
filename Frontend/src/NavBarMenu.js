@@ -1,4 +1,4 @@
-import { mdiAccount, mdiEmail, mdiLogout } from '@mdi/js'
+import { mdiAccount, mdiLogout } from '@mdi/js'
 
 export default [
   {
@@ -10,10 +10,6 @@ export default [
         to: '/profile'
       },
 
-      {
-        icon: mdiEmail,
-        label: 'Messages'
-      },
       {
         isDivider: true
       },

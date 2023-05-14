@@ -85,7 +85,7 @@ const formStatusSubmit = () => {
           </FormField>
         </FormField>
 
-        <FormField label="Checkbox">
+        <FormField label="Priority">
           <FormCheckRadioGroup
             v-model="form.priority"
             name="sample-checkbox"
@@ -93,7 +93,7 @@ const formStatusSubmit = () => {
           />
         </FormField>
 
-        <FormField label="Checkbox">
+        <FormField label="Status">
           <FormCheckRadioGroup
             v-model="form.status"
             name="sample-checkbox"

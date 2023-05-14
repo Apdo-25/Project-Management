@@ -3,7 +3,7 @@ import { mdiChevronUp, mdiChevronDown } from '@mdi/js'
 import { RouterLink } from 'vue-router'
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useStyleStore } from '@/stores/style.js'
-import { useMainStore } from '@/stores/auth.js'
+import { useAuthStore } from '@/stores/auth'
 import BaseIcon from '@/components/BaseIcon.vue'
 import NavBarMenuList from '@/components/NavBarMenuList.vue'
 import BaseDivider from '@/components/BaseDivider.vue'
@@ -47,7 +47,7 @@ const componentClass = computed(() => {
 })
 
 const itemLabel = computed(() =>
-  props.item.isCurrentUser ? useMainStore().userName : props.item.label
+  props.item.isCurrentUser ? useAuthStore().userName : props.item.label
 )
 
 const isDropdownActive = ref(false)
