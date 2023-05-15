@@ -172,4 +172,30 @@ async function user(req, res) {
   return res.status(200).json(user);
 }
 
-module.exports = { register, login, logout, refresh, validateToken, user };
+async function updateUser(req, res) {
+  const user = req.user;
+  const { first_name, last_name, username, email, password } = req.body;
+
+  if (!first_name || !last_name || !username || !email || !password)
+    return res.status(422).json({ message: "Invalid fields" });
+
+  user.first_name = first_name;
+  user.last_name = last_name;
+  user.username = username;
+  user.email = email;
+  user.password = password;
+
+  await user.save();
+
+  return res.status(200).json(user);
+}
+
+module.exports = {
+  register,
+  login,
+  logout,
+  refresh,
+  validateToken,
+  user,
+  updateUser,
+};

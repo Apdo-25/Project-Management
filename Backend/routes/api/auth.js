@@ -15,4 +15,6 @@ router.post("/validateToken", authControllers.validateToken);
 
 router.get("/user", authMiddleware, authControllers.user);
 
+router.put("/user", authMiddleware, authControllers.updateUser);
+
 module.exports = router;
