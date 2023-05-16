@@ -186,7 +186,7 @@ export const useAuthStore = defineStore('auth', {
           ...data,
           lastLogin: new Date().toISOString(),
           fullName: `${data.first_name} ${data.last_name}`,
-          avatar: 'https://i.pravatar.cc/300',
+          avatar: `${data.avatar}`,
           role: 'admin',
           permissions: ['admin', 'user']
         }
@@ -202,7 +202,8 @@ export const useAuthStore = defineStore('auth', {
         const updatedUser = {
           ...data,
           username: payload.username,
-          email: payload.email
+          email: payload.email,
+          avatar: payload.avatar
         };
         this.user = updatedUser;
         return data;

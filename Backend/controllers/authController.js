@@ -183,9 +183,9 @@ async function updateUser(req, res) {
 
 async function updateUser2(req, res) {
     try {
-        const { username, email } = req.body;
+        const { username, email, avatar } = req.body;
 
-        if (!username || !email) {
+        if (!username || !email || !avatar) {
             return res.status(422).json({ message: "Invalid fields" });
         }
 
@@ -197,6 +197,7 @@ async function updateUser2(req, res) {
 
         user.username = username;
         user.email = email;
+        user.avatar = avatar;
 
         await user.save();
 
