@@ -4,31 +4,23 @@ import { mdiBallotOutline, mdiAccount, mdiMail, mdiGithub } from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBox from '@/components/CardBox.vue'
 import FormCheckRadioGroup from '@/components/FormCheckRadioGroup.vue'
-import FormFilePicker from '@/components/FormFilePicker.vue'
 import FormField from '@/components/FormField.vue'
 import FormControl from '@/components/FormControl.vue'
 import BaseDivider from '@/components/BaseDivider.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
-import SectionTitle from '@/components/SectionTitle.vue'
+
 import Layout from '@/layouts/Layout.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
-import NotificationBarInCard from '@/components/NotificationBarInCard.vue'
 
-const selectOptions = [
-  { id: 1, label: 'in progress' },
-  { id: 2, label: 'Open' },
-  { id: 3, label: 'Closed' }
-]
 const selectOptions1 = [
   { id: 1, label: 'Low' },
   { id: 2, label: 'Medium' },
   { id: 3, label: 'High' }
 ]
 const form = reactive({
-  name: 'John Doe',
-  Description: 'john.doe@example.com',
-  status: selectOptions[0],
+  name: '',
+  Description: '',
   priority: selectOptions1[0],
   deadline: ''
 })
@@ -43,8 +35,6 @@ const customElementsForm = reactive({
 const submit = () => {
   //
 }
-
-const formStatusWithHeader = ref(true)
 
 const formStatusCurrent = ref(0)
 
@@ -71,36 +61,31 @@ const formStatusSubmit = () => {
         />
       </SectionTitleLineWithButton>
       <CardBox form @submit.prevent="submit">
-        <FormField label="Grouped with icons">
-          <FormControl v-model="form.name" :icon="mdiAccount" />
-          <FormControl v-model="form.Description" type="text" :icon="mdiMail" />
-          <FormField>
-            <FormControl
-              help="What is your project about. Max 255 characters"
-              label="Project Description"
-              v-model="form.Description"
-              type="textarea"
-              placeholder="Explain how we can help you"
-            />
-          </FormField>
+        <FormField label="Project Name">
+          <FormControl placeholder="Project Name" v-model="form.name" :icon="mdiAccount" />
+        </FormField>
+        <FormField label="Project Description">
+          <FormControl
+            placeholder="Project Description"
+            help="What is your project about. Max 255 characters"
+            label="Project Description"
+            v-model="form.Description"
+            type="textarea"
+          />
         </FormField>
 
         <FormField label="Priority">
           <FormCheckRadioGroup
-            v-model="form.priority"
-            name="sample-checkbox"
-            :options="{ lorem: 'Low', ipsum: 'Medium', dolore: 'HIgh' }"
+            type="radio"
+            v-model="selectOptions1"
+            name="Priority-checkbox"
+            :options="{ lorem: 'Low', ipsum: 'Medium', dolore: 'High' }"
           />
         </FormField>
 
-        <FormField label="Status">
-          <FormCheckRadioGroup
-            v-model="form.status"
-            name="sample-checkbox"
-            :options="{ lorem: 'Open', ipsum: 'In Progress', dolore: 'Closed' }"
-          />
-        </FormField>
-
+        <FormField label="Deadline">
+          <FormControl v-model="form.deadline" :icon="mdiAccount" type="date"
+        /></FormField>
         <BaseDivider />
 
         <template #footer>

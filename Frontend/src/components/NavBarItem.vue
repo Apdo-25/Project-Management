@@ -7,6 +7,7 @@ import { useAuthStore } from '@/stores/auth'
 import BaseIcon from '@/components/BaseIcon.vue'
 import NavBarMenuList from '@/components/NavBarMenuList.vue'
 import BaseDivider from '@/components/BaseDivider.vue'
+import UserAvatarCurrentUser from '@/components/UserAvatarCurrentUser.vue'
 
 const props = defineProps({
   item: {
@@ -105,6 +106,7 @@ onBeforeUnmount(() => {
           item.menu
       }"
     >
+      <UserAvatarCurrentUser v-if="item.isCurrentUser" class="w-6 h-6 mr-3 inline-flex" />
       <BaseIcon v-if="item.icon" :path="item.icon" class="transition-colors" />
       <span
         class="px-2 transition-colors"

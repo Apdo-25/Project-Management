@@ -5,7 +5,7 @@
         <BaseButton
           to="CreateProject"
           :icon="mdiMonitor"
-          label="Back to Home"
+          label="Create a new Project"
           color="contrast"
           rounded-full
           small
