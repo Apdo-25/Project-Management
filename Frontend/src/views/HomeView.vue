@@ -56,7 +56,7 @@ setInterval(() => {
       <BaseDivider />
       <CardBox>
         <CardBoxComponentHeader title="Frequently used Projects" />
-        <SectionTitleLineWithButton :icon="mdiChartPie" title="Trends overview">
+        <SectionTitleLineWithButton :icon="mdiChartPie" title="overview">
           <BaseButton :icon="mdiReload" color="whiteDark" @click="fillChartData" />
         </SectionTitleLineWithButton>
 
@@ -68,7 +68,7 @@ setInterval(() => {
       </CardBox>
       <BaseDivider />
       <CardBox>
-        <CardBoxComponentHeader title="Project Due Dates" />
+        <CardBoxComponentHeader title="Projects Close To Due Dates" />
       </CardBox>
     </SectionMain>
   </Layout>

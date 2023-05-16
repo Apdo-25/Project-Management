@@ -6,6 +6,9 @@ const server = require("../server");
 const should = chai.should();
 const expect = chai.expect;
 const Project = require("../models/Project");
+const User = require("../models/User");
+const Task = require("../models/Task");
+const Board = require("../models/Board");
 
 chai.use(chaiHttp);
 
