@@ -7,6 +7,9 @@ import LayoutGuest from '@/layouts/LayoutGuest.vue'
 import sectionTitle from '@/components/SectionTitle.vue'
 import CardBox from '@/components/CardBox.vue'
 import CardBoxComponentBody from '@/components/CardBoxComponentBody.vue'
+import BaseDivider from '@/components/BaseDivider.vue'
+import CardBoxComponentTitle from '@/components/CardBoxComponentTitle.vue'
+import CardBoxComponentHeader from '@/components/CardBoxComponentHeader.vue'
 
 const currentTime = ref(getCurrentTime())
 
@@ -35,6 +38,14 @@ setInterval(() => {
             projects and stay on top of your deadlines.
           </p>
         </CardBoxComponentBody>
+      </CardBox>
+      <BaseDivider />
+      <CardBox>
+        <CardBoxComponentHeader title="Frequently used Projects" />
+      </CardBox>
+      <BaseDivider />
+      <CardBox>
+        <CardBoxComponentHeader title="Project Due Dates" />
       </CardBox>
     </SectionMain>
   </Layout>

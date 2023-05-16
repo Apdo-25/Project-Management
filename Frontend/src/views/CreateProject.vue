@@ -1,6 +1,6 @@
 <script setup>
 import { reactive, ref } from 'vue'
-import { mdiBallotOutline, mdiAccount, mdiMail, mdiGithub } from '@mdi/js'
+import { mdiBallotOutline, mdiClockTimeEightOutline, mdiTextAccount, mdiGithub } from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBox from '@/components/CardBox.vue'
 import FormCheckRadioGroup from '@/components/FormCheckRadioGroup.vue'
@@ -62,7 +62,7 @@ const formStatusSubmit = () => {
       </SectionTitleLineWithButton>
       <CardBox form @submit.prevent="submit">
         <FormField label="Project Name">
-          <FormControl placeholder="Project Name" v-model="form.name" :icon="mdiAccount" />
+          <FormControl placeholder="Project Name" v-model="form.name" :icon="mdiTextAccount" />
         </FormField>
         <FormField label="Project Description">
           <FormControl
@@ -84,7 +84,7 @@ const formStatusSubmit = () => {
         </FormField>
 
         <FormField label="Deadline">
-          <FormControl v-model="form.deadline" :icon="mdiAccount" type="date"
+          <FormControl v-model="form.deadline" :icon="mdiClockTimeEightOutline" type="date"
         /></FormField>
         <BaseDivider />
 
