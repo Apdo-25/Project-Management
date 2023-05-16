@@ -4,198 +4,215 @@ const bcrypt = require("bcrypt");
 require("dotenv").config();
 
 async function register(req, res) {
-  const { username, email, first_name, last_name, password, password_confirm } =
+    const { username, email, first_name, last_name, password, password_confirm } =
     req.body;
 
-  if (
-    !username ||
-    !email ||
-    !password ||
-    !password_confirm ||
-    !first_name ||
-    !last_name
-  ) {
-    return res.status(422).json({ message: "Invalid fields" });
-  }
+    if (!username ||
+        !email ||
+        !password ||
+        !password_confirm ||
+        !first_name ||
+        !last_name
+    ) {
+        return res.status(422).json({ message: "Invalid fields" });
+    }
 
-  if (password !== password_confirm)
-    return res.status(422).json({ message: "Passwords do not match" });
+    if (password !== password_confirm)
+        return res.status(422).json({ message: "Passwords do not match" });
 
-  const userExists = await User.exists({ email }).exec();
-  if (userExists) return res.sendStatus(409);
+    const userExists = await User.exists({ email }).exec();
+    if (userExists) return res.sendStatus(409);
 
-  try {
-    hashedPassword = await bcrypt.hash(password, 10);
+    try {
+        hashedPassword = await bcrypt.hash(password, 10);
 
-    await User.create({
-      email,
-      username,
-      password: hashedPassword,
-      first_name,
-      last_name,
-    });
+        await User.create({
+            email,
+            username,
+            password: hashedPassword,
+            first_name,
+            last_name,
+        });
 
-    return res.sendStatus(201);
-  } catch (error) {
-    return res.status(400).json({ message: "Could not register" });
-  }
+        return res.sendStatus(201);
+    } catch (error) {
+        return res.status(400).json({ message: "Could not register" });
+    }
 }
 
 async function login(req, res) {
-  const { email, password } = req.body;
+    const { email, password } = req.body;
 
-  if (!email || !password)
-    return res.status(422).json({ message: "Invalid fields" });
+    if (!email || !password)
+        return res.status(422).json({ message: "Invalid fields" });
 
-  const user = await User.findOne({ email });
+    const user = await User.findOne({ email });
 
-  if (!user)
-    return res.status(401).json({ message: "Email or password is incorrect" });
+    if (!user)
+        return res.status(401).json({ message: "Email or password is incorrect" });
 
-  const match = await bcrypt.compare(password, user.password);
+    const match = await bcrypt.compare(password, user.password);
 
-  if (!match)
-    return res.status(401).json({ message: "Email or password is incorrect" });
+    if (!match)
+        return res.status(401).json({ message: "Email or password is incorrect" });
 
-  const accessToken = jwt.sign(
-    {
-      id: user.id,
-    },
-    process.env.ACCESS_TOKEN_SECRET,
-    {
-      expiresIn: "1800s",
-    }
-  );
+    const accessToken = jwt.sign({
+            id: user.id,
+        },
+        process.env.ACCESS_TOKEN_SECRET, {
+            expiresIn: "1800s",
+        }
+    );
 
-  const refreshToken = jwt.sign(
-    {
-      id: user.id,
-    },
-    process.env.REFRESH_TOKEN_SECRET,
-    {
-      expiresIn: "1d",
-    }
-  );
+    const refreshToken = jwt.sign({
+            id: user.id,
+        },
+        process.env.REFRESH_TOKEN_SECRET, {
+            expiresIn: "1d",
+        }
+    );
 
-  user.refresh_token = refreshToken;
-  await user.save();
+    user.refresh_token = refreshToken;
+    await user.save();
 
-  res.cookie("refresh_token", refreshToken, {
-    httpOnly: true,
-    sameSite: "None",
-    secure: true,
-    maxAge: 24 * 60 * 60 * 1000,
-  });
-  res.json({ access_token: accessToken });
+    res.cookie("refresh_token", refreshToken, {
+        httpOnly: true,
+        sameSite: "None",
+        secure: true,
+        maxAge: 24 * 60 * 60 * 1000,
+    });
+    res.json({ access_token: accessToken });
 }
 
 async function logout(req, res) {
-  const cookies = req.cookies;
+    const cookies = req.cookies;
 
-  if (!cookies.refresh_token) return res.sendStatus(204);
+    if (!cookies.refresh_token) return res.sendStatus(204);
 
-  const refreshToken = cookies.refresh_token;
-  const user = await User.findOne({ refresh_token: refreshToken }).exec();
+    const refreshToken = cookies.refresh_token;
+    const user = await User.findOne({ refresh_token: refreshToken }).exec();
 
-  if (!user) {
+    if (!user) {
+        res.clearCookie("refresh_token", {
+            httpOnly: true,
+            sameSite: "None",
+            secure: true,
+            maxAge: 24 * 60 * 60 * 1000,
+        });
+        return res.sendStatus(204);
+    }
+
+    user.refresh_token = null;
+    await user.save();
+
     res.clearCookie("refresh_token", {
-      httpOnly: true,
-      sameSite: "None",
-      secure: true,
-      maxAge: 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        sameSite: "None",
+        secure: true,
+        maxAge: 24 * 60 * 60 * 1000,
     });
-    return res.sendStatus(204);
-  }
-
-  user.refresh_token = null;
-  await user.save();
-
-  res.clearCookie("refresh_token", {
-    httpOnly: true,
-    sameSite: "None",
-    secure: true,
-    maxAge: 24 * 60 * 60 * 1000,
-  });
-  res.sendStatus(204);
+    res.sendStatus(204);
 }
 
 async function refresh(req, res) {
-  const cookies = req.cookies;
-  if (!cookies.refresh_token) return res.sendStatus(401);
+    const cookies = req.cookies;
+    if (!cookies.refresh_token) return res.sendStatus(401);
 
-  const refreshToken = cookies.refresh_token;
+    const refreshToken = cookies.refresh_token;
 
-  const user = await User.findOne({ refresh_token: refreshToken });
+    const user = await User.findOne({ refresh_token: refreshToken });
 
-  if (!user) return res.sendStatus(403);
+    if (!user) return res.sendStatus(403);
 
-  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
-    if (err || user.id !== decoded.id) return res.sendStatus(403);
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
+        if (err || user.id !== decoded.id) return res.sendStatus(403);
 
-    const accessToken = jwt.sign(
-      { id: decoded.id },
-      process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "1800s" }
-    );
+        const accessToken = jwt.sign({ id: decoded.id },
+            process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1800s" }
+        );
 
-    res.json({ access_token: accessToken });
-  });
+        res.json({ access_token: accessToken });
+    });
 }
 
 //token validation asyn function
 async function validateToken(req, res) {
-  const cookies = req.cookies;
-  if (!cookies.refresh_token) return res.sendStatus(401);
+    const cookies = req.cookies;
+    if (!cookies.refresh_token) return res.sendStatus(401);
 
-  const refreshToken = cookies.refresh_token;
+    const refreshToken = cookies.refresh_token;
 
-  const user = await User.findOne({ refresh_token: refreshToken });
+    const user = await User.findOne({ refresh_token: refreshToken });
 
-  if (!user) return res.sendStatus(403);
+    if (!user) return res.sendStatus(403);
 
-  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
-    if (err || user.id !== decoded.id) return res.sendStatus(403);
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
+        if (err || user.id !== decoded.id) return res.sendStatus(403);
 
-    const accessToken = jwt.sign(
-      { id: decoded.id },
-      process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "1800s" }
-    );
+        const accessToken = jwt.sign({ id: decoded.id },
+            process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1800s" }
+        );
 
-    res.json({ access_token: accessToken });
-  });
+        res.json({ access_token: accessToken });
+    });
 }
 
 async function user(req, res) {
-  const user = req.user;
+    const user = req.user;
 
-  return res.status(200).json(user);
+    return res.status(200).json(user);
 }
 
 async function updateUser(req, res) {
-  const user = req.user;
-  const { first_name, last_name, username, email, password } = req.body;
+    const user = req.user;
+    const { first_name, last_name, username, email, password } = req.body;
 
-  if (!first_name || !last_name || !username || !email || !password)
-    return res.status(422).json({ message: "Invalid fields" });
+    if (!first_name || !last_name || !username || !email || !password)
+        return res.status(422).json({ message: "Invalid fields" });
 
-  user.first_name = first_name;
-  user.last_name = last_name;
-  user.username = username;
-  user.email = email;
-  user.password = password;
+    user.first_name = first_name;
+    user.last_name = last_name;
+    user.username = username;
+    user.email = email;
+    user.password = password;
 
-  await user.save();
+    await user.save();
 
-  return res.status(200).json(user);
+    return res.status(200).json(user);
+}
+
+async function updateUser2(req, res) {
+    try {
+        const { username, email } = req.body;
+
+        if (!username || !email) {
+            return res.status(422).json({ message: "Invalid fields" });
+        }
+
+        const user = await User.findById(req.user._id);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        user.username = username;
+        user.email = email;
+
+        await user.save();
+
+        return res.status(200).json(user);
+    } catch (error) {
+        return res.status(500).json({ message: "Error updating user", error: error.message });
+    }
 }
 
 module.exports = {
-  register,
-  login,
-  logout,
-  refresh,
-  validateToken,
-  user,
-  updateUser,
+    register,
+    login,
+    logout,
+    refresh,
+    validateToken,
+    user,
+    updateUser,
+    updateUser2,
 };

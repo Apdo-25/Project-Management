@@ -196,6 +196,21 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    async updateUser(payload: User) {
+      try {
+        const { data } = await useApiPrivate().put('/api/auth/update', payload);
+        const updatedUser = {
+          ...data,
+          username: payload.username,
+          email: payload.email
+        };
+        this.user = updatedUser;
+        return data;
+      } catch (error: Error | any) {
+        throw error.message;
+      }
+    },
+
     async logout() {
       try {
         const { data } = await useApiPrivate().post('/api/auth/logout')

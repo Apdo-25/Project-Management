@@ -27,8 +27,9 @@ const passwordForm = reactive({
   confirmPassword: ''
 })
 
-const submitProfile = () => {
-  authStore.setUser({ username: profileForm.name, email: profileForm.email })
+async function submitProfile() {
+  await authStore
+    .updateUser({ username: profileForm.name, email: profileForm.email })
 }
 
 const submitPass = () => {
