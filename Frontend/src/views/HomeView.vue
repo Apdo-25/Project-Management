@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 
 import SectionMain from '@/components/SectionMain.vue'
 import Layout from '@/layouts/Layout.vue'
@@ -10,6 +10,20 @@ import CardBoxComponentBody from '@/components/CardBoxComponentBody.vue'
 import BaseDivider from '@/components/BaseDivider.vue'
 import CardBoxComponentTitle from '@/components/CardBoxComponentTitle.vue'
 import CardBoxComponentHeader from '@/components/CardBoxComponentHeader.vue'
+import * as chartConfig from '@/components/Charts/chart.config.js'
+import LineChart from '@/components/Charts/LineChart.vue'
+import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
+import BaseButton from '@/components/BaseButton.vue'
+
+const chartData = ref(null)
+
+const fillChartData = () => {
+  chartData.value = chartConfig.sampleChartData()
+}
+
+onMounted(() => {
+  fillChartData()
+})
 
 const currentTime = ref(getCurrentTime())
 
@@ -42,6 +56,15 @@ setInterval(() => {
       <BaseDivider />
       <CardBox>
         <CardBoxComponentHeader title="Frequently used Projects" />
+        <SectionTitleLineWithButton :icon="mdiChartPie" title="Trends overview">
+          <BaseButton :icon="mdiReload" color="whiteDark" @click="fillChartData" />
+        </SectionTitleLineWithButton>
+
+        <CardBox class="mb-6">
+          <div v-if="chartData">
+            <line-chart :data="chartData" class="h-96" />
+          </div>
+        </CardBox>
       </CardBox>
       <BaseDivider />
       <CardBox>
