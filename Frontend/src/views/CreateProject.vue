@@ -50,11 +50,11 @@ const formStatusSubmit = () => {
 <template>
   <Layout>
     <SectionMain>
-      <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Create a Project" main>
+      <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Create A Project" main>
         <BaseButton
-          href="/"
+          to="/projects"
           :icon="mdiGithub"
-          label="Back Home"
+          label="My Projects"
           color="contrast"
           rounded-full
           small
