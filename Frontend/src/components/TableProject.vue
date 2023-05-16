@@ -105,7 +105,7 @@ const projectsPaginated = computed(() =>
             {{ project.members }}
           </td>
           <td data-label="Status" class="lg:w-32">
-            <small class="flex w-2/5 self-center lg:w-full" max="100" :value="project.status">
+            <small class="flex w-2/5 self-center lg:w-full" :value="project.status">
               <span
                 v-if="project.status === 'In progress'"
                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"

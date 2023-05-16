@@ -1,4 +1,4 @@
-import { mdiAccountCircle, mdiMonitor, mdiLock, mdiTable } from '@mdi/js'
+import { mdiMonitor, mdiTable } from '@mdi/js'
 
 export default [
   {
