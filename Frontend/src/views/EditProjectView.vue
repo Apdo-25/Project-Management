@@ -1,6 +1,12 @@
 <script setup>
 import { reactive, ref } from 'vue'
-import { mdiBallotOutline, mdiAccount, mdiMail, mdiGithub } from '@mdi/js'
+import {
+  mdiBallotOutline,
+  mdiAccount,
+  mdiTextAccount,
+  mdiGithub,
+  mdiClockTimeEightOutline
+} from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBox from '@/components/CardBox.vue'
 import FormCheckRadioGroup from '@/components/FormCheckRadioGroup.vue'
@@ -28,7 +34,10 @@ const form = reactive({
   name: '',
   Description: '',
   priority: selectOptions1[0],
-  deadline: ''
+  status: selectOptions[0],
+  deadline: '',
+  addMember: '',
+  removeMeber: ''
 })
 
 const customElementsForm = reactive({
@@ -58,7 +67,7 @@ const formStatusSubmit = () => {
     <SectionMain>
       <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Edit The Project" main>
         <BaseButton
-          href="/"
+          to="/projects"
           :icon="mdiGithub"
           label="Go Back To Project"
           color="contrast"
@@ -68,7 +77,7 @@ const formStatusSubmit = () => {
       </SectionTitleLineWithButton>
       <CardBox form @submit.prevent="submit">
         <FormField label="Project Name">
-          <FormControl placeholder="Project Name" v-model="form.name" :icon="mdiAccount" />
+          <FormControl placeholder="Project Name" v-model="form.name" :icon="mdiTextAccount" />
         </FormField>
         <FormField label="Project Description">
           <FormControl
@@ -99,15 +108,15 @@ const formStatusSubmit = () => {
         </FormField>
 
         <FormField label="Add Member">
-          <FormControl placeholder="Add Member" v-model="form.name" :icon="mdiAccount" />
+          <FormControl placeholder="Add Member" v-model="form.addMember" :icon="mdiAccount" />
         </FormField>
 
         <FormField label="Remove Member">
-          <FormControl placeholder="Remove Member" v-model="form.name" :icon="mdiAccount" />
+          <FormControl placeholder="Remove Member" v-model="form.removeMeber" :icon="mdiAccount" />
         </FormField>
 
         <FormField label="Deadline">
-          <FormControl v-model="form.deadline" :icon="mdiAccount" type="date"
+          <FormControl v-model="form.deadline" :icon="mdiClockTimeEightOutline" type="date"
         /></FormField>
         <BaseDivider />
 
