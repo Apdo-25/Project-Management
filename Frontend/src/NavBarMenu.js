@@ -1,30 +1,34 @@
-import { mdiAccount, mdiLogout } from '@mdi/js'
+import { mdiAccount, mdiLogout, mdiThemeLightDark } from '@mdi/js'
 
-export default [
-  {
-    isCurrentUser: true,
-    menu: [
-      {
-        icon: mdiAccount,
-        label: 'My Profile',
-        to: '/profile'
-      },
+export default [{
+        isCurrentUser: true,
+        menu: [{
+                icon: mdiAccount,
+                label: 'My Profile',
+                to: '/profile'
+            },
 
-      {
-        isDivider: true
-      },
-      {
+            {
+                isDivider: true
+            },
+            {
+                icon: mdiLogout,
+                label: 'Log Out',
+                isLogout: true
+            }
+        ]
+    },
+
+    {
         icon: mdiLogout,
-        label: 'Log Out',
+        label: 'Log out',
+        isDesktopNoLabel: true,
         isLogout: true
-      }
-    ]
-  },
-
-  {
-    icon: mdiLogout,
-    label: 'Log out',
-    isDesktopNoLabel: true,
-    isLogout: true
-  }
+    },
+    {
+        icon: mdiThemeLightDark,
+        label: "Light/Dark",
+        isDesktopNoLabel: true,
+        isToggleLightDark: true,
+    }
 ]
