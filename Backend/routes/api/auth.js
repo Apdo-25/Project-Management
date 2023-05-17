@@ -19,4 +19,5 @@ router.put("/user", authMiddleware, authControllers.updateUser);
 
 router.put("/update", authMiddleware, authControllers.updateUser2);
 
+
 module.exports = router;
