@@ -5,17 +5,27 @@ import KanbanBoard from '@/components/kanban/KanbanBoard.vue'
 import Layout from '@/layouts/Layout.vue'
 import ProjectTitle from '@/components/kanban/ProjectTitle.vue'
 import SectionMain from '@/components/SectionMain.vue'
+import CardBox from '@/components/CardBox.vue'
+import CardBoxComponentBody from '@/components/CardBoxComponentBody.vue'
+import CardBoxComponentHeader from '@/components/CardBoxComponentHeader.vue'
 </script>
 
 <template>
   <Layout>
     <SectionMain>
-      <div class="flex">
-        <div class="w-4/5 p-10">
-          <ProjectTitle />
-          <KanbanBoard />
-        </div>
-      </div>
+      <SectionTitleLineWithButton :icon="mdiTableBorder" title="My Projects" main>
+        <BaseButton
+          to="CreateProject"
+          :icon="mdiMonitor"
+          label="Create a new Project"
+          color="contrast"
+          rounded-full
+          small
+        />
+      </SectionTitleLineWithButton>
+
+      <ProjectTitle />
+      <KanbanBoard />
     </SectionMain>
   </Layout>
 </template>

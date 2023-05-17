@@ -2,7 +2,6 @@
 import { ref, computed } from 'vue'
 import draggable from 'vuedraggable'
 import Ticket from './Ticket.vue'
-import KanbanBoardControls from './KanbanBoardControls.vue'
 
 const lanes = ref([
   {
@@ -144,8 +143,6 @@ const dragOptions = computed(() => {
 </script>
 
 <template>
-  <KanbanBoardControls />
-
   <div class="grid grid-cols-3 gap-6">
     <div
       v-for="lane in lanes"
