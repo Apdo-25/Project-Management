@@ -35,6 +35,15 @@ const routes = [
     name: 'kanban',
     component: () => import('@/views/Kanban.vue')
   },
+  {
+    meta: {
+      title: 'KanbanBoard',
+      requiresAuth: true
+    },
+    path: '/KanbanBoard',
+    name: 'KanbanBoard',
+    component: () => import('@/views/KanbanBoardView.vue')
+  },
 
   {
     meta: {
