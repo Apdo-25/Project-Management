@@ -2,6 +2,10 @@
 import { ref, computed } from 'vue'
 import draggable from 'vuedraggable'
 import Ticket from './Ticket.vue'
+import CardBox from '../CardBox.vue'
+import SectionMain from '../SectionMain.vue'
+import SectionTitleLineWithButton from '../SectionTitleLineWithButton.vue'
+import CardBoxComponentTitle from '@/components/CardBoxComponentTitle.vue'
 
 const lanes = ref([
   {
@@ -144,13 +148,13 @@ const dragOptions = computed(() => {
 
 <template>
   <div class="grid grid-cols-3 gap-6">
-    <div
+    <CardBox
       v-for="lane in lanes"
       :key="lane.name"
       class="border border-gray-300 rounded-md bg-gray-50"
     >
-      <div
-        class="bg-white border-b border-gray-300 p-4 rounded-t-md flex items-center justify-between"
+      <CardBoxComponentTitle
+        class="border-gray-300 p-4 rounded-t-md flex items-center justify-between"
       >
         <div class="text-lg font-semibold">
           {{ lane.name }}
@@ -164,11 +168,11 @@ const dragOptions = computed(() => {
             Clear all
           </button>
 
-          <span class="block py-1 px-3 bg-gray-200 rounded-xl text-sm font-semibold">
+          <span class="block py-1 px-3 bg-gray-400 rounded-xl text-sm font-semibold">
             {{ lane.tickets.length }}
           </span>
         </div>
-      </div>
+      </CardBoxComponentTitle>
 
       <div class="p-4 h-full">
         <draggable
@@ -183,6 +187,6 @@ const dragOptions = computed(() => {
           </template>
         </draggable>
       </div>
-    </div>
+    </CardBox>
   </div>
 </template>

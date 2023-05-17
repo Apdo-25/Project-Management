@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import CardBox from '../CardBox.vue'
 
 const props = defineProps({
   ticket: Object
@@ -7,7 +8,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <div
+  <CardBox
     class="bg-white p-4 mb-3 shadow-md border-t border-r border-l border-gray-100 rounded-md flex flex-col-reverse space-y-2 space-y-reverse relative hover:cursor-move"
   >
     <div>{{ ticket.title }}</div>
@@ -47,5 +48,5 @@ const props = defineProps({
     >
       {{ ticket.level }}
     </div>
-  </div>
+  </CardBox>
 </template>
