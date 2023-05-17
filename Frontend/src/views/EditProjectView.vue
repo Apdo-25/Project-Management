@@ -4,7 +4,7 @@ import {
   mdiBallotOutline,
   mdiAccount,
   mdiTextAccount,
-  mdiGithub,
+  mdiArrowLeft,
   mdiClockTimeEightOutline
 } from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
@@ -68,7 +68,7 @@ const formStatusSubmit = () => {
       <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Edit The Project" main>
         <BaseButton
           to="/projects"
-          :icon="mdiGithub"
+          :icon="mdiArrowLeft"
           label="Go Back To Project"
           color="contrast"
           rounded-full

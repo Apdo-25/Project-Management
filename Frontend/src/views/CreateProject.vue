@@ -1,6 +1,6 @@
 <script setup>
 import { reactive, ref } from 'vue'
-import { mdiBallotOutline, mdiClockTimeEightOutline, mdiTextAccount, mdiGithub } from '@mdi/js'
+import { mdiBallotOutline, mdiClockTimeEightOutline, mdiTextAccount, mdiArrowLeft } from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBox from '@/components/CardBox.vue'
 import FormCheckRadioGroup from '@/components/FormCheckRadioGroup.vue'
@@ -53,7 +53,7 @@ const formStatusSubmit = () => {
       <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Create A Project" main>
         <BaseButton
           to="/projects"
-          :icon="mdiGithub"
+          :icon="mdiArrowLeft"
           label="My Projects"
           color="contrast"
           rounded-full

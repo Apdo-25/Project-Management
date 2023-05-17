@@ -28,15 +28,6 @@ const routes = [
 
   {
     meta: {
-      title: 'Kanban',
-      requiresAuth: true
-    },
-    path: '/kanban',
-    name: 'kanban',
-    component: () => import('@/views/Kanban.vue')
-  },
-  {
-    meta: {
       title: 'KanbanBoard',
       requiresAuth: true
     },

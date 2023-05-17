@@ -4,7 +4,7 @@
       <SectionTitleLineWithButton :icon="mdiTableBorder" title="My Projects" main>
         <BaseButton
           to="CreateProject"
-          :icon="mdiMonitor"
+          :icon="mdiPencilOutline"
           label="Create a new Project"
           color="contrast"
           rounded-full
@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { mdiTableBorder, mdiMonitor } from '@mdi/js'
+import { mdiTableBorder, mdiPencilOutline } from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
 import TableProject from '@/components/TableProject.vue'
 import Layout from '@/layouts/Layout.vue'
