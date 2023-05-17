@@ -18,6 +18,8 @@ export interface State {
   user: User
   accessToken: string
   authReady: boolean
+  //all users
+  users: User[]
 }
 
 export interface LoginData {
@@ -39,13 +41,15 @@ export const useAuthStore = defineStore('auth', {
     return {
       user: {} as User,
       accessToken: '',
-      authReady: false
+      authReady: false,
+      users: []
     }
   },
 
   getters: {
     userDetail: (state: State) => state.user,
-    isAuthenticated: (state: State) => !!state.accessToken
+    isAuthenticated: (state: State) => !!state.accessToken,
+    AllUsers: (state: State) => state.users
   },
 
   actions: {
@@ -198,17 +202,17 @@ export const useAuthStore = defineStore('auth', {
 
     async updateUser(payload: User) {
       try {
-        const { data } = await useApiPrivate().put('/api/auth/update', payload);
+        const { data } = await useApiPrivate().put('/api/auth/update', payload)
         const updatedUser = {
           ...data,
           username: payload.username,
           email: payload.email,
           avatar: payload.avatar
-        };
-        this.user = updatedUser;
-        return data;
+        }
+        this.user = updatedUser
+        return data
       } catch (error: Error | any) {
-        throw error.message;
+        throw error.message
       }
     },
 
