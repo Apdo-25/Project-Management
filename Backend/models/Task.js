@@ -1,10 +1,8 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-// Schema for Tasks
 const taskSchema = new Schema(
   {
-    project: { type: Schema.Types.ObjectId, ref: "Project" },
     board: {
       type: Schema.Types.ObjectId,
       ref: "Board",
@@ -26,5 +24,4 @@ const taskSchema = new Schema(
   }
 );
 
-// Export the model
 module.exports = mongoose.model("Task", taskSchema);
