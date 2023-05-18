@@ -1,52 +1,3 @@
-<script setup>
-import { reactive, ref } from 'vue'
-import { mdiBallotOutline, mdiClockTimeEightOutline, mdiTextAccount, mdiArrowLeft } from '@mdi/js'
-import SectionMain from '@/components/SectionMain.vue'
-import CardBox from '@/components/CardBox.vue'
-import FormCheckRadioGroup from '@/components/FormCheckRadioGroup.vue'
-import FormField from '@/components/FormField.vue'
-import FormControl from '@/components/FormControl.vue'
-import BaseDivider from '@/components/BaseDivider.vue'
-import BaseButton from '@/components/BaseButton.vue'
-import BaseButtons from '@/components/BaseButtons.vue'
-
-import Layout from '@/layouts/Layout.vue'
-import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
-
-const selectOptions1 = [
-  { id: 1, label: 'Low' },
-  { id: 2, label: 'Medium' },
-  { id: 3, label: 'High' }
-]
-const form = reactive({
-  name: '',
-  Description: '',
-  priority: selectOptions1[0],
-  deadline: ''
-})
-
-const customElementsForm = reactive({
-  checkbox: ['lorem'],
-  radio: 'one',
-  switch: ['one'],
-  file: null
-})
-
-const submit = () => {
-  //
-}
-
-const formStatusCurrent = ref(0)
-
-const formStatusOptions = ['info', 'success', 'danger', 'warning']
-
-const formStatusSubmit = () => {
-  formStatusCurrent.value = formStatusOptions[formStatusCurrent.value + 1]
-    ? formStatusCurrent.value + 1
-    : 0
-}
-</script>
-
 <template>
   <Layout>
     <SectionMain>
@@ -69,7 +20,7 @@ const formStatusSubmit = () => {
             placeholder="Project Description"
             help="What is your project about. Max 255 characters"
             label="Project Description"
-            v-model="form.Description"
+            v-model="form.description"
             type="textarea"
           />
         </FormField>
@@ -77,20 +28,24 @@ const formStatusSubmit = () => {
         <FormField label="Priority">
           <FormCheckRadioGroup
             type="radio"
-            v-model="selectOptions1"
+            v-model="form.priority"
             name="Priority-checkbox"
-            :options="{ lorem: 'Low', ipsum: 'Medium', dolore: 'High' }"
+            :options="{ low: 'Low', medium: 'Medium', high: 'High' }"
           />
         </FormField>
 
+        <FormField label="Members">
+          <FormControl v-model="form.members" :icon="mdiTextAccount" />
+        </FormField>
+
         <FormField label="Deadline">
-          <FormControl v-model="form.deadline" :icon="mdiClockTimeEightOutline" type="date"
-        /></FormField>
+          <FormControl v-model="form.deadline" :icon="mdiClockTimeEightOutline" type="date" />
+        </FormField>
         <BaseDivider />
 
         <template #footer>
           <BaseButtons>
-            <BaseButton type="submit" color="info" label="Submit" />
+            <BaseButton type="submit" color="info" label="Submit" @click="submit" />
             <BaseButton type="reset" color="info" outline label="Reset" />
           </BaseButtons>
         </template>
@@ -98,3 +53,71 @@ const formStatusSubmit = () => {
     </SectionMain>
   </Layout>
 </template>
+
+<script setup>
+import { ref } from 'vue'
+
+import SectionMain from '@/components/SectionMain.vue'
+import CardBox from '@/components/CardBox.vue'
+import FormCheckRadioGroup from '@/components/FormCheckRadioGroup.vue'
+import FormField from '@/components/FormField.vue'
+import FormControl from '@/components/FormControl.vue'
+import BaseDivider from '@/components/BaseDivider.vue'
+import BaseButton from '@/components/BaseButton.vue'
+import BaseButtons from '@/components/BaseButtons.vue'
+import Layout from '@/layouts/Layout.vue'
+import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
+
+import { useRouter } from 'vue-router'
+import { mdiBallotOutline, mdiClockTimeEightOutline, mdiTextAccount, mdiArrowLeft } from '@mdi/js'
+import { useProjectStore } from '@/stores/project'
+// Other imports...
+
+const router = useRouter() // Add this line to access Vue Router
+const form = ref({
+  name: '',
+  description: '',
+  priority: 'low',
+  members: [],
+  deadline: ''
+})
+
+const projectStore = useProjectStore()
+
+const submit = () => {
+  console.log(submit)
+  const membersInput = form.value.members
+  const membersToSend = membersInput ? membersInput : []
+
+  const projectData = {
+    name: form.value.name,
+    description: form.value.description,
+    priority: form.value.priority,
+    members: membersToSend,
+    deadline: form.value.deadline,
+    status: 'new' // or whatever default status you want
+  }
+
+  projectStore
+    .createProject(projectData)
+    .then(() => {
+      router.push({ name: 'Projects' })
+
+      // Project created successfully
+
+      // Navigate to the kanban board
+      router.push('/KanbanBoard')
+
+      // Reset form
+      form.value.name = ''
+      form.value.description = ''
+      form.value.priority = 'low'
+      form.value.members = ''
+      form.value.deadline = ''
+    })
+    .catch((error) => {
+      console.error('Error creating project:', error)
+      // Handle error
+    })
+}
+</script>

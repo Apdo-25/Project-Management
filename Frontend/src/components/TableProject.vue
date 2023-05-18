@@ -7,25 +7,27 @@ import BaseLevel from '@/components/BaseLevel.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
-import useProjectStore from '@/stores/project'
+import { useProjectStoreWrapper } from '@/stores/project'
 import { useAuthStore } from '@/stores/auth'
 import CardBox from '@/components/CardBox.vue'
 
-const projectStore = useProjectStore()
+const projectStore = useProjectStoreWrapper()
 const authStore = useAuthStore()
 
 onMounted(async () => {
-  await projectStore.fetchProjects()
+  const userId = authStore.userDetail.id
+  const response = await projectStore.fetchUserProjects(userId)
 
-  //console
-  console.log(projectStore.projects)
+  // Console log the response and the projects
+  console.log('fetchUserProjects response:', response)
+  console.log('projects:', projectStore.getProjects)
 })
 
 const perPage = ref(5)
 const currentPage = ref(0)
 const checkedRows = ref([])
 
-const numPages = computed(() => Math.ceil(projectStore.projects.length / perPage.value))
+const numPages = computed(() => Math.ceil(projectStore.getProjects.length / perPage.value))
 
 const currentPageHuman = computed(() => currentPage.value + 1)
 
@@ -50,14 +52,20 @@ const remove = (arr, cb) => {
 
   return newArr
 }
-
 const checked = (isChecked, project) => {
   if (isChecked) {
     checkedRows.value.push(project)
   } else {
-    checkedRows.value = remove(checkedRows.value, (row) => row.id === project.id)
+    checkedRows.value = remove(checkedRows.value, (row) => row._id === project._id)
   }
 }
+
+const projectsPaginated = computed(() => {
+  const currentUser = authStore.userDetail.id // Access the current user's ID from the auth store
+  return projectStore.getProjects
+    .filter((project) => project.createdBy === currentUser || project.members.includes(currentUser))
+    .slice(perPage.value * currentPage.value, perPage.value * (currentPage.value + 1))
+})
 
 // const projectsPaginated = computed(() => {
 //   const currentUser = authStore.userDetail.id // Access the current user's ID from the auth store
@@ -65,13 +73,6 @@ const checked = (isChecked, project) => {
 //     .filter((project) => project.createdBy === currentUser || project.members.includes(currentUser))
 //     .slice(perPage.value * currentPage.value, perPage.value * (currentPage.value + 1))
 // })
-
-const projectsPaginated = computed(() =>
-  projectStore.projects.slice(
-    perPage.value * currentPage.value,
-    perPage.value * (currentPage.value + 1)
-  )
-)
 </script>
 
 <template>
@@ -90,7 +91,7 @@ const projectsPaginated = computed(() =>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="project in projectsPaginated" :key="project.id">
+        <tr v-for="project in projectsPaginated" :key="project._id">
           <TableCheckboxCell v-if="checkable" @checked="checked($event, project)" />
           <td class="border-b-0 lg:w-6 before:hidden">
             <UserAvatar :username="project.name" class="w-24 h-24 mx-auto lg:w-6 lg:h-6" />
@@ -134,7 +135,7 @@ const projectsPaginated = computed(() =>
           <td class="before:hidden lg:w-1 whitespace-nowrap">
             <BaseButtons>
               <BaseButton
-                :href="`/projects/${project.id}`"
+                :href="`/projects/${project._id}`"
                 :icon="mdiEye"
                 label="View"
                 color="info"
@@ -150,7 +151,7 @@ const projectsPaginated = computed(() =>
                 small
               />
               <BaseButton
-                :href="`/projects/${project.id}/delete`"
+                :href="`/projects/${project._id}/delete`"
                 :icon="mdiTrashCan"
                 label="Delete"
                 color="danger"

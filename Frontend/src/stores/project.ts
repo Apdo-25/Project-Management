@@ -28,6 +28,30 @@ export const useProjectStore = defineStore('project', {
       }
     },
 
+    async fetchUserProjects(userId) {
+      try {
+        const response = await useApiPrivate().get(`/api/projects?userId=${userId}`)
+        if (response.status === 200) {
+          this.projects = response.data
+        } else {
+          throw new Error(`Request failed with status code ${response.status}`)
+        }
+      } catch (error) {
+        console.error('Failed to fetch projects:', error)
+      }
+    },
+
+    async fetchMemberProjects(userId: string) {
+      try {
+        const response = await useApiPrivate().get(`/api/project/projects/member/${userId}`)
+        this.projects = response.data
+        return this.projects
+      } catch (error) {
+        console.error(`Error fetching projects for member ${userId}:`, error)
+        throw error
+      }
+    },
+
     async fetchProjectById(id: string) {
       try {
         const response = await useApiPrivate().get(`/api/project/projects/${id}`)
@@ -42,7 +66,7 @@ export const useProjectStore = defineStore('project', {
       try {
         const response = await useApiPrivate().post('/api/project/projects', projectData)
         const project = response.data
-        this.projects.push(project)
+        this.projects.push(project) // Add the project to the store's state
         return project
       } catch (error) {
         console.error('Error creating project:', error)
@@ -136,6 +160,10 @@ export const useProjectStore = defineStore('project', {
         console.error('Error removing member from project:', error)
         throw error
       }
+    },
+
+    addProject(project: Project) {
+      this.projects.push(project)
     }
   }
 })
@@ -143,5 +171,6 @@ export const useProjectStore = defineStore('project', {
 //export store
 export type ProjectStore = ReturnType<typeof useProjectStore>
 
-//export default store
-export default useProjectStore
+export function useProjectStoreWrapper() {
+  return useProjectStore()
+}

@@ -1,6 +1,7 @@
 <script setup>
 import SectionMain from '@/components/SectionMain.vue'
 import CardBox from '@/components/CardBox.vue'
+import CardBoxComponentHeader from '@/components/CardBoxComponentHeader.vue'
 </script>
 
 <template>
