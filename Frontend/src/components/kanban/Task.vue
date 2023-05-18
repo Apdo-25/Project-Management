@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import CardBox from '../CardBox.vue'
 
 const props = defineProps({
-  ticket: Object
+  task: Object
 })
 </script>
 
@@ -11,8 +11,8 @@ const props = defineProps({
   <CardBox
     class="bg-white p-4 mb-3 shadow-md border-t border-r border-l border-gray-100 rounded-md flex flex-col-reverse space-y-2 space-y-reverse relative hover:cursor-move"
   >
-    <div>{{ ticket.title }}</div>
-    <div class="text-gray-400 text-sm">{{ ticket.author }}, {{ ticket.created_at }}</div>
+    <div>{{ task.title }}</div>
+    <div class="text-gray-400 text-sm">{{ task.author }}, {{ task.created_at }}</div>
     <div class="text-gray-300 flex items-center">
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -27,26 +27,26 @@ const props = defineProps({
         />
       </svg>
       <span class="text-gray-400 font-semibold">
-        {{ ticket.comments_count }}
+        {{ task.comments_count }}
       </span>
     </div>
     <div
-      v-if="ticket.level == 'Low Level'"
+      v-if="task.level == 'Low Level'"
       class="absolute top-4 right-4 bg-green-100 text-green-700 font-semibold text-sm px-3 rounded-full"
     >
-      {{ ticket.level }}
+      {{ task.level }}
     </div>
     <div
-      v-if="ticket.level == 'Medium Level'"
+      v-if="task.level == 'Medium Level'"
       class="absolute top-4 right-4 bg-yellow-100 text-yellow-700 font-semibold text-sm px-3 rounded-full"
     >
-      {{ ticket.level }}
+      {{ task.level }}
     </div>
     <div
-      v-if="ticket.level == 'High Level'"
+      v-if="task.level == 'High Level'"
       class="absolute top-4 right-4 bg-red-100 text-red-700 font-semibold text-sm px-3 rounded-full"
     >
-      {{ ticket.level }}
+      {{ task.level }}
     </div>
   </CardBox>
 </template>

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import draggable from 'vuedraggable'
-import Ticket from './Ticket.vue'
+import Task from './Task.vue'
 import CardBox from '../CardBox.vue'
 import SectionMain from '../SectionMain.vue'
 import SectionTitleLineWithButton from '../SectionTitleLineWithButton.vue'
@@ -10,7 +10,7 @@ import CardBoxComponentTitle from '@/components/CardBoxComponentTitle.vue'
 const lanes = ref([
   {
     name: 'To Do',
-    tickets: [
+    tasks: [
       {
         title:
           "We don't have a brig. Meh. Calculon is gonna kill us and it's all everybody else's fault!",
@@ -71,7 +71,7 @@ const lanes = ref([
   },
   {
     name: 'In Progress',
-    tickets: [
+    tasks: [
       {
         title:
           "You are the last hope of the universe. Stop! Don't shoot fire stick in space canoe!",
@@ -100,7 +100,7 @@ const lanes = ref([
   },
   {
     name: 'Done',
-    tickets: [
+    tasks: [
       {
         title:
           "Stop it, stop it. It's fine. I will 'destroy' you! I can explain. It's very valuable. ",
@@ -148,11 +148,7 @@ const dragOptions = computed(() => {
 
 <template>
   <div class="grid grid-cols-3 gap-6">
-    <CardBox
-      v-for="lane in lanes"
-      :key="lane.name"
-      class="border border-gray-300 rounded-md bg-gray-50"
-    >
+    <CardBox v-for="lane in lanes" :key="lane.name">
       <CardBoxComponentTitle
         class="border-gray-300 p-4 rounded-t-md flex items-center justify-between"
       >
@@ -169,7 +165,7 @@ const dragOptions = computed(() => {
           </button>
 
           <span class="block py-1 px-3 bg-gray-400 rounded-xl text-sm font-semibold">
-            {{ lane.tickets.length }}
+            {{ lane.tasks.length }}
           </span>
         </div>
       </CardBoxComponentTitle>
@@ -177,13 +173,13 @@ const dragOptions = computed(() => {
       <div class="p-4 h-full">
         <draggable
           class="min-h-full"
-          :list="lane.tickets"
+          :list="lane.tasks"
           group="tickets"
           itemKey="name"
           v-bind="dragOptions"
         >
           <template #item="{ element }">
-            <Ticket :ticket="element" />
+            <Task :task="element" />
           </template>
         </draggable>
       </div>
