@@ -13,16 +13,14 @@ export const useProjectStore = defineStore('project', {
 
   getters: {
     getProjects: (state) => state.projects,
-    getProjectById: (state) => (id: string) => {
-      return state.projects.find((project) => project._id === id)
-    }
+    getProjectById: (state) => (id: string) => state.projects.find((project) => project._id === id)
   },
 
   actions: {
     async fetchProjects() {
       try {
         const response = await useApiPrivate().get('/api/project/projects')
-        this.projects = response.data.projects // Update the projects property with the fetched data
+        this.projects = response.data
         return this.projects
       } catch (error) {
         console.error('Error fetching projects:', error)
@@ -100,15 +98,11 @@ export const useProjectStore = defineStore('project', {
 
     async removeBoard(projectId: string, boardId: string) {
       try {
-        const response = await useApiPrivate().delete(
-          `/api/project/projects/${projectId}/boards/${boardId}`
-        )
-        const project = response.data
+        await useApiPrivate().delete(`/api/project/projects/${projectId}/boards/${boardId}`)
         const index = this.projects.findIndex((project) => project._id === projectId)
         if (index !== -1) {
-          this.projects.splice(index, 1, project)
+          this.projects.splice(index, 1)
         }
-        return project
       } catch (error) {
         console.error('Error removing board from project:', error)
         throw error
@@ -117,9 +111,9 @@ export const useProjectStore = defineStore('project', {
 
     async addMember(projectId: string, memberId: string) {
       try {
-        const response = await useApiPrivate().post(`/api/project/projects/${projectId}/members`, {
-          memberId
-        })
+        const response = await useApiPrivate().post(
+          `/api/project/projects/${projectId}/members/${memberId}`
+        )
         const project = response.data
         const index = this.projects.findIndex((project) => project._id === projectId)
         if (index !== -1) {
@@ -131,30 +125,15 @@ export const useProjectStore = defineStore('project', {
         throw error
       }
     },
-
     async removeMember(projectId: string, memberId: string) {
       try {
-        const response = await useApiPrivate().delete(
-          `/api/project/projects/${projectId}/members/${memberId}`
-        )
-        const project = response.data
+        await useApiPrivate().delete(`/api/project/projects/${projectId}/members/${memberId}`)
         const index = this.projects.findIndex((project) => project._id === projectId)
         if (index !== -1) {
-          this.projects.splice(index, 1, project)
+          this.projects.splice(index, 1)
         }
-        return project
       } catch (error) {
         console.error('Error removing member from project:', error)
-        throw error
-      }
-    },
-
-    async deleteAllProjects() {
-      try {
-        await useApiPrivate().delete(`/api/project/projects`)
-        this.projects = []
-      } catch (error) {
-        console.error('Error deleting all projects:', error)
         throw error
       }
     }
@@ -163,4 +142,6 @@ export const useProjectStore = defineStore('project', {
 
 //export store
 export type ProjectStore = ReturnType<typeof useProjectStore>
+
+//export default store
 export default useProjectStore
