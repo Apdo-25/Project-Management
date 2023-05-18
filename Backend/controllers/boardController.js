@@ -28,7 +28,7 @@ async function createBoard(req, res) {
   try {
     const { name, project, creator, members } = req.body;
     const board = await Board.create({ name, project, creator, members });
-    return res.json(board);
+    return res.status(201).json(board);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Failed to create board." });
@@ -68,13 +68,11 @@ async function deleteBoard(req, res) {
   }
 }
 
-// Create a task within a board
 async function createTask(req, res) {
   try {
     const { boardId } = req.params;
     const { name, description } = req.body;
 
-    // Create the task using the provided information
     const task = await Task.create({
       name,
       description,
@@ -88,13 +86,10 @@ async function createTask(req, res) {
   }
 }
 
-// Get tasks within a board
 async function getTasks(req, res) {
   try {
     const { boardId } = req.params;
-
-    // Retrieve all tasks associated with the given boardId
-    const tasks = await Task.find({ board: boardId });
+    const tasks = await Task.find({ board: boardId }).exec();
 
     return res.status(200).json(tasks);
   } catch (error) {
@@ -103,18 +98,16 @@ async function getTasks(req, res) {
   }
 }
 
-// Update a task within a board
 async function updateTask(req, res) {
   try {
     const { boardId, taskId } = req.params;
     const { name, description } = req.body;
 
-    // Find the task by taskId and boardId and update its information
     const task = await Task.findOneAndUpdate(
       { _id: taskId, board: boardId },
       { name, description },
       { new: true }
-    );
+    ).exec();
 
     if (!task) {
       return res.status(404).json({ error: "Task not found." });
@@ -127,16 +120,14 @@ async function updateTask(req, res) {
   }
 }
 
-// Delete a task within a board
 async function deleteTask(req, res) {
   try {
     const { boardId, taskId } = req.params;
 
-    // Find the task by taskId and boardId and delete it
     const task = await Task.findOneAndDelete({
       _id: taskId,
       board: boardId,
-    });
+    }).exec();
 
     if (!task) {
       return res.status(404).json({ error: "Task not found." });

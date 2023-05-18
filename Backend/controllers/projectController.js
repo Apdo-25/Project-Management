@@ -3,23 +3,68 @@ const Board = require("../models/Board");
 const Task = require("../models/Task");
 
 async function createProject(req, res) {
+  const { name, description, status, members, priority, deadline } = req.body;
+
+  let project;
   try {
-    const { name } = req.body;
-    const project = await Project.create({ name });
+    project = await Project.create({
+      name,
+      description,
+      // If status is not provided, set it to "New"
+      status: status || "new",
+      members,
+      priority,
+      deadline,
+    });
+  } catch (error) {
+    console.error("Error creating project: ", error);
+    return res.status(500).json({ error: "Failed to create project." });
+  }
+
+  try {
     return res.json(project);
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Failed to create project." });
+    console.error("Error returning project: ", error);
+    return res.status(500).json({ error: "Failed to return project." });
   }
 }
 
-async function getProjects(req, res) {
+async function getAllProjects(req, res) {
   try {
     const projects = await Project.find().exec();
     return res.json(projects);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Failed to fetch projects." });
+  }
+}
+
+async function getUserProjects(req, res) {
+  const { userId } = req.params; // Extract the user ID from the request parameters
+
+  try {
+    // Filter the projects so only those where the user is a member are returned
+    const projects = await Project.find({ members: userId }).exec();
+    return res.json(projects);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to fetch user's projects." });
+  }
+}
+
+async function getMemberProjects(req, res) {
+  const { userId } = req.params; // Extract the user ID from the request parameters
+  const { projectId } = req.query; // Extract the project ID from the request query parameters
+  try {
+    // Filter the projects so only those where the user is a member are returned
+    const projects = await Project.find({
+      members: userId,
+      _id: { $ne: projectId }, // Exclude the current project
+    }).exec();
+    return res.json(projects);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to fetch user's projects." });
   }
 }
 
@@ -211,7 +256,9 @@ async function deleteAllProjects(req, res) {
 
 module.exports = {
   createProject,
-  getProjects,
+  getAllProjects,
+  getUserProjects,
+  getMemberProjects,
   getProject,
   updateProject,
   deleteProject,

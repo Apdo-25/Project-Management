@@ -9,14 +9,14 @@ const projectSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Board",
     },
-    creator: {
+    createdBy: {
       type: Schema.Types.ObjectId,
       ref: "User",
     },
     status: {
       type: String,
-      enum: ["In progress", "Open", "Closed"],
-      default: "In progress",
+      enum: ["in progress", "open", "closed", "new"],
+      default: "in progress",
     },
     members: [
       {
@@ -30,8 +30,8 @@ const projectSchema = new Schema(
     },
     priority: {
       type: String,
-      enum: ["Low", "Medium", "High"],
-      default: "Low",
+      enum: ["low", "medium", "high"],
+      default: "low",
     },
   },
   {

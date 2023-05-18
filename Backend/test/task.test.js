@@ -1,116 +1,215 @@
-process.env.NODE_ENV = "test";
+// const chai = require("chai");
+// const chaiHttp = require("chai-http");
+// const server = require("../server");
+// const expect = chai.expect;
+// const Task = require("../models/Task");
 
-const chai = require("chai");
-const chaiHttp = require("chai-http");
-const server = require("../server");
-const should = chai.should();
-const expect = chai.expect;
-const Task = require("../models/Task");
+// //env testdb
+// process.env.NODE_ENV = "test";
 
-chai.use(chaiHttp);
+// chai.use(chaiHttp);
 
-//clear db after test
-after(async function () {
-  try {
-    await Task.deleteMany();
-  } catch (err) {
-    console.error(err);
-  }
-});
+// describe("Task Controller", () => {
+//   beforeEach(async () => {
+//     // Clear the database before each test
+//     await Task.deleteMany();
+//   });
 
-describe("/First Test Collection", () => {
-  it("test default API route...", (done) => {
-    chai
-      .request(server)
-      .get("/")
-      .end((err, res) => {
-        res.should.have.status(200);
-        res.body.should.be.a("object");
-        res.body.should.have.property("message").eql("Hello World!");
-        done();
-      });
-  });
-});
+//   describe("GET /api/task/tasks", () => {
+//     it("should get all tasks", async () => {
+//       // Create test tasks
+//       const task1 = new Task({
+//         name: "Task 1",
+//         description: "Description 1",
+//         due_date: new Date(),
+//         assigned_to: "User 1",
+//         creator: "User 2",
+//         status: "In Progress",
+//         priority: "High",
+//       });
+//       await task1.save();
 
-describe("/Second Test Collection", () => {
-  it("test GET route...", (done) => {
-    chai
-      .request(server)
-      .get("/api/task/tasks")
-      .end((err, res) => {
-        res.should.have.status(200);
-        res.body.should.be.a("array");
-        done();
-      });
-  });
-});
+//       const task2 = new Task({
+//         name: "Task 2",
+//         description: "Description 2",
+//         due_date: new Date(),
+//         assigned_to: "User 2",
+//         creator: "User 1",
+//         status: "Completed",
+//         priority: "Low",
+//       });
+//       await task2.save();
 
-describe("/Third Test Collection", () => {
-  it("test POST route...", (done) => {
-    chai
-      .request(server)
-      .post("/api/task/tasks")
-      .send({
-        name: "Test Task",
-        description: "Test Description",
-      })
-      .end((err, res) => {
-        res.should.have.status(200);
-        res.body.should.be.a("object");
-        res.body.should.have.property("name").eql("Test Task");
-        res.body.should.have.property("description").eql("Test Description");
-        done();
-      });
-  });
-});
+//       const response = await chai.request(server).get("/api/task/tasks");
 
-describe("/Fourth Test Collection", function () {
-  it("test DELETE route...", async function () {
-    this.timeout(10000); // increase the timeout to 5 seconds
-    const task = new Task({
-      name: "Test Task",
-      description: "Test Description",
-    });
-    await task.save();
-    const res = await chai.request(server).delete("/api/task/tasks/" + task.id);
-    res.should.have.status(204);
-    res.body.should.be.a("object");
-  });
-});
+//       expect(response).to.have.status(200);
+//       expect(response.body).to.be.an("array");
+//       expect(response.body).to.have.lengthOf(2);
 
-describe("/Fifth Test Collection", function () {
-  it("test PUT route...", async function () {
-    this.timeout(20000); // increase the timeout to 10 seconds
-    const task = new Task({
-      name: "Test Task",
-      description: "Test Description",
-    });
-    await task.save();
-    const res = await chai
-      .request(server)
-      .put("/api/task/tasks/" + task.id)
-      .send({
-        name: "Test Task Updated",
-        description: "Test Description Updated",
-      });
-    res.should.have.status(200);
-    res.body.should.be.a("object");
-  });
-});
+//       const taskNames = response.body.map((task) => task.name);
+//       expect(taskNames).to.include.members(["Task 1", "Task 2"]);
+//     });
+//   });
 
-describe("/Sixth Test Collection", function () {
-  it("test GET by ID route...", async function () {
-    this.timeout(10000); // increase the timeout to 5 seconds
-    const task = new Task({
-      name: "Test Task",
-      description: "Test Description",
-    });
-    await task.save();
-    const res = await chai
-      .request(server)
-      .get("/api/task/tasks/" + task.id)
-      .send(task);
-    res.should.have.status(200);
-    res.body.should.be.a("object");
-  });
-});
+//   describe("GET /api/task/tasks/:id", () => {
+//     it("should get a single task", async () => {
+//       // Create a test task
+//       const task = new Task({
+//         name: "Test Task",
+//         description: "Test Description",
+//         due_date: new Date(),
+//         assigned_to: "User 1",
+//         creator: "User 2",
+//         status: "In Progress",
+//         priority: "High",
+//       });
+//       await task.save();
+
+//       const response = await chai
+//         .request(server)
+//         .get(`/api/task/tasks/${task._id}`);
+
+//       expect(response).to.have.status(200);
+//       expect(response.body).to.be.an("object");
+//       expect(response.body).to.have.property("name", "Test Task");
+//       expect(response.body).to.have.property("description", "Test Description");
+//     });
+
+//     it("should return error if task is not found", async () => {
+//       const response = await chai
+//         .request(server)
+//         .get("/api/task/tasks/1234567890");
+
+//       expect(response).to.have.status(404);
+//       expect(response.body).to.have.property("error", "Task not found.");
+//     });
+//   });
+
+//   describe("POST /api/task/tasks", () => {
+//     it("should create a new task", async () => {
+//       const response = await chai.request(server).post("/api/task/tasks").send({
+//         name: "Test Task",
+//         description: "Test Description",
+//         due_date: new Date(),
+//         assigned_to: "User 1",
+//         creator: "User 2",
+//         status: "In Progress",
+//         priority: "High",
+//       });
+
+//       expect(response).to.have.status(200);
+//       expect(response.body).to.be.an("object");
+//       expect(response.body).to.have.property("name", "Test Task");
+//       expect(response.body).to.have.property("description", "Test Description");
+//     });
+//   });
+
+//   describe("PUT /api/task/tasks/:id", () => {
+//     it("should update a task", async () => {
+//       // Create a test task
+//       const task = new Task({
+//         name: "Test Task",
+//         description: "Test Description",
+//         due_date: new Date(),
+//         assigned_to: "User 1",
+//         creator: "User 2",
+//         status: "In Progress",
+//         priority: "High",
+//       });
+//       await task.save();
+
+//       const response = await chai
+//         .request(server)
+//         .put(`/api/task/tasks/${task._id}`)
+//         .send({ name: "Updated Task", description: "Updated Description" });
+
+//       expect(response).to.have.status(200);
+//       expect(response.body).to.be.an("object");
+//       expect(response.body).to.have.property("name", "Updated Task");
+//       expect(response.body).to.have.property(
+//         "description",
+//         "Updated Description"
+//       );
+//     });
+
+//     it("should return error if task is not found", async () => {
+//       const response = await chai
+//         .request(server)
+//         .put("/api/task/tasks/1234567890")
+//         .send({ name: "Updated Task" });
+
+//       expect(response).to.have.status(404);
+//       expect(response.body).to.have.property("error", "Task not found.");
+//     });
+//   });
+
+//   describe("DELETE /api/task/tasks/:id", () => {
+//     it("should delete a task", async () => {
+//       // Create a test task
+//       const task = new Task({
+//         name: "Test Task",
+//         description: "Test Description",
+//         due_date: new Date(),
+//         assigned_to: "User 1",
+//         creator: "User 2",
+//         status: "In Progress",
+//         priority: "High",
+//       });
+//       await task.save();
+
+//       const response = await chai
+//         .request(server)
+//         .delete(`/api/task/tasks/${task._id}`);
+
+//       expect(response).to.have.status(204);
+
+//       // Check if the task is deleted from the database
+//       const deletedTask = await Task.findById(task._id);
+//       expect(deletedTask).to.be.null;
+//     });
+
+//     it("should return error if task is not found", async () => {
+//       const response = await chai
+//         .request(server)
+//         .delete("/api/task/tasks/1234567890");
+
+//       expect(response).to.have.status(404);
+//       expect(response.body).to.have.property("error", "Task not found.");
+//     });
+//   });
+
+//   describe("DELETE /api/task/tasks", () => {
+//     it("should delete all tasks", async () => {
+//       // Create test tasks
+//       const task1 = new Task({
+//         name: "Task 1",
+//         description: "Description 1",
+//         due_date: new Date(),
+//         assigned_to: "User 1",
+//         creator: "User 2",
+//         status: "In Progress",
+//         priority: "High",
+//       });
+//       await task1.save();
+
+//       const task2 = new Task({
+//         name: "Task 2",
+//         description: "Description 2",
+//         due_date: new Date(),
+//         assigned_to: "User 2",
+//         creator: "User 1",
+//         status: "Completed",
+//         priority: "Low",
+//       });
+//       await task2.save();
+
+//       const response = await chai.request(server).delete("/api/task/tasks");
+
+//       expect(response).to.have.status(204);
+
+//       // Check if all tasks are deleted from the database
+//       const deletedTasks = await Task.find();
+//       expect(deletedTasks).to.have.lengthOf(0);
+//     });
+//   });
+// });

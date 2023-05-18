@@ -19,6 +19,8 @@ const PORT = 4000;
 
 connectDB();
 
+//routes
+
 // Allow Credentials
 app.use(credentials);
 
@@ -50,6 +52,7 @@ app.get("/", (req, res) => {
 // Routes
 app.use("/api/auth", require("./routes/api/auth"));
 app.use("/api/project", require("./routes/api/project"));
+app.use("/api/board", require("./routes/api/board"));
 app.use("/api/task", require("./routes/api/task"));
 
 // 404
