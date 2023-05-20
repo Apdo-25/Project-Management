@@ -31,7 +31,7 @@ const routes = [
       title: 'KanbanBoard',
       requiresAuth: true
     },
-    path: '/KanbanBoard',
+    path: '/KanbanBoard/:id',
     name: 'KanbanBoard',
     component: () => import('@/views/KanbanBoardView.vue')
   },

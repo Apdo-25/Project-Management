@@ -10,10 +10,5 @@ export default [
     to: '/projects',
     label: 'My Projects',
     icon: mdiTable
-  },
-  {
-    to: '/KanbanBoard',
-    label: 'Kanban Board',
-    icon: mdiTable
   }
 ]

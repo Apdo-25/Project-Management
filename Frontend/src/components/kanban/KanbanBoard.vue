@@ -1,38 +1,5 @@
-<template>
-  <div class="grid grid-cols-3 gap-6" v-if="lanesLength > 0">
-    <CardBox
-      v-for="lane in lanes"
-      :key="lane._id"
-      class="border border-gray-300 rounded-md bg-gray-50"
-    >
-      <CardBoxComponentHeader>
-        <CardBoxComponentTitle :title="lane.name" />
-        <div class="flex items-center space-x-2">
-          <button @click="editLane(lane._id)" class="text-blue-500">Edit Lane</button>
-          <button @click="deleteLane(lane._id)" class="text-red-500">Delete Lane</button>
-        </div>
-      </CardBoxComponentHeader>
-      <CardBoxComponentBody class="p-4 h-full">
-        <draggable
-          class="min-h-full"
-          :list="lane.tasks"
-          group="tasks"
-          itemKey="id"
-          v-bind="dragOptions"
-          @change="handleTaskDrag"
-        >
-          <template #item="{ element }">
-            <Task :task="element" />
-          </template>
-        </draggable>
-      </CardBoxComponentBody>
-    </CardBox>
-    <button @click="addLane">Add Lane</button>
-  </div>
-</template>
-
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import draggable from 'vuedraggable'
 import Task from './Task.vue'
 import CardBox from '../CardBox.vue'
@@ -57,13 +24,22 @@ const dragOptions = computed(() => ({
   ghostClass: 'ghost'
 }))
 
+const project = ref(null)
+const projectBoard = ref(null)
+
 onMounted(async () => {
   await projectStore.fetchProjects()
-  const project = projectStore.getProjectById(props.projectId)
-  if (project && project.board) {
-    lanes.value = project.board.lanes
-  }
+  project.value = projectStore.getProjectById(props.projectId)
 })
+
+watch(
+  () => project.value,
+  (newProject) => {
+    if (newProject && newProject.board) {
+      lanes.value = newProject.board.lanes
+    }
+  }
+)
 
 const deleteLane = async (laneId) => {
   await projectStore.deleteLane(props.projectId, laneId)
@@ -113,3 +89,36 @@ const handleTaskDrag = (event) => {
   }
 }
 </script>
+
+<template>
+  <div class="grid grid-cols-3 gap-6" v-if="lanesLength > 0">
+    <CardBox
+      v-for="lane in lanes"
+      :key="lane._id"
+      class="border border-gray-300 rounded-md bg-gray-50"
+    >
+      <CardBoxComponentHeader>
+        <CardBoxComponentTitle :title="lane.name" />
+        <div class="flex items-center space-x-2">
+          <button @click="editLane(lane._id)" class="text-blue-500">Edit Lane</button>
+          <button @click="deleteLane(lane._id)" class="text-red-500">Delete Lane</button>
+        </div>
+      </CardBoxComponentHeader>
+      <CardBoxComponentBody class="p-4 h-full">
+        <draggable
+          class="min-h-full"
+          :list="lane.tasks"
+          group="tasks"
+          itemKey="id"
+          v-bind="dragOptions"
+          @change="handleTaskDrag"
+        >
+          <template #item="{ element }">
+            <Task :task="element" />
+          </template>
+        </draggable>
+      </CardBoxComponentBody>
+    </CardBox>
+    <button @click="addLane">Add Lane</button>
+  </div>
+</template>

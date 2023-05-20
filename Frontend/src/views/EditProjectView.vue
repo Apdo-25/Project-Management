@@ -1,80 +1,143 @@
-<template>
-  <CardBox>
-    <div>
-      <h2>Edit Project</h2>
-
-      <form @submit="updateProject">
-        <label>
-          Project Name:
-          <input v-model="projectName" type="text" required />
-        </label>
-
-        <h3>Project Members</h3>
-        <ul>
-          <li v-for="member in projectMembers" :key="member.id">
-            {{ member.name }}
-            <button @click="removeMember(member.id)">Remove</button>
-          </li>
-        </ul>
-
-        <h3>Add Member</h3>
-        <select v-model="selectedMember">
-          <option v-for="user in availableUsers" :key="user.id" :value="user.id">
-            {{ user.name }}
-          </option>
-        </select>
-        <button @click="addMember">Add</button>
-
-        <button type="submit">Update Project</button>
-      </form>
-    </div>
-  </CardBox>
-</template>
-
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-
+import { ref, onMounted } from 'vue'
+import {
+  mdiBallotOutline,
+  mdiAccount,
+  mdiTextAccount,
+  mdiArrowLeft,
+  mdiClockTimeEightOutline
+} from '@mdi/js'
+import SectionMain from '@/components/SectionMain.vue'
 import CardBox from '@/components/CardBox.vue'
-import UserAvatar from '@/components/UserAvatar.vue'
+import FormCheckRadioGroup from '@/components/FormCheckRadioGroup.vue'
+import FormField from '@/components/FormField.vue'
+import FormControl from '@/components/FormControl.vue'
+import BaseDivider from '@/components/BaseDivider.vue'
+import BaseButton from '@/components/BaseButton.vue'
+import BaseButtons from '@/components/BaseButtons.vue'
+
+import Layout from '@/layouts/Layout.vue'
+import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import { useProjectStore } from '@/stores/project'
-import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const projectStore = useProjectStore()
-const authStore = useAuthStore()
 
-const projectId = // Get the project ID from the route or props
-const project = computed(() => projectStore.getProjectById(projectId))
-
-const projectName = ref(project.value.name)
-const projectMembers = computed(() => {
-  const currentUser = authStore.userDetail.id
-  return project.value.members.filter(memberId => memberId !== currentUser)
+const form = ref({
+  name: '',
+  description: '', // Fix the property name to match the template
+  priority: '',
+  status: '',
+  deadline: '',
+  addMember: '',
+  removeMember: ''
 })
 
-const availableUsers = computed(() => {
-  const currentUser = authStore.userDetail.id
-  return authStore.users.filter(user => user.id !== currentUser && !project.value.members.includes(user.id))
+const projectId = ref('')
+
+onMounted(() => {
+  projectId.value = router.currentRoute.value.params.id
+  projectStore.fetchProject(projectId.value)
 })
 
-const selectedMember = ref('')
+const submit = async () => {
+  const projectData = {
+    name: form.value.name,
+    description: form.value.description, // Fix the property name to match the template
+    priority: form.value.priority,
+    status: form.value.status,
+    deadline: form.value.deadline,
+    addMember: form.value.addMember,
+    removeMember: form.value.removeMember
+  }
 
-const updateProject = () => {
-  project.value.name = projectName.value
-  projectStore.updateProject(project.value)
-}
+  try {
+    await projectStore.updateProject(projectId.value, projectData)
 
-const addMember = () => {
-  if (selectedMember.value) {
-    project.value.members.push(selectedMember.value)
-    selectedMember.value = ''
+    // Navigate back to the project view
+    router.push(`/projects/${projectId.value}`)
+  } catch (error) {
+    console.error('Error updating project:', error)
   }
 }
 
-const removeMember = (memberId) => {
-  project.value.members = project.value.members.filter(member => member !== memberId)
-}
+const formStatusCurrent = ref(0)
 
-onMounted(() => {
-  // Fetch necessary data or perform any initialization here
-})
+const formStatusOptions = ['info', 'success', 'danger', 'warning']
+
+const formStatusSubmit = () => {
+  formStatusCurrent.value = formStatusOptions[formStatusCurrent.value + 1]
+    ? formStatusCurrent.value + 1
+    : 0
+}
 </script>
+
+<template>
+  <Layout>
+    <SectionMain>
+      <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Edit The Project" main>
+        <BaseButton
+          to="/projects"
+          :icon="mdiArrowLeft"
+          label="Go Back To Project"
+          color="contrast"
+          rounded-full
+          small
+        />
+      </SectionTitleLineWithButton>
+      <CardBox form @submit.prevent="submit">
+        <FormField label="Project Name">
+          <FormControl placeholder="Project Name" v-model="form.name" :icon="mdiTextAccount" />
+        </FormField>
+        <FormField label="Project Description">
+          <FormControl
+            placeholder="Project Description"
+            help="What is your project about. Max 255 characters"
+            label="Project Description"
+            v-model="form.description"
+            type="textarea"
+          />
+        </FormField>
+
+        <FormField label="Priority">
+          <FormCheckRadioGroup
+            type="radio"
+            v-model="form.priority"
+            name="Priority-checkbox"
+            :options="{ low: 'Low', medium: 'Medium', high: 'High' }"
+          />
+        </FormField>
+
+        <FormField label="Status">
+          <FormCheckRadioGroup
+            type="radio"
+            v-model="form.status"
+            name="Status-checkbox"
+            :options="{ open: 'Open', inProgress: 'In Progress', closed: 'Closed' }"
+          />
+        </FormField>
+
+        <FormField label="Add Member">
+          <FormControl placeholder="Add Member" v-model="form.addMember" :icon="mdiAccount" />
+        </FormField>
+
+        <FormField label="Remove Member">
+          <FormControl placeholder="Remove Member" v-model="form.removeMember" :icon="mdiAccount" />
+        </FormField>
+
+        <FormField label="Deadline">
+          <FormControl v-model="form.deadline" :icon="mdiClockTimeEightOutline" type="date" />
+        </FormField>
+        <BaseDivider />
+
+        <template #footer>
+          <BaseButtons>
+            <BaseButton type="submit" color="info" label="Submit" @click="submit" />
+            <BaseButton type="reset" color="info" outline label="Reset" />
+          </BaseButtons>
+        </template>
+      </CardBox>
+    </SectionMain>
+  </Layout>
+</template>

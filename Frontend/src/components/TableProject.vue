@@ -63,13 +63,14 @@
             <BaseButtons>
               <BaseButton
                 v-if="project?._id"
-                :href="`/projects/${project._id}`"
+                :to="`/KanbanBoard/${project._id}`"
                 :icon="mdiEye"
                 label="View"
                 color="info"
                 rounded-full
                 small
               />
+
               <BaseButton
                 v-if="project?._id"
                 :to="`/EditProject/${project._id}`"
@@ -183,8 +184,8 @@ const deleteProject = (project) => {
 }
 
 const projects = computed(() => {
-  const currentUser = '64688511feb8bc94205787ca'
-  console.log('Current User: ', currentUser)
+  const currentUser = authStore.userDetail._id
+  console.log(currentUser)
 
   const filteredProjects = projectStore.getProjects
   console.log('All Projects: ', filteredProjects)
