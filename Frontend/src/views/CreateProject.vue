@@ -98,10 +98,10 @@ const submit = async () => {
   }
 
   try {
-    await projectStore.createProject(projectData)
+    const newProject = await projectStore.createProject(projectData)
 
     // Navigate to the kanban board
-    router.push('/KanbanBoard')
+    router.push(`/KanbanBoard/${newProject._id}`)
 
     // Reset form
     form.value = {
