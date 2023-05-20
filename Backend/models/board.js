@@ -7,7 +7,7 @@ const BoardSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "Project",
   },
-  creator: {
+  createdBy: {
     type: Schema.Types.ObjectId,
     ref: "User",
   },
@@ -15,6 +15,12 @@ const BoardSchema = new Schema({
     {
       type: Schema.Types.ObjectId,
       ref: "User",
+    },
+  ],
+  lanes: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Lane",
     },
   ],
   tasks: [

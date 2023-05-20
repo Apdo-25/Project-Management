@@ -3,15 +3,15 @@ const Schema = mongoose.Schema;
 
 const taskSchema = new Schema(
   {
-    board: {
+    lane: {
       type: Schema.Types.ObjectId,
-      ref: "Board",
+      ref: "Lane",
     },
     name: { type: String, required: true, max: 100 },
     description: { type: String, required: true, max: 1000 },
     due_date: { type: Date, required: false },
     assigned_to: { type: Schema.Types.ObjectId, ref: "User" },
-    creator: { type: Schema.Types.ObjectId, ref: "User" },
+    createdBy: { type: Schema.Types.ObjectId, ref: "User" },
     status: {
       type: String,
       enum: ["New", "In Progress", "Completed"],

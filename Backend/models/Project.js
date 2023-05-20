@@ -5,10 +5,6 @@ const projectSchema = new Schema(
   {
     name: { type: String, required: true, max: 100 },
     description: { type: String, required: true, max: 100 },
-    board: {
-      type: Schema.Types.ObjectId,
-      ref: "Board",
-    },
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: "User",
@@ -33,6 +29,12 @@ const projectSchema = new Schema(
       enum: ["low", "medium", "high"],
       default: "low",
     },
+    boards: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Board",
+      },
+    ],
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
