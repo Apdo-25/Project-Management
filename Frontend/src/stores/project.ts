@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { useApiPrivate } from '../services/useApi'
 import { Project, ProjectData, BoardData } from '@/stores/types'
+import { useAuthStore } from './auth'
 
 export interface State {
   projects: Project[]
@@ -17,36 +18,54 @@ export const useProjectStore = defineStore('project', {
   },
 
   actions: {
+    async fetchProject(projectId: string) {
+      console.log(projectId)
+      try {
+        const response = await useApiPrivate().get(`/api/project/projects/${projectId}`)
+        const project = response.data
+        return project
+      } catch (error) {
+        console.error('Error fetching project:', error)
+        throw error
+      }
+    },
+
     async fetchProjects() {
       try {
         const response = await useApiPrivate().get('/api/project/projects')
-        this.projects = response.data
-        return this.projects
+        const projects = response.data
+        this.projects = projects
+        return projects
       } catch (error) {
         console.error('Error fetching projects:', error)
         throw error
       }
     },
 
-    async fetchUserProjects(userId) {
+    async fetchUserProjects() {
       try {
-        const response = await useApiPrivate().get(`/api/projects?userId=${userId}`)
-        if (response.status === 200) {
-          this.projects = response.data
-        } else {
-          throw new Error(`Request failed with status code ${response.status}`)
-        }
+        const authStore = useAuthStore()
+        const userId = authStore.userDetail.id
+        const response = await useApiPrivate().get(`/api/project/projects/user/${userId}`)
+        const projects = response.data
+        this.projects = projects
+        return projects
       } catch (error) {
-        console.error('Failed to fetch projects:', error)
+        console.error('Failed to fetch user projects:', error)
+        throw error
       }
     },
 
-    async fetchMemberProjects(userId: string) {
+    async fetchMemberProjects() {
       try {
+        const authStore = useAuthStore()
+        const userId = authStore.userDetail.id
         const response = await useApiPrivate().get(`/api/project/projects/member/${userId}`)
         this.projects = response.data
         return this.projects
       } catch (error) {
+        const authStore = useAuthStore()
+        const userId = authStore.userDetail.id
         console.error(`Error fetching projects for member ${userId}:`, error)
         throw error
       }
@@ -149,6 +168,7 @@ export const useProjectStore = defineStore('project', {
         throw error
       }
     },
+
     async removeMember(projectId: string, memberId: string) {
       try {
         await useApiPrivate().delete(`/api/project/projects/${projectId}/members/${memberId}`)
@@ -168,9 +188,8 @@ export const useProjectStore = defineStore('project', {
   }
 })
 
-//export store
+// Export store
 export type ProjectStore = ReturnType<typeof useProjectStore>
 
-export function useProjectStoreWrapper() {
-  return useProjectStore()
-}
+// Export default store
+export default useProjectStore

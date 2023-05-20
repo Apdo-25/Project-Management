@@ -58,7 +58,7 @@ export interface ProjectData {
   name: string
   description: string
   board: string // Board ID
-  creator: string // Creator ID
+  createdBy: string // Creator ID
   status: 'In progress' | 'Open' | 'Closed'
   members: string[] // Member IDs
   deadline: Date

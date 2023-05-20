@@ -1,16 +1,12 @@
 <script setup>
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
+import { ref, onMounted } from 'vue'
 import KanbanBoard from '@/components/kanban/KanbanBoard.vue'
 import Layout from '@/layouts/Layout.vue'
 import ProjectTitle from '@/components/kanban/ProjectTitle.vue'
 import SectionMain from '@/components/SectionMain.vue'
-import CardBox from '@/components/CardBox.vue'
-import CardBoxComponentBody from '@/components/CardBoxComponentBody.vue'
-import CardBoxComponentHeader from '@/components/CardBoxComponentHeader.vue'
+import BaseButton from '@/components/BaseButton.vue'
 import { mdiArrowLeft, mdiTableBorder } from '@mdi/js'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
-import BaseButton from '@/components/BaseButton.vue'
 </script>
 
 <template>

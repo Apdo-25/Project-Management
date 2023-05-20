@@ -1,58 +1,115 @@
-<script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
-import draggable from 'vuedraggable'
-import Task from './Task.vue'
-import CardBox from '../CardBox.vue'
-import SectionMain from '../SectionMain.vue'
-import SectionTitleLineWithButton from '../SectionTitleLineWithButton.vue'
-import CardBoxComponentTitle from '@/components/CardBoxComponentTitle.vue'
-import { useBoardStore } from '@/stores/board' // import the board store
-
-const boardStore = useBoardStore() // initialize the board store
-
-let lanes = reactive([]) // initial value of lanes
-
-// fetch board on component mounted
-onMounted(async () => {
-  await boardStore.fetchBoards()
-  if (boardStore.getBoards[0]) {
-    lanes.value = boardStore.getBoards[0].lanes // replace with the fetched board's lanes
-  }
-})
-const lanesLength = computed(() => (lanes.value ? lanes.value.length : 0))
-
-const dragOptions = computed(() => {
-  return {
-    animation: 200,
-    disabled: false,
-    ghostClass: 'ghost'
-  }
-})
-</script>
-
 <template>
   <div class="grid grid-cols-3 gap-6" v-if="lanesLength > 0">
     <CardBox
-      v-for="lane in lanes.value"
-      :key="lane.name"
+      v-for="lane in lanes"
+      :key="lane._id"
       class="border border-gray-300 rounded-md bg-gray-50"
     >
-      <!-- CardBoxComponentTitle and other content here... -->
-
-      <div class="p-4 h-full">
+      <CardBoxComponentHeader>
+        <CardBoxComponentTitle :title="lane.name" />
+        <div class="flex items-center space-x-2">
+          <button @click="editLane(lane._id)" class="text-blue-500">Edit Lane</button>
+          <button @click="deleteLane(lane._id)" class="text-red-500">Delete Lane</button>
+        </div>
+      </CardBoxComponentHeader>
+      <CardBoxComponentBody class="p-4 h-full">
         <draggable
           class="min-h-full"
           :list="lane.tasks"
-          group="tickets"
-          itemKey="name"
+          group="tasks"
+          itemKey="id"
           v-bind="dragOptions"
+          @change="handleTaskDrag"
         >
           <template #item="{ element }">
             <Task :task="element" />
-            <!-- updated Task component usage -->
           </template>
         </draggable>
-      </div>
+      </CardBoxComponentBody>
     </CardBox>
+    <button @click="addLane">Add Lane</button>
   </div>
 </template>
+
+<script setup>
+import { ref, onMounted, computed } from 'vue'
+import draggable from 'vuedraggable'
+import Task from './Task.vue'
+import CardBox from '../CardBox.vue'
+import CardBoxComponentTitle from '@/components/CardBoxComponentTitle.vue'
+import CardBoxComponentHeader from '@/components/CardBoxComponentHeader.vue'
+import CardBoxComponentBody from '@/components/CardBoxComponentBody.vue'
+import { useProjectStore } from '@/stores/project'
+
+const projectStore = useProjectStore()
+const props = defineProps({
+  projectId: {
+    type: String,
+    required: true
+  }
+})
+
+const lanes = ref([])
+const lanesLength = computed(() => lanes.value.length)
+const dragOptions = computed(() => ({
+  animation: 200,
+  disabled: false,
+  ghostClass: 'ghost'
+}))
+
+onMounted(async () => {
+  await projectStore.fetchProjects()
+  const project = projectStore.getProjectById(props.projectId)
+  if (project && project.board) {
+    lanes.value = project.board.lanes
+  }
+})
+
+const deleteLane = async (laneId) => {
+  await projectStore.deleteLane(props.projectId, laneId)
+}
+
+const editLane = async (laneId) => {
+  const laneData = {
+    name: lanes.value.find((l) => l._id === laneId).name
+  }
+  await projectStore.updateLane(props.projectId, laneId, laneData)
+}
+
+const addLane = async () => {
+  const laneData = {
+    name: 'New Lane'
+  }
+  await projectStore.addLane(props.projectId, laneData)
+}
+
+const handleTaskDrag = (event) => {
+  // Update the order of tasks within a lane after drag
+  const { newIndex, oldIndex, to, from } = event
+  const taskId = event.item._id
+  const fromLaneId = from.parentElement.dataset.id
+  const toLaneId = to.parentElement.dataset.id
+
+  if (fromLaneId === toLaneId) {
+    // Update task order within the same lane
+    const laneIndex = lanes.value.findIndex((lane) => lane._id === fromLaneId)
+    if (laneIndex !== -1) {
+      const tasks = lanes.value[laneIndex].tasks
+      const task = tasks.splice(oldIndex, 1)[0]
+      tasks.splice(newIndex, 0, task)
+    }
+  } else {
+    // Move task to another lane
+    const fromLaneIndex = lanes.value.findIndex((lane) => lane._id === fromLaneId)
+    const toLaneIndex = lanes.value.findIndex((lane) => lane._id === toLaneId)
+
+    if (fromLaneIndex !== -1 && toLaneIndex !== -1) {
+      const fromTasks = lanes.value[fromLaneIndex].tasks
+      const toTasks = lanes.value[toLaneIndex].tasks
+
+      const task = fromTasks.splice(oldIndex, 1)[0]
+      toTasks.splice(newIndex, 0, task)
+    }
+  }
+}
+</script>

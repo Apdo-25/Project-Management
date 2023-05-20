@@ -20,7 +20,9 @@ export const useTaskStore = defineStore('task', {
     getLanes: (state) => state.lanes,
     getTasks: (state) => state.lanes.flatMap((lane) => lane.tasks),
     getTaskById: (state) => (id: string) =>
-      state.lanes.flatMap((lane) => lane.tasks).find((task) => task._id === id)
+      state.lanes.flatMap((lane) => lane.tasks).find((task) => task._id === id),
+    getTasksByBoardId: (state) => (boardId: string) =>
+      state.lanes.flatMap((lane) => lane.tasks).filter((task) => task.board._id === boardId)
   },
 
   actions: {

@@ -13,7 +13,9 @@ export const useBoardStore = defineStore('board', {
 
   getters: {
     getBoards: (state) => state.boards,
-    getBoardById: (state) => (id: string) => state.boards.find((board) => board._id === id)
+    getBoardById: (state) => (id: string) => state.boards.find((board) => board._id === id),
+    getBoardsByProjectId: (state) => (projectId: string) =>
+      state.boards.filter((board) => board.project._id === projectId)
   },
 
   actions: {
@@ -84,7 +86,7 @@ export const useBoardStore = defineStore('board', {
         const task = response.data
         const boardIndex = this.boards.findIndex((board) => board._id === boardId)
         if (boardIndex !== -1) {
-          this.boards[boardIndex].tasks.push(task)
+          this.boards[boardIndex].lanes[0].tasks.push(task)
         }
         return task
       } catch (error) {
@@ -102,9 +104,11 @@ export const useBoardStore = defineStore('board', {
         const updatedTask = response.data
         const boardIndex = this.boards.findIndex((board) => board._id === boardId)
         if (boardIndex !== -1) {
-          const taskIndex = this.boards[boardIndex].tasks.findIndex((task) => task._id === taskId)
+          const taskIndex = this.boards[boardIndex].lanes[0].tasks.findIndex(
+            (task) => task._id === taskId
+          )
           if (taskIndex !== -1) {
-            this.boards[boardIndex].tasks.splice(taskIndex, 1, updatedTask)
+            this.boards[boardIndex].lanes[0].tasks.splice(taskIndex, 1, updatedTask)
           }
         }
         return updatedTask
@@ -119,9 +123,11 @@ export const useBoardStore = defineStore('board', {
         await useApi().delete(`/api/board/boards/${boardId}/tasks/${taskId}`)
         const boardIndex = this.boards.findIndex((board) => board._id === boardId)
         if (boardIndex !== -1) {
-          const taskIndex = this.boards[boardIndex].tasks.findIndex((task) => task._id === taskId)
+          const taskIndex = this.boards[boardIndex].lanes[0].tasks.findIndex(
+            (task) => task._id === taskId
+          )
           if (taskIndex !== -1) {
-            this.boards[boardIndex].tasks.splice(taskIndex, 1)
+            this.boards[boardIndex].lanes[0].tasks.splice(taskIndex, 1)
           }
         }
       } catch (error) {

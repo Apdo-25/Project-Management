@@ -1,15 +1,43 @@
-<script setup>
-import { computed, ref, onMounted } from 'vue'
-import { mdiMonitorCellphone, mdiTrashCan, mdiEye } from '@mdi/js'
-import TableCheckboxCell from '@/components/TableCheckboxCell.vue'
+<template>
+  <CardBox>
+    <div>
+      <h2>Edit Project</h2>
 
-import BaseLevel from '@/components/BaseLevel.vue'
-import BaseButtons from '@/components/BaseButtons.vue'
-import BaseButton from '@/components/BaseButton.vue'
-import UserAvatar from '@/components/UserAvatar.vue'
-import useProjectStore from '@/stores/project'
-import { useAuthStore } from '@/stores/auth'
+      <form @submit="updateProject">
+        <label>
+          Project Name:
+          <input v-model="projectName" type="text" required />
+        </label>
+
+        <h3>Project Members</h3>
+        <ul>
+          <li v-for="member in projectMembers" :key="member.id">
+            {{ member.name }}
+            <button @click="removeMember(member.id)">Remove</button>
+          </li>
+        </ul>
+
+        <h3>Add Member</h3>
+        <select v-model="selectedMember">
+          <option v-for="user in availableUsers" :key="user.id" :value="user.id">
+            {{ user.name }}
+          </option>
+        </select>
+        <button @click="addMember">Add</button>
+
+        <button type="submit">Update Project</button>
+      </form>
+    </div>
+  </CardBox>
+</template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+
 import CardBox from '@/components/CardBox.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
+import { useProjectStore } from '@/stores/project'
+import { useAuthStore } from '@/stores/auth'
 
 const projectStore = useProjectStore()
 const authStore = useAuthStore()
@@ -50,36 +78,3 @@ onMounted(() => {
   // Fetch necessary data or perform any initialization here
 })
 </script>
-
-<template>
-  <CardBox>
-    <div>
-      <h2>Edit Project</h2>
-
-      <form @submit="updateProject">
-        <label>
-          Project Name:
-          <input v-model="projectName" type="text" required />
-        </label>
-
-        <h3>Project Members</h3>
-        <ul>
-          <li v-for="member in projectMembers" :key="member.id">
-            {{ member.name }}
-            <button @click="removeMember(member.id)">Remove</button>
-          </li>
-        </ul>
-
-        <h3>Add Member</h3>
-        <select v-model="selectedMember">
-          <option v-for="user in availableUsers" :key="user.id" :value="user.id">
-            {{ user.name }}
-          </option>
-        </select>
-        <button @click="addMember">Add</button>
-
-        <button type="submit">Update Project</button>
-      </form>
-    </div>
-  </CardBox>
-</template>

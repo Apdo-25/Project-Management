@@ -73,7 +73,9 @@ import { mdiBallotOutline, mdiClockTimeEightOutline, mdiTextAccount, mdiArrowLef
 import { useProjectStore } from '@/stores/project'
 // Other imports...
 
-const router = useRouter() // Add this line to access Vue Router
+const router = useRouter()
+const projectStore = useProjectStore()
+
 const form = ref({
   name: '',
   description: '',
@@ -82,12 +84,9 @@ const form = ref({
   deadline: ''
 })
 
-const projectStore = useProjectStore()
-
-const submit = () => {
-  console.log(submit)
+const submit = async () => {
   const membersInput = form.value.members
-  const membersToSend = membersInput ? membersInput : []
+  const membersToSend = Array.isArray(membersInput) ? membersInput : [membersInput]
 
   const projectData = {
     name: form.value.name,
@@ -95,29 +94,25 @@ const submit = () => {
     priority: form.value.priority,
     members: membersToSend,
     deadline: form.value.deadline,
-    status: 'new' // or whatever default status you want
+    status: 'new'
   }
 
-  projectStore
-    .createProject(projectData)
-    .then(() => {
-      router.push({ name: 'Projects' })
+  try {
+    await projectStore.createProject(projectData)
 
-      // Project created successfully
+    // Navigate to the kanban board
+    router.push('/KanbanBoard')
 
-      // Navigate to the kanban board
-      router.push('/KanbanBoard')
-
-      // Reset form
-      form.value.name = ''
-      form.value.description = ''
-      form.value.priority = 'low'
-      form.value.members = ''
-      form.value.deadline = ''
-    })
-    .catch((error) => {
-      console.error('Error creating project:', error)
-      // Handle error
-    })
+    // Reset form
+    form.value = {
+      name: '',
+      description: '',
+      priority: 'low',
+      members: [],
+      deadline: ''
+    }
+  } catch (error) {
+    console.error('Error creating project:', error)
+  }
 }
 </script>
