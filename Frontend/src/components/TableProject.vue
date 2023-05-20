@@ -7,7 +7,7 @@
           <th />
           <th>Name</th>
           <th>Description</th>
-          <th>Members</th>
+          <th>Deadline</th>
           <th>Status</th>
           <th>Created</th>
           <th />
@@ -25,38 +25,41 @@
           <td data-label="Description">
             {{ project.description }}
           </td>
-          <td data-label="Members">
-            <ul>
-              <li v-for="memberId in project.members" :key="memberId">
-                {{ getUser(memberId)?._id }}
-              </li>
-            </ul>
+          <td data-label="Deadline">
+            {{ formatDate(project.deadline) }}
           </td>
           <td data-label="Status" class="lg:w-32">
             <small class="flex w-2/5 self-center lg:w-full" :value="project.status">
               <span
-                v-if="project.status === 'In progress'"
+                v-if="project.status === 'in progress'"
                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
               >
                 In progress
               </span>
               <span
-                v-else-if="project.status === 'Closed'"
+                v-else-if="project.status === 'closed'"
                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"
               >
                 Closed
               </span>
               <span
-                v-else-if="project.status === 'Open'"
+                v-else-if="project.status === 'open'"
                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
               >
                 Open
               </span>
+              <span
+                v-else-if="project.status === 'new'"
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+              >
+                New
+              </span>
             </small>
           </td>
+
           <td data-label="Created" class="lg:w-1 whitespace-nowrap">
             <small class="text-gray-500 dark:text-slate-400" :title="project.created_at">
-              {{ project.created_at }}
+              {{ formatDate(project.created_at) }}
             </small>
           </td>
           <td class="before:hidden lg:w-1 whitespace-nowrap">
@@ -134,6 +137,11 @@ defineProps({
   }
 })
 
+const formatDate = (dateString) => {
+  const date = new Date(dateString)
+  return date.toLocaleDateString()
+}
+
 const projectStore = useProjectStore()
 const authStore = useAuthStore()
 
@@ -165,10 +173,6 @@ const remove = (arr, cb) => {
   })
 
   return newArr
-}
-
-const getUser = (id) => {
-  return authStore.users.find((user) => user._id === id)
 }
 
 const checked = (isChecked, project) => {

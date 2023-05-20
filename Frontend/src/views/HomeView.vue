@@ -1,28 +1,28 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { mdiChartPie, mdiReload } from '@mdi/js'
+import { ref, onMounted, computed } from 'vue'
 import SectionMain from '@/components/SectionMain.vue'
 import Layout from '@/layouts/Layout.vue'
-import LayoutGuest from '@/layouts/LayoutGuest.vue'
-import sectionTitle from '@/components/SectionTitle.vue'
+import SectionTitle from '@/components/SectionTitle.vue'
 import CardBox from '@/components/CardBox.vue'
 import CardBoxComponentBody from '@/components/CardBoxComponentBody.vue'
 import BaseDivider from '@/components/BaseDivider.vue'
-import CardBoxComponentTitle from '@/components/CardBoxComponentTitle.vue'
 import CardBoxComponentHeader from '@/components/CardBoxComponentHeader.vue'
-import * as chartConfig from '@/components/Charts/chart.config.js'
-import LineChart from '@/components/Charts/LineChart.vue'
-import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
-import BaseButton from '@/components/BaseButton.vue'
+import { useProjectStore } from '@/stores/project'
+import { useAuthStore } from '@/stores/auth'
 
-const chartData = ref(null)
+const projectStore = useProjectStore()
+const authStore = useAuthStore()
 
-const fillChartData = () => {
-  chartData.value = chartConfig.sampleChartData()
-}
+onMounted(async () => {
+  await authStore.initialize()
+  const currentUser = authStore.userDetail.id
 
-onMounted(() => {
-  fillChartData()
+  try {
+    await projectStore.fetchUserProjects(currentUser)
+  } catch (error) {
+    console.error('Error fetching projects:', error)
+    // Handle the error here, e.g., display an error message or fallback behavior
+  }
 })
 
 const currentTime = ref(getCurrentTime())
@@ -32,43 +32,51 @@ function getCurrentTime() {
   return now.toLocaleTimeString()
 }
 
-// Update clock every second
-setInterval(() => {
-  currentTime.value = getCurrentTime()
-}, 1000)
+const filteredProjects = computed(() => {
+  const currentUser = authStore.userDetail._id
+  const projects = projectStore.getProjects
+
+  console.log('Projects: ', projects)
+  console.log('Current User ID: ', currentUser)
+
+  // Filter projects close to the deadline (e.g., within 7 days)
+  const currentDate = new Date()
+  const deadlineThreshold = currentDate.getTime() + 7 * 24 * 60 * 60 * 1000
+  const filtered = projects.filter((project) => {
+    const deadlineDate = new Date(project.deadline)
+    return deadlineDate.getTime() <= deadlineThreshold && project.userId === currentUser
+  })
+
+  console.log('Filtered Projects: ', filtered)
+  return filtered
+})
 </script>
+
 <template>
   <Layout>
     <SectionMain>
-      <div class="clock text-right pr-4">
-        Time:
-        {{ currentTime }}
-      </div>
-      <sectionTitle> <h2 class="text-xl font-semibold">Welcome To PM-Project</h2> </sectionTitle>
+      <div class="clock text-right pr-4">Time: {{ currentTime }}</div>
+      <SectionTitle>
+        <h2 class="text-xl font-semibold">Dashboard</h2>
+      </SectionTitle>
       <CardBox>
         <CardBoxComponentBody>
           <p class="text-lg">
-            PM-Project is a project management tool that makes it easy to keep track of your
-            projects and stay on top of your deadlines.
+            Welcome to PM-Project, a comprehensive project management tool designed to help you stay
+            organized, collaborate with your team, and meet project deadlines.
           </p>
         </CardBoxComponentBody>
       </CardBox>
       <BaseDivider />
       <CardBox>
-        <CardBoxComponentHeader title="Frequently used Projects" />
-        <SectionTitleLineWithButton :icon="mdiChartPie" title="overview">
-          <BaseButton :icon="mdiReload" color="whiteDark" @click="fillChartData" />
-        </SectionTitleLineWithButton>
-
-        <CardBox class="mb-6">
-          <div v-if="chartData">
-            <line-chart :data="chartData" class="h-96" />
-          </div>
-        </CardBox>
-      </CardBox>
-      <BaseDivider />
-      <CardBox>
-        <CardBoxComponentHeader title="Projects Close To Due Dates" />
+        <CardBoxComponentHeader title="Projects Close to Due Dates" />
+        <CardBoxComponentBody>
+          <ul>
+            <li v-for="project in filteredProjects" :key="project._id">
+              {{ project.name }} - Due Date: {{ project.dueDate }}
+            </li>
+          </ul>
+        </CardBoxComponentBody>
       </CardBox>
     </SectionMain>
   </Layout>

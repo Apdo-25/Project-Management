@@ -108,6 +108,21 @@ export const useProjectStore = defineStore('project', {
       }
     },
 
+    async fetchProjectsCloseDueDates() {
+      try {
+        const response = await useApiPrivate().get('/api/project/projects/closeDueDates')
+        this.projects = response.data
+        return this.projects
+      } catch (error) {
+        console.error('Error fetching projects close to due dates:', error)
+        // Handle the error response appropriately
+        if (error) {
+          console.error('Error details:', error)
+        }
+        throw error
+      }
+    },
+
     async deleteProject(id: string) {
       try {
         await useApiPrivate().delete(`/api/project/projects/${id}`)

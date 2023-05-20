@@ -78,10 +78,11 @@ const formStatusSubmit = () => {
     <SectionMain>
       <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Edit The Project" main>
         <BaseButton
-          to="/projects"
-          :icon="mdiArrowLeft"
-          label="Go Back To Project"
-          color="contrast"
+          v-if="projectId"
+          :to="`/KanbanBoard/${projectId}`"
+          :icon="mdiEye"
+          label="Back to board"
+          color="info"
           rounded-full
           small
         />
