@@ -77,7 +77,9 @@ async function getProject(req, res) {
     const project = await Project.findById(projectId)
       .populate({
         path: "boards",
-        populate: { path: "tasks" },
+        populate: {
+          path: "tasks",
+        },
       })
       .exec();
 
@@ -112,10 +114,17 @@ async function getUserProjects(req, res) {
 
 async function updateProject(req, res) {
   try {
-    const { name } = req.body;
+    const { name, description, status, members, priority, deadline } = req.body;
     const project = await Project.findByIdAndUpdate(
       req.params.id,
-      { name },
+      {
+        name,
+        description,
+        status: status || "new",
+        members,
+        priority,
+        deadline,
+      },
       { new: true }
     ).exec();
 
