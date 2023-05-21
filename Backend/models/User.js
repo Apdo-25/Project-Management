@@ -36,7 +36,8 @@ const UserSchema = Schema(
     },
     avatar: {
       type: String,
-      default: "https://i.pravatar.cc/300",
+      default:
+        "https://play-lh.googleusercontent.com/XVHP0sBKrRJYZq_dB1RalwSmx5TcYYRRfYMFO18jgNAnxHAIA1osxM55XHYTb3LpkV8",
     },
     refresh_token: String,
   },

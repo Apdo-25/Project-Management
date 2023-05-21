@@ -139,6 +139,21 @@ async function updateProject(req, res) {
   }
 }
 
+async function getProjectsCloseDueDates(req, res) {
+  try {
+    const projects = await Project.find({
+      deadline: { $lte: new Date() }, // Fetch projects with a deadline less than or equal to the current date
+    }).exec();
+
+    return res.json(projects);
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ error: "Failed to fetch projects close to due dates." });
+  }
+}
+
 async function deleteProject(req, res) {
   try {
     const project = await Project.findByIdAndDelete(req.params.id).exec();
@@ -288,6 +303,7 @@ module.exports = {
   getMemberProjects,
   getProject,
   updateProject,
+  getProjectsCloseDueDates,
   deleteProject,
   addBoard,
   removeBoard,

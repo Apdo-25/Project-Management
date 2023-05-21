@@ -9,6 +9,10 @@ router.get("/projects/member/:userId", projectControllers.getMemberProjects);
 router.get("/projects/:id", projectControllers.getProject);
 router.post("/projects", projectControllers.createProject);
 router.put("/projects/:id", projectControllers.updateProject);
+router.get(
+  "/projects/closeDueDates",
+  projectControllers.getProjectsCloseDueDates
+);
 router.delete("/projects/:id", projectControllers.deleteProject);
 
 //Tasks

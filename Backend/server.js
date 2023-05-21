@@ -19,7 +19,41 @@ const PORT = 4000;
 
 connectDB();
 
-//routes
+const multer = require("multer");
+const upload = multer({ storage: multer.memoryStorage() });
+
+app.post(
+  "/updateUser2",
+  upload.single("avatar"),
+  async function (req, res, next) {
+    try {
+      const { username, email } = req.body;
+      const avatar = req.file.buffer; // This is your uploaded file
+
+      if (!username || !email || !avatar) {
+        return res.status(422).json({ message: "Invalid fields" });
+      }
+
+      const user = await User.findById(req.user._id);
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      user.username = username;
+      user.email = email;
+      user.avatar = avatar.toString("base64");
+
+      await user.save();
+
+      return res.status(200).json(user);
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: "Error updating user", error: error.message });
+    }
+  }
+);
 
 // Allow Credentials
 app.use(credentials);

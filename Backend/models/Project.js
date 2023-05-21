@@ -12,7 +12,7 @@ const projectSchema = new Schema(
     status: {
       type: String,
       enum: ["in progress", "open", "closed", "new"],
-      default: "in progress",
+      default: "new",
     },
     members: [
       {
