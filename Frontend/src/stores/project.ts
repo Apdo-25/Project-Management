@@ -19,7 +19,7 @@ export const useProjectStore = defineStore('project', {
 
   actions: {
     async fetchProject(projectId: string) {
-      console.log(projectId)
+      //console.log(projectId)
       try {
         const response = await useApiPrivate().get(`/api/project/projects/${projectId}`)
         const project = response.data
