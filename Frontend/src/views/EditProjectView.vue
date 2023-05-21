@@ -36,15 +36,6 @@ const form = ref({
 
 const projectId = ref('')
 
-onMounted(async () => {
-  try {
-    const project = await projectStore.fetchProject(router.currentRoute.value.params.id)
-    form.value = { ...project } // Assign the fetched project data to the form
-  } catch (error) {
-    console.error('Error fetching project:', error)
-  }
-})
-
 const formatDate = (dateString) => {
   const date = new Date(dateString)
   const day = String(date.getUTCDate()).padStart(2, '0')
@@ -53,15 +44,29 @@ const formatDate = (dateString) => {
   return `${year}-${month}-${day}`
 }
 
+onMounted(async () => {
+  try {
+    const project = await projectStore.fetchProject(router.currentRoute.value.params.id)
+    form.value = { ...project } // Assign the fetched project data to the form
+    form.value.deadline = formatDate(project.deadline) // Format the deadline to "dd-MM-yyyy"
+    console.log('form:', form.value)
+    console.log('project:', project)
+
+  } catch (error) {
+    console.error('Error fetching project:', error)
+  }
+})
+
 const submit = async () => {
   const projectData = { ...form.value }
 
   // Format the deadline to "dd-MM-yyyy"
-  projectData.deadline = formatDate(projectData.deadline)
-
+  //console.log('projectData:', projectData)
+  //console.log('projectId:', projectData._id)
+  //console.log('deadline:', projectData.deadline)
   try {
-    await projectStore.updateProject(projectId.value, projectData)
-    router.push(`/projects/${projectId.value}`)
+    await projectStore.updateProject(projectData._id, projectData)
+    router.push(`/KanbanBoard/${projectData._id}`)
   } catch (error) {
     if (error.response) {
       // The request was made and the server responded with an error status
