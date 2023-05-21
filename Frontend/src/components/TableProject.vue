@@ -9,6 +9,7 @@
           <th>Description</th>
           <th>Deadline</th>
           <th>Status</th>
+          <th>Priority</th>
           <th>Created</th>
           <th />
         </tr>
@@ -53,6 +54,28 @@
                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
               >
                 New
+              </span>
+            </small>
+          </td>
+          <td data-label="Status" class="lg:w-32">
+            <small class="flex w-2/5 self-center lg:w-full" :value="project.priority">
+              <span
+                v-if="project.priority === 'low'"
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+              >
+                Low
+              </span>
+              <span
+                v-else-if="project.priority === 'medium'"
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"
+              >
+                Medium
+              </span>
+              <span
+                v-else-if="project.priority === 'high'"
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
+              >
+                High
               </span>
             </small>
           </td>

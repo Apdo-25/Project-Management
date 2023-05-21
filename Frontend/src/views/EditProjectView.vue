@@ -4,7 +4,7 @@ import {
   mdiBallotOutline,
   mdiAccount,
   mdiTextAccount,
-  mdiArrowLeft,
+  mdiEye,
   mdiClockTimeEightOutline
 } from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
@@ -36,6 +36,11 @@ const form = ref({
 
 const projectId = ref('')
 
+//get projectId
+onMounted(() => {
+  projectId.value = router.currentRoute.value.params.id
+})
+
 const formatDate = (dateString) => {
   const date = new Date(dateString)
   const day = String(date.getUTCDate()).padStart(2, '0')
@@ -51,7 +56,6 @@ onMounted(async () => {
     form.value.deadline = formatDate(project.deadline) // Format the deadline to "dd-MM-yyyy"
     //console.log('form:', form.value)
     //console.log('project:', project)
-
   } catch (error) {
     console.error('Error fetching project:', error)
   }
@@ -97,15 +101,17 @@ const formStatusSubmit = () => {
   <Layout>
     <SectionMain>
       <SectionTitleLineWithButton :icon="mdiBallotOutline" title="Edit The Project" main>
-        <BaseButton
-          v-if="projectId"
-          :to="`/KanbanBoard/${projectId}`"
-          :icon="mdiEye"
-          label="Back to board"
-          color="info"
-          rounded-full
-          small
-        />
+        <BaseButtons>
+          <BaseButton
+            v-if="projectId"
+            :to="`/KanbanBoard/${projectId}`"
+            :icon="mdiEye"
+            label="Back to board"
+            color="info"
+            rounded-full
+            small
+          />
+        </BaseButtons>
       </SectionTitleLineWithButton>
       <CardBox form @submit.prevent="submit">
         <FormField label="Project Name">
