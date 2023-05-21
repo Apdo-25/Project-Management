@@ -6,8 +6,8 @@
           <BaseButton
             v-if="projectId"
             :to="`/EditProject/${projectId}`"
-            :icon="mdiMonitorCellphone"
-            label="Edit"
+            :icon="mdiFileEdit"
+            label="Edit Project"
             color="primary"
             rounded-full
             small
@@ -29,7 +29,7 @@ import ProjectTitle from '@/components/kanban/ProjectTitle.vue'
 import SectionMain from '@/components/SectionMain.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
 import BaseButton from '@/components/BaseButton.vue'
-import { mdiArrowLeft, mdiTableBorder } from '@mdi/js'
+import { mdiFileEdit, mdiTableBorder } from '@mdi/js'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import { useProjectStore } from '@/stores/project'
 import { useRouter } from 'vue-router'
@@ -39,8 +39,8 @@ const projectStore = useProjectStore()
 
 const projectId = ref('')
 
-onMounted(() => {
+onMounted(async () => {
   projectId.value = router.currentRoute.value.params.id
-  projectStore.fetchProject(projectId.value)
+  await projectStore.fetchProject(projectId.value)
 })
 </script>

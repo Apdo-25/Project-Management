@@ -89,6 +89,7 @@
                 :icon="mdiTrashCan"
                 label="Delete"
                 color="danger"
+                @click="isModalDangerActive = true"
                 rounded-full
                 small
               />
@@ -141,6 +142,8 @@ const formatDate = (dateString) => {
   const date = new Date(dateString)
   return date.toLocaleDateString()
 }
+
+const isModalDangerActive = ref(false)
 
 const projectStore = useProjectStore()
 const authStore = useAuthStore()

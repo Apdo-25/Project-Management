@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, onBeforeUnmount } from 'vue'
 import SectionMain from '@/components/SectionMain.vue'
 import Layout from '@/layouts/Layout.vue'
 import SectionTitle from '@/components/SectionTitle.vue'
@@ -13,42 +13,56 @@ import { useAuthStore } from '@/stores/auth'
 const projectStore = useProjectStore()
 const authStore = useAuthStore()
 
-onMounted(async () => {
-  await authStore.initialize()
-  const currentUser = authStore.userDetail.id
+const currentTime = ref(getCurrentTime())
 
-  try {
-    await projectStore.fetchUserProjects(currentUser)
-  } catch (error) {
-    console.error('Error fetching projects:', error)
-    // Handle the error here, e.g., display an error message or fallback behavior
-  }
+let intervalId
+
+onMounted(() => {
+  intervalId = setInterval(() => {
+    currentTime.value = getCurrentTime()
+  }, 1000)
 })
 
-const currentTime = ref(getCurrentTime())
+onBeforeUnmount(() => {
+  clearInterval(intervalId)
+})
 
 function getCurrentTime() {
   const now = new Date()
   return now.toLocaleTimeString()
 }
 
-const filteredProjects = computed(() => {
+const formatDate = (dateString) => {
+  const date = new Date(dateString)
+  return date.toLocaleDateString()
+}
+
+const projects = computed(() => {
   const currentUser = authStore.userDetail._id
-  const projects = projectStore.getProjects
 
-  console.log('Projects: ', projects)
-  console.log('Current User ID: ', currentUser)
+  const filteredProjects = projectStore.getProjects
+  console.log('Filtered Projects:', filteredProjects)
 
-  // Filter projects close to the deadline (e.g., within 7 days)
-  const currentDate = new Date()
-  const deadlineThreshold = currentDate.getTime() + 7 * 24 * 60 * 60 * 1000
-  const filtered = projects.filter((project) => {
-    const deadlineDate = new Date(project.deadline)
-    return deadlineDate.getTime() <= deadlineThreshold && project.userId === currentUser
-  })
+  const filteredProjectsByUser = filteredProjects.filter(
+    (project) => project.createdBy === currentUser
+  )
 
-  console.log('Filtered Projects: ', filtered)
-  return filtered
+  console.log('Filtered Projects By User:', filteredProjectsByUser)
+
+  return filteredProjectsByUser || []
+})
+
+const recentProjects = computed(() => {
+  console.log('Recent Projects:', projects.value.slice(0, 10))
+  return projects.value.slice(0, 10)
+})
+
+const upcomingDeadlines = computed(() => {
+  const filteredUpcoming = projects.value.filter(
+    (project) => new Date(project.deadline) > new Date()
+  )
+  console.log('Upcoming Deadlines:', filteredUpcoming)
+  return filteredUpcoming
 })
 </script>
 
@@ -69,11 +83,23 @@ const filteredProjects = computed(() => {
       </CardBox>
       <BaseDivider />
       <CardBox>
-        <CardBoxComponentHeader title="Projects Close to Due Dates" />
+        <CardBoxComponentHeader title="Recent Projects" />
         <CardBoxComponentBody>
           <ul>
-            <li v-for="project in filteredProjects" :key="project._id">
-              {{ project.name }} - Due Date: {{ project.dueDate }}
+            <li v-for="project in recentProjects" :key="project._id">
+              {{ project.name }}
+            </li>
+          </ul>
+        </CardBoxComponentBody>
+      </CardBox>
+      <BaseDivider />
+
+      <CardBox>
+        <CardBoxComponentHeader title="Upcoming Deadlines" />
+        <CardBoxComponentBody>
+          <ul>
+            <li v-for="project in upcomingDeadlines" :key="project._id">
+              {{ project.name }} - Due Date: {{ formatDate(project.deadline) }}
             </li>
           </ul>
         </CardBoxComponentBody>

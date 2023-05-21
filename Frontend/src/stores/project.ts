@@ -34,7 +34,7 @@ export const useProjectStore = defineStore('project', {
       try {
         const response = await useApiPrivate().get('/api/project/projects')
         const projects = response.data
-        this.projects = projects
+        this.$patch({ projects }) // update the state
         return projects
       } catch (error) {
         console.error('Error fetching projects:', error)
@@ -42,13 +42,11 @@ export const useProjectStore = defineStore('project', {
       }
     },
 
-    async fetchUserProjects() {
+    async fetchUserProjects(userId: string) {
       try {
-        const authStore = useAuthStore()
-        const userId = authStore.userDetail.id
         const response = await useApiPrivate().get(`/api/project/projects/user/${userId}`)
         const projects = response.data
-        this.projects = projects
+        this.$patch({ projects }) // update the state
         return projects
       } catch (error) {
         console.error('Failed to fetch user projects:', error)

@@ -29,8 +29,12 @@ const passwordForm = reactive({
 })
 
 async function submitProfile() {
-  await authStore
-    .updateUser({ username: profileForm.name, email: profileForm.email, avatar: profileForm.avatar })
+  let formData = new FormData()
+  formData.append('username', profileForm.name)
+  formData.append('email', profileForm.email)
+  formData.append('avatar', profileForm.avatar)
+
+  await authStore.updateUser(formData)
 }
 
 const submitPass = () => {
@@ -50,7 +54,12 @@ const submitPass = () => {
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <CardBox is-form @submit.prevent="submitProfile">
           <FormField label="Avatar" help="Max 500kb">
-            <FormFilePicker v-model="profileForm.avatar" label="Upload" accept=".jpg,.jpeg,.png" :max-size="500000" />
+            <FormFilePicker
+              v-model="profileForm.avatar"
+              label="Upload"
+              accept=".jpg,.jpeg,.png"
+              :max-size="500000"
+            />
           </FormField>
 
           <FormField label="Name" help="Required. Your name">

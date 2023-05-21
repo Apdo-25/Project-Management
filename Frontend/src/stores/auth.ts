@@ -103,13 +103,17 @@ export const useAuthStore = defineStore('auth', {
         }
       }
 
-      // No access token found or error occurred, resolve immediately
+      // Whether or not login data was found, we have attempted to initialize auth.
       this.authReady = true
       return Promise.resolve()
     },
 
     async attempt() {
       try {
+        if (!this.accessToken) {
+          await this.initialize()
+        }
+
         if (!this.accessToken) {
           // No access token found, resolve immediately
           return Promise.resolve()

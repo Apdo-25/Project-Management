@@ -1,31 +1,3 @@
-<script setup>
-import { defineProps } from 'vue'
-import { useTaskStore } from '@/stores/task'
-import { useAuthStore } from '@/stores/auth'
-import CardBox from '@/components/CardBox.vue'
-
-const props = defineProps({
-  task: Object
-})
-
-const taskStore = useTaskStore()
-const authStore = useAuthStore()
-
-const getUser = (id) => {
-  return authStore.users.find((user) => user._id === id)
-}
-
-const editTask = () => {
-  taskStore.updateTask(props.task._id, {
-    /* Updated task data */
-  })
-}
-
-const deleteTask = () => {
-  taskStore.deleteTask(props.task._id)
-}
-</script>
-
 <template>
   <CardBox
     class="bg-white p-4 mb-3 shadow-md border-t border-r border-l border-gray-100 rounded-md flex flex-col-reverse space-y-2 space-y-reverse relative hover:cursor-move"
@@ -59,3 +31,25 @@ const deleteTask = () => {
     </div>
   </CardBox>
 </template>
+
+<script setup>
+import { useTaskStore } from '@/stores/task'
+import { useAuthStore } from '@/stores/auth'
+
+const taskStore = useTaskStore()
+const authStore = useAuthStore()
+
+const getUser = (id) => {
+  return authStore.users.find((user) => user._id === id)
+}
+
+const editTask = () => {
+  taskStore.updateTask(props.task._id, {
+    /* Updated task data */
+  })
+}
+
+const deleteTask = () => {
+  taskStore.deleteTask(props.task._id)
+}
+</script>

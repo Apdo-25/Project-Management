@@ -36,29 +36,44 @@ const form = ref({
 
 const projectId = ref('')
 
-onMounted(() => {
-  projectId.value = router.currentRoute.value.params.id
-  projectStore.fetchProject(projectId.value)
+onMounted(async () => {
+  try {
+    const project = await projectStore.fetchProject(router.currentRoute.value.params.id)
+    form.value = { ...project } // Assign the fetched project data to the form
+  } catch (error) {
+    console.error('Error fetching project:', error)
+  }
 })
 
+const formatDate = (dateString) => {
+  const date = new Date(dateString)
+  const day = String(date.getUTCDate()).padStart(2, '0')
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+  const year = date.getUTCFullYear()
+  return `${year}-${month}-${day}`
+}
+
 const submit = async () => {
-  const projectData = {
-    name: form.value.name,
-    description: form.value.description, // Fix the property name to match the template
-    priority: form.value.priority,
-    status: form.value.status,
-    deadline: form.value.deadline,
-    addMember: form.value.addMember,
-    removeMember: form.value.removeMember
-  }
+  const projectData = { ...form.value }
+
+  // Format the deadline to "dd-MM-yyyy"
+  projectData.deadline = formatDate(projectData.deadline)
 
   try {
     await projectStore.updateProject(projectId.value, projectData)
-
-    // Navigate back to the project view
     router.push(`/projects/${projectId.value}`)
   } catch (error) {
-    console.error('Error updating project:', error)
+    if (error.response) {
+      // The request was made and the server responded with an error status
+      console.error('Error updating project:', error.response.status)
+      console.error('Error message:', error.response.data)
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.error('No response received:', error.request)
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.error('Error:', error.message)
+    }
   }
 }
 
