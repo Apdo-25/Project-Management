@@ -22,8 +22,8 @@ router.delete("/projects/:id/boards/:boardId", projectControllers.removeBoard);
 //Members
 router.post("/projects/:id/members", projectControllers.addMember);
 router.delete(
-  "/projects/:id/members/:memberId",
-  projectControllers.removeMember
+    "/projects/:id/members/:memberId",
+    projectControllers.removeMember
 );
 
 router.delete("/projects", projectControllers.deleteAllProjects);
