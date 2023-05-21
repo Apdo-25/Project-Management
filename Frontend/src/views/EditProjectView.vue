@@ -49,8 +49,8 @@ onMounted(async () => {
     const project = await projectStore.fetchProject(router.currentRoute.value.params.id)
     form.value = { ...project } // Assign the fetched project data to the form
     form.value.deadline = formatDate(project.deadline) // Format the deadline to "dd-MM-yyyy"
-    console.log('form:', form.value)
-    console.log('project:', project)
+    //console.log('form:', form.value)
+    //console.log('project:', project)
 
   } catch (error) {
     console.error('Error fetching project:', error)
