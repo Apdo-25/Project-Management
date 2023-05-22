@@ -1,36 +1,3 @@
-<template>
-  <div class="grid grid-cols-3 gap-6" v-if="lanesLength > 0">
-    <CardBox
-      v-for="lane in lanes"
-      :key="lane._id"
-      class="border border-gray-300 rounded-md bg-gray-50"
-    >
-      <CardBoxComponentHeader>
-        <CardBoxComponentTitle :title="lane.name" />
-        <div class="flex items-center space-x-2">
-          <button @click="editLane(lane._id)" class="text-blue-500">Edit Lane</button>
-          <button @click="deleteLane(lane._id)" class="text-red-500">Delete Lane</button>
-        </div>
-      </CardBoxComponentHeader>
-      <CardBoxComponentBody class="p-4 h-full">
-        <draggable
-          class="min-h-full"
-          :list="lane.tasks"
-          group="tasks"
-          item-key="id"
-          v-bind="dragOptions"
-          @change="handleTaskDrag"
-        >
-          <template #item="{ element }">
-            <Task :task="element" />
-          </template>
-        </draggable>
-      </CardBoxComponentBody>
-    </CardBox>
-    <button @click="addLane">Add Lane</button>
-  </div>
-</template>
-
 <script setup>
 import { ref, computed, watch, defineProps } from 'vue'
 import draggable from 'vuedraggable'
@@ -40,7 +7,7 @@ import CardBoxComponentTitle from '@/components/CardBoxComponentTitle.vue'
 import CardBoxComponentHeader from '@/components/CardBoxComponentHeader.vue'
 import CardBoxComponentBody from '@/components/CardBoxComponentBody.vue'
 import { useProjectStore } from '@/stores/project'
-
+import KanbanBoardControls from './KanbanBoardControls.vue'
 const projectStore = useProjectStore()
 
 const props = defineProps({
@@ -49,14 +16,6 @@ const props = defineProps({
     required: true
   }
 })
-
-const lanes = ref([])
-const lanesLength = computed(() => lanes.value.length)
-const dragOptions = computed(() => ({
-  animation: 200,
-  disabled: false,
-  ghostClass: 'ghost'
-}))
 
 const project = ref(null)
 
@@ -69,50 +28,187 @@ watch(
   }
 )
 
-const deleteLane = async (laneId) => {
-  await projectStore.deleteLane(props.projectId, laneId)
-}
-
-const editLane = async (laneId) => {
-  const laneData = {
-    name: lanes.value.find((l) => l._id === laneId).name
+const lanes = ref([
+  {
+    name: 'To Do',
+    tasks: [
+      {
+        title:
+          "We don't have a brig. Meh. Calculon is gonna kill us and it's all everybody else's fault!",
+        author: 'Philip J. Fry',
+        created_at: '16 hours ago',
+        level: 'Medium Level',
+        comments_count: 12
+      },
+      {
+        title:
+          "This opera's as lousy as it is brilliant! Your lyrics lack subtlety. You can't just have your characters announce how they feel.",
+        author: 'Turanga Leela',
+        created_at: '16 hours ago',
+        level: 'High Level',
+        comments_count: 1
+      },
+      {
+        title:
+          "Stop it, stop it. It's fine. I will 'destroy' you! I can explain. It's very valuable. ",
+        author: 'Bender Bending Rodriguez',
+        created_at: '16 hours ago',
+        level: 'Low Level',
+        comments_count: 12
+      },
+      {
+        title:
+          "Hey, whatcha watching? Hey! I'm a porno-dealing monster, what do I care what you think? It must be wonderful.",
+        author: 'Professor Farnsworth',
+        created_at: '16 hours ago',
+        level: 'Medium Level',
+        comments_count: 0
+      },
+      {
+        title:
+          "A superpowers drug you can just rub onto your skin? You'd think it would be something you'd have to freebase.",
+        author: 'Amy Wong',
+        created_at: '16 hours ago',
+        level: 'High Level',
+        comments_count: 56
+      },
+      {
+        title:
+          'Robot 1-X, save my friends! And Zoidberg! Perhaps, but perhaps your civilization is merely the sewer of an even greater society above you!',
+        author: 'Hermes Conrad',
+        created_at: '16 hours ago',
+        level: 'Medium Level',
+        comments_count: 10
+      },
+      {
+        title:
+          "You are the last hope of the universe. Stop! Don't shoot fire stick in space canoe!",
+        author: 'Dr. John A. Zoidberg',
+        created_at: '16 hours ago',
+        level: 'Low Level',
+        comments_count: 3
+      }
+    ]
+  },
+  {
+    name: 'In Progress',
+    tasks: [
+      {
+        title:
+          "You are the last hope of the universe. Stop! Don't shoot fire stick in space canoe!",
+        author: 'Dr. John A. Zoidberg',
+        created_at: '16 hours ago',
+        level: 'Low Level',
+        comments_count: 12
+      },
+      {
+        title:
+          "A superpowers drug you can just rub onto your skin? You'd think it would be something you'd have to freebase.",
+        author: 'Amy Wong',
+        created_at: '16 hours ago',
+        level: 'High Level',
+        comments_count: 2
+      },
+      {
+        title:
+          "This opera's as lousy as it is brilliant! Your lyrics lack subtlety. You can't just have your characters announce how they feel.",
+        author: 'Turanga Leela',
+        created_at: '16 hours ago',
+        level: 'High Level',
+        comments_count: 12
+      }
+    ]
+  },
+  {
+    name: 'Done',
+    tasks: [
+      {
+        title:
+          "Stop it, stop it. It's fine. I will 'destroy' you! I can explain. It's very valuable. ",
+        author: 'Bender Bending Rodriguez',
+        created_at: '16 hours ago',
+        level: 'Low Level',
+        comments_count: 12
+      },
+      {
+        title:
+          "Hey, whatcha watching? Hey! I'm a porno-dealing monster, what do I care what you think? It must be wonderful.",
+        author: 'Professor Farnsworth',
+        created_at: '16 hours ago',
+        level: 'Medium Level',
+        comments_count: 0
+      },
+      {
+        title:
+          "We don't have a brig. Meh. Calculon is gonna kill us and it's all everybody else's fault!",
+        author: 'Philip J. Fry',
+        created_at: '16 hours ago',
+        level: 'Medium Level',
+        comments_count: 12
+      },
+      {
+        title:
+          "This opera's as lousy as it is brilliant! Your lyrics lack subtlety. You can't just have your characters announce how they feel.",
+        author: 'Turanga Leela',
+        created_at: '16 hours ago',
+        level: 'High Level',
+        comments_count: 1
+      }
+    ]
   }
-  await projectStore.updateLane(props.projectId, laneId, laneData)
-}
-
-const addLane = async () => {
-  const laneData = {
-    name: 'New Lane'
+])
+const dragOptions = computed(() => {
+  return {
+    animation: 200,
+    disabled: false,
+    ghostClass: 'ghost'
   }
-  await projectStore.addLane(props.projectId, laneData)
-}
-
-const handleTaskDrag = (event) => {
-  const { newIndex, oldIndex, to, from } = event
-  const taskId = event.item.dataset.id
-  const fromLaneId = from.parentElement.dataset.id
-  const toLaneId = to.parentElement.dataset.id
-
-  if (fromLaneId === toLaneId) {
-    // Update task order within the same lane
-    const laneIndex = lanes.value.findIndex((lane) => lane._id === fromLaneId)
-    if (laneIndex !== -1) {
-      const tasks = lanes.value[laneIndex].tasks
-      const task = tasks.splice(oldIndex, 1)[0]
-      tasks.splice(newIndex, 0, task)
-    }
-  } else {
-    // Move task to another lane
-    const fromLaneIndex = lanes.value.findIndex((lane) => lane._id === fromLaneId)
-    const toLaneIndex = lanes.value.findIndex((lane) => lane._id === toLaneId)
-
-    if (fromLaneIndex !== -1 && toLaneIndex !== -1) {
-      const fromTasks = lanes.value[fromLaneIndex].tasks
-      const toTasks = lanes.value[toLaneIndex].tasks
-
-      const task = fromTasks.splice(oldIndex, 1)[0]
-      toTasks.splice(newIndex, 0, task)
-    }
-  }
-}
+})
 </script>
+
+<template>
+  <KanbanBoardControls />
+
+  <div class="grid grid-cols-3 gap-6">
+    <div
+      v-for="lane in lanes"
+      :key="lane.name"
+      class="border border-gray-300 rounded-md bg-gray-50"
+    >
+      <div
+        class="bg-white border-b border-gray-300 p-4 rounded-t-md flex items-center justify-between"
+      >
+        <div class="text-lg font-semibold">
+          {{ lane.name }}
+        </div>
+
+        <div class="flex items-center space-x-4">
+          <button
+            v-if="lane.name == 'Done'"
+            class="text-blue-500 hover:text-blue-700 font-semibold"
+          >
+            Clear all
+          </button>
+
+          <span class="block py-1 px-3 bg-gray-200 rounded-xl text-sm font-semibold">
+            {{ lane.tasks.length }}
+          </span>
+        </div>
+      </div>
+
+      <div class="p-4 h-full">
+        <draggable
+          class="min-h-full"
+          :list="lane.tasks"
+          group="tickets"
+          itemKey="name"
+          v-bind="dragOptions"
+        >
+          <template #item="{ element }">
+            <Task :task="element" />
+          </template>
+        </draggable>
+      </div>
+    </div>
+  </div>
+</template>
