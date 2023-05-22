@@ -6,7 +6,7 @@
 // const Board = require("../models/Board");
 // const Task = require("../models/Task");
 
-// //env testdb
+// // Set the environment to test
 // process.env.NODE_ENV = "test";
 
 // chai.use(chaiHttp);
@@ -23,117 +23,64 @@
 //     it("should create a new project", async () => {
 //       const response = await chai
 //         .request(server)
-//         .post("/api/project/projects")
+//         .post("/api/project")
 //         .send({
-//           name: "Xaar Project",
-//           description: "Test Description",
+//           name: "Test Project",
+//           description: "This is a test project",
+//           status: "new",
+//           members: ["member1", "member2"],
+//           priority: "high",
+//           deadline: new Date("2023-05-31"),
 //         });
 
 //       expect(response).to.have.status(200);
-//       expect(response.body).to.be.an("object");
 //       expect(response.body).to.have.property("name", "Test Project");
-//       expect(response.body).to.have.property("description", "Test Description");
+//       expect(response.body).to.have.property(
+//         "description",
+//         "This is a test project"
+//       );
+//       expect(response.body).to.have.property("status", "new");
+//       expect(response.body)
+//         .to.have.property("members")
+//         .to.deep.equal(["member1", "member2"]);
+//       expect(response.body).to.have.property("priority", "high");
+//       expect(response.body).to.have.property("deadline");
+//       expect(response.body).to.have.property("createdBy");
+//       expect(response.body).to.have.property("boards").to.be.an("array");
 //     });
+
+//     // Add more test cases for error handling and edge cases
 //   });
 
 //   describe("GET /api/project/projects", () => {
-//     it("should get all projects", async () => {
-//       // Create test projects
-//       const project1 = new Project({
+//     it("should fetch all projects", async () => {
+//       // Create sample projects in the database
+//       await Project.create({
 //         name: "Project 1",
-//         description: "Description 1",
+//         description: "Project 1 description",
+//         status: "new",
+//         members: ["member1"],
+//         priority: "high",
+//         deadline: new Date("2023-05-31"),
 //       });
-//       await project1.save();
-
-//       const project2 = new Project({
+//       await Project.create({
 //         name: "Project 2",
-//         description: "Description 2",
+//         description: "Project 2 description",
+//         status: "in-progress",
+//         members: ["member2"],
+//         priority: "medium",
+//         deadline: new Date("2023-06-15"),
 //       });
-//       await project2.save();
 
-//       const response = await chai.request(server).get("/api/project/projects");
+//       const response = await chai.request(server).get("/api/project");
 
 //       expect(response).to.have.status(200);
 //       expect(response.body).to.be.an("array");
-//       expect(response.body).to.have.lengthOf(2);
-
-//       const projectNames = response.body.map((project) => project.name);
-//       expect(projectNames).to.include.members(["Project 1", "Project 2"]);
+//       expect(response.body.length).to.equal(2);
 //     });
+
+//     // Add more test cases for error handling and edge cases
 //   });
 
-//   describe("DELETE /api/project/projects/:id", () => {
-//     it("should delete a project", async () => {
-//       // Create a test project
-//       const project = new Project({
-//         name: "Test Project",
-//         description: "Test Description",
-//       });
-//       await project.save();
-
-//       const response = await chai
-//         .request(server)
-//         .delete(`/api/project/projects/${project._id}`);
-
-//       expect(response).to.have.status(204);
-
-//       // Check if the project is deleted from the database
-//       const deletedProject = await Project.findById(project._id);
-//       expect(deletedProject).to.be.null;
-//     });
-
-//     it("should delete associated boards and tasks", async () => {
-//       // Create a test project with associated boards and tasks
-//       const project = new Project({
-//         name: "Test Project",
-//         description: "Test Description",
-//       });
-//       await project.save();
-
-//       const board1 = new Board({
-//         name: "Board 1",
-//         project: project._id,
-//       });
-//       await board1.save();
-
-//       const board2 = new Board({
-//         name: "Board 2",
-//         project: project._id,
-//       });
-//       await board2.save();
-
-//       const task1 = new Task({
-//         name: "Task 1",
-//         board: board1._id,
-//         project: project._id,
-//       });
-//       await task1.save();
-
-//       const task2 = new Task({
-//         name: "Task 2",
-//         board: board2._id,
-//         project: project._id,
-//       });
-//       await task2.save();
-
-//       const response = await chai
-//         .request(server)
-//         .delete(`/api/project/projects/${project._id}`);
-
-//       expect(response).to.have.status(204);
-
-//       // Check if the project, boards, and tasks are deleted from the database
-//       const deletedProject = await Project.findById(project._id);
-//       const deletedBoard1 = await Board.findById(board1._id);
-//       const deletedBoard2 = await Board.findById(board2._id);
-//       const deletedTask1 = await Task.findById(task1._id);
-//       const deletedTask2 = await Task.findById(task2._id);
-
-//       expect(deletedProject).to.be.null;
-//       expect(deletedBoard1).to.be.null;
-//       expect(deletedBoard2).to.be.null;
-//       expect(deletedTask1).to.be.null;
-//       expect(deletedTask2).to.be.null;
-//     });
-//   });
+//   // Add more test cases for other controller functions
 // });
