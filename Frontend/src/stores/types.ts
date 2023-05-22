@@ -39,6 +39,8 @@ export interface Board {
 // Task Model
 export interface Task {
   _id: string
+  boardId: string // Board ID
+  laneId: number // Lane ID
   name: string
   description: string
   board: string // Board ID

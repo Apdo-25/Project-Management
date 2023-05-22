@@ -119,6 +119,25 @@ async function updateTask(req, res) {
   }
 }
 
+// Update task laneId
+async function updateTaskLane(req, res) {
+  try {
+    const { laneId } = req.body;
+    const task = await Task.findByIdAndUpdate(
+      req.params.id,
+      { laneId },
+      { new: true }
+    ).exec();
+    if (!task) {
+      return res.status(404).json({ error: "Task not found." });
+    }
+    return res.json(task);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to update task lane." });
+  }
+}
+
 // Delete a task
 async function deleteTask(req, res) {
   try {
@@ -151,6 +170,7 @@ module.exports = {
   createTask,
   createTaskId,
   updateTask,
+  updateTaskLane,
   deleteTask,
   deleteAllTasks,
 };

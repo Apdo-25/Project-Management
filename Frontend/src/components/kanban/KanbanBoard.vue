@@ -17,6 +17,7 @@ const taskStore = useTaskStore()
 
 //get boardid from route
 const boardId = route.params.id
+const oldLanes = ref(null)
 
 const lanes = ref([
   {
@@ -93,14 +94,75 @@ const addTask = async () => {
   }
 }
 
+
 // Fetch tasks from boardId and update the lanes
 const fetchTasksAndPopulateLanes = async () => {
   const tasks = await taskStore.getTasksfromBoardId(boardId)
   console.log(tasks)
   lanes.value.forEach((lane) => {
     lane.tasks = tasks.filter((task) => task.laneId === lane.id)
+    console.log(lane.tasks)
   })
 }
+function onStart() {
+  oldLanes.value = JSON.parse(JSON.stringify(lanes.value));
+}
+
+async function onEnd({ oldIndex, newIndex, item }) {
+  // Get the dragged task
+  const task = item;
+  console.log('Task object:', task);
+  // Validate task
+  if (!task) {
+    console.error('Task is undefined');
+    return;
+  }
+  if (!task.id) {
+    console.error('Task has no _id property');
+    return;
+  }
+
+  // Find the original lane and task index in the old lanes
+  let originalLaneIndex, originalTaskIndex;
+  for (let i = 0; i < oldLanes.value.length; i++) {
+    let index = oldLanes.value[i].tasks.findIndex(t => t._id === task._id);
+    if (index !== -1) {
+      originalLaneIndex = i;
+      originalTaskIndex = index;
+      break;
+    }
+  }
+
+  // Get the lane where the task was dropped
+  const laneId = lanes.value.findIndex(lane => lane.tasks.some(t => t.laneId === task.id));
+  console.log('laneId:', laneId);
+  console.log('laneId:', laneId);
+
+  // Check if laneId is valid index
+  if (laneId >= 0 && laneId < lanes.value.length) {
+    try {
+      // Update the task's lane in the database
+      console.log('laneId:', task.id);
+      console.log('laneId:', laneId);
+      await taskStore.updateTaskLane(task.id, laneId);
+      
+      // Update the laneId of the task in the local data
+      task.laneId = laneId;
+    } catch (error) {
+      // If updating the task fails, reset its position
+      lanes.value[originalLaneIndex].tasks.splice(originalTaskIndex, 0, lanes.value[laneId].tasks.splice(newIndex, 1)[0]);
+      console.error('Error updating task lane:', error);
+    }
+  } else {
+    console.error('Lane not found or invalid laneId');
+  }
+}
+
+
+
+
+
+
 
 // Call the fetchTasksAndPopulateLanes function when the component is mounted
 onMounted(fetchTasksAndPopulateLanes)
@@ -141,9 +203,11 @@ onMounted(fetchTasksAndPopulateLanes)
           group="tasks"
           itemKey="name"
           v-bind="dragOptions"
+          @start="onStart"
+          @end="onEnd"
         >
           <template #item="{ element }">
-            <Task :task="element" />
+            <Task :task="element" :id="element._id" />
           </template>
         </draggable>
       </div>

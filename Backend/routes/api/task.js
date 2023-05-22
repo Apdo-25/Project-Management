@@ -10,6 +10,8 @@ router.get("/tasks/board/:id", taskControllers.getTasksByBoardId);
 router.post("/tasks/:id", authMiddleware, taskControllers.createTaskId);
 router.post("/tasks", authMiddleware, taskControllers.createTask);
 router.put("/tasks/:id", authMiddleware, taskControllers.updateTask);
+router.put("/tasks/:id/lane", authMiddleware, taskControllers.updateTaskLane);
+
 router.delete("/tasks/:id", authMiddleware, taskControllers.deleteTask);
 router.delete("/tasks", authMiddleware, taskControllers.deleteAllTasks);
 

@@ -75,7 +75,7 @@ export const useTaskStore = defineStore('task', {
         throw error
       }
     },
-    
+
     async createTaskwithBoardId(taskData: TaskData, boardId: string) {
       try {
         const response = await useApiPrivate().post(`/api/task/tasks/${boardId}`, taskData)
@@ -107,6 +107,22 @@ export const useTaskStore = defineStore('task', {
         throw error
       }
     },
+
+    async updateTaskLane(id: string, laneId: number) {
+      try {
+        const response = await useApiPrivate().put(`/api/task/tasks/${id}/lane`, { laneId })
+        const updatedTask = response.data
+        console.log(`${id}`)
+        console.log(`${laneId}`)
+   
+        return updatedTask
+      } catch (error) {
+        console.error('Error updating task lane:', error)
+        throw error
+      }
+    }
+    ,
+    
 
     async deleteTask(id: string) {
       try {
