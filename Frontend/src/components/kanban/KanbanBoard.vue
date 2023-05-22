@@ -1,174 +1,106 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import draggable from 'vuedraggable'
 import Task from './Task.vue'
-import KanbanBoardControls from './KanbanBoardControls.vue'
+import CardBox from '@/components/CardBox.vue'
+import BaseButtons from '@/components/BaseButtons.vue'
+import BaseButton from '@/components/BaseButton.vue'
+import CardBoxModal from '@/components/CardBoxModal.vue'
+import { mdiPlus } from '@mdi/js'
+import FormField from '@/components/FormField.vue'
+import FormControl from '@/components/FormControl.vue'
 
 const lanes = ref([
   {
     name: 'To Do',
-    tickets: [
-      {
-        title:
-          "We don't have a brig. Meh. Calculon is gonna kill us and it's all everybody else's fault!",
-        author: 'Philip J. Fry',
-        created_at: '16 hours ago',
-        level: 'Medium Level',
-        comments_count: 12
-      },
-      {
-        title:
-          "This opera's as lousy as it is brilliant! Your lyrics lack subtlety. You can't just have your characters announce how they feel.",
-        author: 'Turanga Leela',
-        created_at: '16 hours ago',
-        level: 'High Level',
-        comments_count: 1
-      },
-      {
-        title:
-          "Stop it, stop it. It's fine. I will 'destroy' you! I can explain. It's very valuable. ",
-        author: 'Bender Bending Rodriguez',
-        created_at: '16 hours ago',
-        level: 'Low Level',
-        comments_count: 12
-      },
-      {
-        title:
-          "Hey, whatcha watching? Hey! I'm a porno-dealing monster, what do I care what you think? It must be wonderful.",
-        author: 'Professor Farnsworth',
-        created_at: '16 hours ago',
-        level: 'Medium Level',
-        comments_count: 0
-      },
-      {
-        title:
-          "A superpowers drug you can just rub onto your skin? You'd think it would be something you'd have to freebase.",
-        author: 'Amy Wong',
-        created_at: '16 hours ago',
-        level: 'High Level',
-        comments_count: 56
-      },
-      {
-        title:
-          'Robot 1-X, save my friends! And Zoidberg! Perhaps, but perhaps your civilization is merely the sewer of an even greater society above you!',
-        author: 'Hermes Conrad',
-        created_at: '16 hours ago',
-        level: 'Medium Level',
-        comments_count: 10
-      },
-      {
-        title:
-          "You are the last hope of the universe. Stop! Don't shoot fire stick in space canoe!",
-        author: 'Dr. John A. Zoidberg',
-        created_at: '16 hours ago',
-        level: 'Low Level',
-        comments_count: 3
-      }
-    ]
+    tasks: []
   },
   {
     name: 'In Progress',
-    tickets: [
-      {
-        title:
-          "You are the last hope of the universe. Stop! Don't shoot fire stick in space canoe!",
-        author: 'Dr. John A. Zoidberg',
-        created_at: '16 hours ago',
-        level: 'Low Level',
-        comments_count: 12
-      },
-      {
-        title:
-          "A superpowers drug you can just rub onto your skin? You'd think it would be something you'd have to freebase.",
-        author: 'Amy Wong',
-        created_at: '16 hours ago',
-        level: 'High Level',
-        comments_count: 2
-      },
-      {
-        title:
-          "This opera's as lousy as it is brilliant! Your lyrics lack subtlety. You can't just have your characters announce how they feel.",
-        author: 'Turanga Leela',
-        created_at: '16 hours ago',
-        level: 'High Level',
-        comments_count: 12
-      }
-    ]
+    tasks: []
   },
   {
     name: 'Done',
-    tickets: [
-      {
-        title:
-          "Stop it, stop it. It's fine. I will 'destroy' you! I can explain. It's very valuable. ",
-        author: 'Bender Bending Rodriguez',
-        created_at: '16 hours ago',
-        level: 'Low Level',
-        comments_count: 12
-      },
-      {
-        title:
-          "Hey, whatcha watching? Hey! I'm a porno-dealing monster, what do I care what you think? It must be wonderful.",
-        author: 'Professor Farnsworth',
-        created_at: '16 hours ago',
-        level: 'Medium Level',
-        comments_count: 0
-      },
-      {
-        title:
-          "We don't have a brig. Meh. Calculon is gonna kill us and it's all everybody else's fault!",
-        author: 'Philip J. Fry',
-        created_at: '16 hours ago',
-        level: 'Medium Level',
-        comments_count: 12
-      },
-      {
-        title:
-          "This opera's as lousy as it is brilliant! Your lyrics lack subtlety. You can't just have your characters announce how they feel.",
-        author: 'Turanga Leela',
-        created_at: '16 hours ago',
-        level: 'High Level',
-        comments_count: 1
-      }
-    ]
+    tasks: []
   }
 ])
 
-const dragOptions = computed(() => {
-  return {
-    animation: 200,
-    disabled: false,
-    ghostClass: 'ghost'
-  }
+const dragOptions = {
+  animation: 200,
+  disabled: false,
+  ghostClass: 'ghost'
+}
+
+const selectOptions = [
+  { id: 1, label: 'Low Level' },
+  { id: 2, label: 'Medium Level' },
+  { id: 3, label: 'High Level' }
+]
+
+const currentDate = new Date()
+const formattedDate = `${('0' + currentDate.getDate()).slice(-2)}-${(
+  '0' +
+  (currentDate.getMonth() + 1)
+).slice(-2)}-${currentDate.getFullYear()}`
+
+// Initialize newTask with default values
+const newTask = ref({
+  title: '',
+  author: '',
+  created_at: `${('0' + new Date().getDate()).slice(-2)}-${(
+    '0' +
+    (new Date().getMonth() + 1)
+  ).slice(-2)}-${new Date().getFullYear()}`,
+  level: 'Low Level'
 })
+
+let showModal = ref(false)
+let currentLane = ref(null)
+
+const openModal = (lane) => {
+  showModal.value = true
+  currentLane.value = lane
+}
+const addTask = () => {
+  if (newTask.value.title !== '') {
+    currentLane.value.tasks.push({ ...newTask.value })
+    newTask.value = {
+      title: '',
+      author: '',
+      created_at: `${('0' + new Date().getDate()).slice(-2)}-${(
+        '0' +
+        (new Date().getMonth() + 1)
+      ).slice(-2)}-${new Date().getFullYear()}`,
+      level: 'Low Level'
+    }
+    showModal.value = false
+  }
+}
 </script>
 
 <template>
-  <KanbanBoardControls />
-
   <div class="grid grid-cols-3 gap-6">
-    <div
+    <CardBox
       v-for="lane in lanes"
       :key="lane.name"
       class="border border-gray-300 rounded-md bg-gray-50"
     >
-      <div
-        class="bg-white border-b border-gray-300 p-4 rounded-t-md flex items-center justify-between"
-      >
+      <div class="border-b border-gray-300 p-4 rounded-t-md flex items-center justify-between">
         <div class="text-lg font-semibold">
           {{ lane.name }}
         </div>
 
         <div class="flex items-center space-x-4">
-          <button
-            v-if="lane.name == 'Done'"
-            class="text-blue-500 hover:text-blue-700 font-semibold"
-          >
-            Clear all
-          </button>
-
-          <span class="block py-1 px-3 bg-gray-200 rounded-xl text-sm font-semibold">
-            {{ lane.tickets.length }}
+          <BaseButton
+            :onClick="() => openModal(lane)"
+            :icon="mdiPlus"
+            label="Add Task"
+            color="contrast"
+            rounded-full
+            small
+          />
+          <span class="block py-1 px-3 bg-gray-400 rounded-xl text-sm font-semibold">
+            {{ lane.tasks.length }}
           </span>
         </div>
       </div>
@@ -176,16 +108,39 @@ const dragOptions = computed(() => {
       <div class="p-4 h-full">
         <draggable
           class="min-h-full"
-          :list="lane.tickets"
-          group="tickets"
+          :list="lane.tasks"
+          group="tasks"
           itemKey="name"
           v-bind="dragOptions"
         >
           <template #item="{ element }">
-            <Ticket :ticket="element" />
+            <Task :task="element" />
           </template>
         </draggable>
       </div>
-    </div>
+    </CardBox>
+    <CardBoxModal
+      :modelValue="showModal"
+      title="Add Task"
+      @update:modelValue="showModal = $event"
+      @confirm="addTask"
+      :buttonLabel="buttonLabel"
+      hasCancel
+    >
+      <FormField label="Grouped with icons">
+        <FormControl v-model="newTask.title" :icon="mdiAccount" placeholder="Task title" />
+        <FormControl v-model="newTask.author" placeholder="Task author" :icon="mdiMail" />
+      </FormField>
+      <FormField label="Dropdown" class="border rounded w-full py-2 px-3 text-white mt-2">
+        <FormControl v-model="newTask.level" :options="selectOptions" />
+      </FormField>
+
+      <template #footer>
+        <BaseButtons>
+          <BaseButton label="Add" color="contrast" @click="addTask" />
+          <BaseButton label="Cancel" color="contrast" outline @click="cancel" />
+        </BaseButtons>
+      </template>
+    </CardBoxModal>
   </div>
 </template>
