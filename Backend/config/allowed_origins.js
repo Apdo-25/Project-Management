@@ -6,7 +6,8 @@ const origins = [
   "http://localhost:5173",
   "http://localhost:4000",
   "https://pm-api-km33.onrender.com/",
-  "https://pm-api-km33.onrender.com"
+  "https://pm-api-km33.onrender.com",
+  "https://pm-project.onrender.com/",
 ];
 
 module.exports = origins;
