@@ -1,37 +1,13 @@
 <script setup>
-import { ref, computed, watch, defineProps } from 'vue'
+import { ref, computed } from 'vue'
 import draggable from 'vuedraggable'
 import Task from './Task.vue'
-import CardBox from '../CardBox.vue'
-import CardBoxComponentTitle from '@/components/CardBoxComponentTitle.vue'
-import CardBoxComponentHeader from '@/components/CardBoxComponentHeader.vue'
-import CardBoxComponentBody from '@/components/CardBoxComponentBody.vue'
-import { useProjectStore } from '@/stores/project'
 import KanbanBoardControls from './KanbanBoardControls.vue'
-const projectStore = useProjectStore()
-
-const props = defineProps({
-  projectId: {
-    type: String,
-    required: true
-  }
-})
-
-const project = ref(null)
-
-watch(
-  () => project.value,
-  (newProject) => {
-    if (newProject && newProject.board) {
-      lanes.value = newProject.board.lanes
-    }
-  }
-)
 
 const lanes = ref([
   {
     name: 'To Do',
-    tasks: [
+    tickets: [
       {
         title:
           "We don't have a brig. Meh. Calculon is gonna kill us and it's all everybody else's fault!",
@@ -92,7 +68,7 @@ const lanes = ref([
   },
   {
     name: 'In Progress',
-    tasks: [
+    tickets: [
       {
         title:
           "You are the last hope of the universe. Stop! Don't shoot fire stick in space canoe!",
@@ -121,7 +97,7 @@ const lanes = ref([
   },
   {
     name: 'Done',
-    tasks: [
+    tickets: [
       {
         title:
           "Stop it, stop it. It's fine. I will 'destroy' you! I can explain. It's very valuable. ",
@@ -157,6 +133,7 @@ const lanes = ref([
     ]
   }
 ])
+
 const dragOptions = computed(() => {
   return {
     animation: 200,
@@ -191,7 +168,7 @@ const dragOptions = computed(() => {
           </button>
 
           <span class="block py-1 px-3 bg-gray-200 rounded-xl text-sm font-semibold">
-            {{ lane.tasks.length }}
+            {{ lane.tickets.length }}
           </span>
         </div>
       </div>
@@ -199,13 +176,13 @@ const dragOptions = computed(() => {
       <div class="p-4 h-full">
         <draggable
           class="min-h-full"
-          :list="lane.tasks"
+          :list="lane.tickets"
           group="tickets"
           itemKey="name"
           v-bind="dragOptions"
         >
           <template #item="{ element }">
-            <Task :task="element" />
+            <Ticket :ticket="element" />
           </template>
         </draggable>
       </div>

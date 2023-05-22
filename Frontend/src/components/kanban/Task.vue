@@ -1,8 +1,9 @@
 <script setup>
-import { ref } from 'vue'
-const defineProps = {
+import { defineProps } from 'vue'
+
+const props = defineProps({
   ticket: Object
-}
+})
 </script>
 
 <template>
