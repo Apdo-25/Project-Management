@@ -9,7 +9,7 @@ export function useApiPrivate(): AxiosInstance {
     axiosPrivateInstance.interceptors.request.use(
       (config) => {
         if (!config.headers['Authorization']) {
-          config.headers['Authorization'] = `Bearer ${authStore.accessToken}`
+          config.headers['Authorization'] = `${authStore.accessToken}`
         }
         return config
       },

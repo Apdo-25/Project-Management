@@ -1,134 +1,180 @@
 openapi: 3.0.0
 info:
+  title: Project-Management API Docs
+  description: Project-Management API Docs
   version: 1.0.0
-  title: Project Management API
-  description: REST API for managing projects and tasks
 servers:
-  - url: http://localhost:4000
-    description: Local server
-
+  - url: 'http://localhost:4000/api/'
+    description: Localhost development server
 components:
   securitySchemes:
-    access_token:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
   schemas:
-    Project:
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-        description:
-          type: string
-        status:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-      required:
-        - name
-        - description
-        - status
-
-    Task:
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-        description:
-          type: string
-        status:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-      required:
-        - name
-        - description
-        - status
     User:
       type: object
       properties:
-        id:
-          type: integer
-        name:
+        username:
           type: string
         email:
           type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
         password:
           type: string
-        createdAt:
+        password_confirm:
           type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-      required:
-        - name
-        - email
-        - password
-
-    AuthResponse:
+    Project:
       type: object
       properties:
-        user:
-          $ref: '#/components/schemas/User'
-        token:
+        _id:
           type: string
-
-    ProjectResponse:
-      type: object
-      properties:
-        project:
-          $ref: '#/components/schemas/Project'
-
-    ProjectList:
-      type: object
-      properties:
-        projects:
+        name:
+          type: string
+        description:
+          type: string
+        board:
+          type: string
+        createdBy:
+          type: string
+        status:
+          type: string
+            enum:
+              - In progress
+              - Open
+              - Closed
+        members:
           type: array
-          items:
-            $ref: '#/components/schemas/Project'
-
-    TaskResponse:
-      type: object
-      properties:
-        task:
-          $ref: '#/components/schemas/Task'
-
-    TaskList:
-      type: object
-      properties:
+        items:
+          type: string
+        deadline:
+          type: string
+          format: date-time
+        priority:
+          type: string
+            enum:
+              - Low
+              - Medium
+              - High
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    ProjectData:
+        type: object
+        properties:
+          name:
+            type: string
+          description:
+            type: string
+    Lane:
+        type: object
+        properties:
+        name:
+            type: string
+            maxLength: 100
+        board:
+          type: string
+          format: objectId
+          description: Board ID
         tasks:
           type: array
-          items:
-            $ref: '#/components/schemas/Task'
-
-    ErrorResponse:
-      type: object
-      properties:
-        message:
+        items:
           type: string
-          
+          format: objectId
+          description: Task IDs
+    Task:
+        type: object
+        properties:
+          lane:
+            type: string
+            format: objectId
+            description: Lane ID
+          name:
+            type: string
+            required: true
+            maxLength: 100
+          description:
+            type: string
+            required: true
+            maxLength: 1000
+          due_date:
+            type: string
+            format: date-time
+            required: false
+          assigned_to:
+            type: string
+            format: objectId
+            description: User ID
+          createdBy:
+            type: string
+            format: objectId
+            description: User ID
+          status:
+            type: string
+            enum:
+              - New
+              - In Progress
+              - Completed
+            default: New
+          priority:
+            type: number
+            required: false
+            minimum: 1
+            maximum: 5
+    TaskData:
+        type: object
+        properties:
+          name:
+            type: string
+            required: true
+            maxLength: 100
+          description:
+            type: string
+            required: true
+            maxLength: 1000
+          priority:
+            type: number
+            required: false
+            minimum: 1
+            maximum: 5
 paths:
-  /api/auth/login:
+  /auth/register:
     post:
       tags:
-        - auth
-      summary: Login
-      description: Login with email and password
+        - User
+      summary: Register a new User
+      description: Register a new User in the database
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: User created succesfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  _id:
+                    type: string
+  /auth/login:
+    post:
+      tags:
+        - User
+      summary: Login a User
+      description: Login a User in order to get JWT token (auth-token)
       requestBody:
         required: true
         content:
@@ -140,113 +186,182 @@ paths:
                   type: string
                 password:
                   type: string
-              required:
-                - email
-                - password
       responses:
         '200':
-          description: Login successful
+          description: User logged in succesfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthResponse'
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /api/auth/register:
-    post:
-      tags:
-        - auth
-      summary: Register
-      description: Register with name, email and password
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                email:
-                  type: string
-                password:
-                  type: string
-              required:
-                - name
-                - email
-                - password
-      responses:
-        '200':
-          description: Registration successful
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthResponse'
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /api/project/projects:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  data:
+                    type: string
+  /auth/user:
     get:
       tags:
-        - project
-      summary: Get all projects
-      description: Get all projects
+        - User
+      summary: Retrieves a list of Users
+      description: Retrieves a list of Users as JSON objects.
       security:
-        - access_token: []
+        - ApiKeyAuth: []
       responses:
         '200':
-          description: Projects found
+          description: A list of Users JSON objects in an array.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProjectList'
-        '401':
-          description: Unauthorized
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+  '/user/{id}':
+    get:
+      tags:
+        - User
+      summary: Specific User
+      description: Retrieves a specific User based on it id.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: MongoDB id
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A User in the format of a JSON object.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    put:
+      tags:
+        - User
+      summary: Updates a specific User
+      description: Updates a specific User based on it id
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: MongoDB id
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: User updated succesfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
+                $ref: '#/components/schemas/User'
+    delete:
+      tags:
+        - User
+      summary: Deletes a specific User
+      description: Deletes a specific User based on it id
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: MongoDB id
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User deleted succesfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /project/projects:
+    get:
+      tags:
+        - Projects
+      summary: Retrieves a list of Projects
+      description: Retrieves a list of Projects as JSON objects.
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: A list Projects Project JSON objects in an array.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
     post:
       tags:
-        - project
-      summary: Create a project
-      description: Create a project
+        - Projects
+      summary: Create a new Project
+      description: Create a new Project
       security:
-        - access_token: []    
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectData'
+      responses:
+        '200':
+          description: Project created succesfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectData'
+  '/project/projects/{id}':
+    get:
+      tags:
+        - Projects
+      summary: Specific Projects
+      description: Retrieves a specific Projects based on it id.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: MongoDB id
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A Projects in the format of a JSON object.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
+    put:
+      tags:
+        - Projects
+      summary: Updates a specific Project
+      description: Updates a specific Project based on it id
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: MongoDB id
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -255,65 +370,107 @@ paths:
               $ref: '#/components/schemas/Project'
       responses:
         '200':
-          description: Project created
+          description: Projects updated succesfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProjectResponse'
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /api/task/tasks:
-    get:
+                $ref: '#/components/schemas/Project'
+    delete:
       tags:
-        - task
-      summary: Get all tasks
-      description: Get all tasks
+        - Projects
+      summary: Deletes a specific Project
+      description: Deletes a specific Project based on it id
       security:
-        - access_token: []
+        - ApiKeyAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: MongoDB id
+          schema:
+            type: string
       responses:
         '200':
-          description: Tasks found
+          description: Project deleted succesfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TaskList'
-        '401':
-          description: Unauthorized
+                $ref: '#/components/schemas/Project'
+  /task/tasks:
+    get:
+      tags:
+        - tasks
+      summary: Retrieves a list of tasks
+      description: Retrieves a list of tasks as JSON objects.
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: A list tasks Project JSON objects in an array.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
     post:
       tags:
-        - task
-      summary: Create a task
-      description: Create a task
+        - tasks
+      summary: Create a new Task
+      description: Create a new Task
       security:
-        - access_token: []    
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskData'
+      responses:
+        '200':
+          description: Task created succesfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskData'
+  '/task/tasks/{id}':
+    get:
+      tags:
+        - tasks
+      summary: Specific Task
+      description: Retrieves a specific Task based on it id.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: MongoDB id
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A Task in the format of a JSON object.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+    put:
+      tags:
+        - tasks
+      summary: Updates a specific Task
+      description: Updates a specific Task based on it id
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: MongoDB id
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -322,37 +479,29 @@ paths:
               $ref: '#/components/schemas/Task'
       responses:
         '200':
-          description: Task created
+          description: Task updated succesfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TaskResponse'
-        '400':
-          description: Bad request
+                $ref: '#/components/schemas/Task'
+    delete:
+      tags:
+        - tasks
+      summary: Deletes a specific Task
+      description: Deletes a specific Task based on it id
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: MongoDB id
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Task deleted succesfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /api/task/tasks/{id}:
-  
-
-
-
-
-
-
-
-             
+                $ref: '#/components/schemas/Task'
