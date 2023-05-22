@@ -12,13 +12,13 @@ const errorHandlerMiddleware = require("./middleware/error_handler");
 const authenticationMiddleware = require("./middleware/authentication");
 
 const server = express();
-const swaggerUi = require('swagger-ui-express');
-const YAML = require('yamljs');
+const swaggerUi = require("swagger-ui-express");
+const YAML = require("yamljs");
 
 const app = server;
 
-const swaggerDefinition = YAML.load('./swagger.yaml');
-app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDefinition));
+const swaggerDefinition = YAML.load("./swagger.yaml");
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDefinition));
 
 const PORT = 4000;
 
@@ -28,36 +28,36 @@ const multer = require("multer");
 const upload = multer({ storage: multer.memoryStorage() });
 
 app.post(
-    "/updateUser2",
-    upload.single("avatar"),
-    async function(req, res, next) {
-        try {
-            const { username, email } = req.body;
-            const avatar = req.file.buffer; // This is your uploaded file
+  "/updateUser2",
+  upload.single("avatar"),
+  async function (req, res, next) {
+    try {
+      const { username, email } = req.body;
+      const avatar = req.file.buffer; // This is your uploaded file
 
-            if (!username || !email || !avatar) {
-                return res.status(422).json({ message: "Invalid fields" });
-            }
+      if (!username || !email || !avatar) {
+        return res.status(422).json({ message: "Invalid fields" });
+      }
 
-            const user = await User.findById(req.user._id);
+      const user = await User.findById(req.user._id);
 
-            if (!user) {
-                return res.status(404).json({ message: "User not found" });
-            }
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
 
-            user.username = username;
-            user.email = email;
-            user.avatar = avatar.toString("base64");
+      user.username = username;
+      user.email = email;
+      user.avatar = avatar.toString("base64");
 
-            await user.save();
+      await user.save();
 
-            return res.status(200).json(user);
-        } catch (error) {
-            return res
-                .status(500)
-                .json({ message: "Error updating user", error: error.message });
-        }
+      return res.status(200).json(user);
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: "Error updating user", error: error.message });
     }
+  }
 );
 
 // Allow Credentials
@@ -85,7 +85,7 @@ app.use(errorHandlerMiddleware);
 
 //root route
 app.get("/", (req, res) => {
-    res.status(200).send({ message: "Hello World!" });
+  res.status(200).send({ message: "Hello World!" });
 });
 
 // Routes
@@ -96,20 +96,20 @@ app.use("/api/task", require("./routes/api/task"));
 
 // 404
 app.all("*", (req, res) => {
-    res.status(404);
+  res.status(404);
 
-    if (req.accepts("json")) {
-        res.json({ error: "404 Not Found" });
-    } else {
-        res.type("text").send("404 Not Found");
-    }
+  if (req.accepts("json")) {
+    res.json({ error: "404 Not Found" });
+  } else {
+    res.type("text").send("404 Not Found");
+  }
 });
 
 mongoose.connection.once("open", () => {
-    console.log("DB connected");
-    app.listen(PORT, () => {
-        console.log(`Listening on port ${PORT}`);
-    });
+  console.log("DB connected");
+  app.listen(PORT, () => {
+    console.log(`Listening on port ${PORT}`);
+  });
 });
 
 module.exports = server;
