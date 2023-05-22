@@ -7,6 +7,8 @@ const taskSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Lane",
     },
+    boardId: { type: Schema.Types.ObjectId, ref: "Board" },
+    laneId: { type: Schema.Types.Number, ref: "Lane" },
     name: { type: String, required: true, max: 100 },
     description: { type: String, required: true, max: 1000 },
     due_date: { type: Date, required: false },

@@ -92,7 +92,11 @@ components:
     Task:
         type: object
         properties:
-          lane:
+          boardId:
+            type: string
+            format: objectId
+            description: Board ID
+          laneId:
             type: string
             format: objectId
             description: Lane ID
@@ -131,6 +135,14 @@ components:
     TaskData:
         type: object
         properties:
+          boardId:
+            type: string
+            format: objectId
+            description: Board ID
+          laneId:
+            type: string
+            format: objectId
+            description: Lane ID
           name:
             type: string
             required: true
@@ -433,6 +445,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TaskData'
+  '/task/tasks/board/{id}':
+    get:
+      tags:
+        - tasks
+      summary: Specific Task
+      description: Retrieves a specific Task based on it id.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: MongoDB id
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A Task in the format of a JSON object.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+
   '/task/tasks/{id}':
     get:
       tags:

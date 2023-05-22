@@ -10,7 +10,7 @@ const props = defineProps({
   <div
     class="p-4 mb-3 shadow-md border-t border-r border-l border-gray-100 rounded-md flex flex-col-reverse space-y-2 space-y-reverse relative hover:cursor-move"
   >
-    <div>{{ task.title }}</div>
+    <div>{{ task.name }}</div>
     <div class="text-gray-400 text-sm">{{ task.author }}, {{ task.created_at }}</div>
     <div class="text-gray-300 flex items-center">
       <svg

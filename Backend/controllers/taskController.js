@@ -25,10 +25,25 @@ async function getTask(req, res) {
   }
 }
 
+async function getTasksByBoardId(req, res) {
+  try {
+    const tasks = await Task.find({ boardId: req.params.id }).exec();
+    if (!tasks) {
+      return res.status(404).json({ error: "Tasks not found." });
+    }
+    return res.json(tasks);
+  } catch (error) {
+    //console.error(error);
+    return res.status(500).json({ error: "Failed to fetch tasks." });
+  }
+}
+
 // Create a new task
 async function createTask(req, res) {
   try {
     const {
+      boardId,
+      laneId,
       name,
       description,
       due_date,
@@ -38,6 +53,8 @@ async function createTask(req, res) {
       priority,
     } = req.body;
     const task = await Task.create({
+      boardId,
+      laneId,
       name,
       description,
       due_date,
@@ -108,6 +125,7 @@ async function deleteAllTasks(req, res) {
 module.exports = {
   getTasks,
   getTask,
+  getTasksByBoardId,
   createTask,
   updateTask,
   deleteTask,

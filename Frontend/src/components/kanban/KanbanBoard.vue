@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import draggable from 'vuedraggable'
 import Task from './Task.vue'
 import CardBox from '@/components/CardBox.vue'
@@ -9,17 +9,28 @@ import CardBoxModal from '@/components/CardBoxModal.vue'
 import { mdiPlus } from '@mdi/js'
 import FormField from '@/components/FormField.vue'
 import FormControl from '@/components/FormControl.vue'
+import { useTaskStore } from '@/stores/task.ts'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const taskStore = useTaskStore()
+
+//get boardid from route
+const boardId = route.params.id
 
 const lanes = ref([
   {
+    id: 1,
     name: 'To Do',
     tasks: []
   },
   {
+    id: 2,
     name: 'In Progress',
     tasks: []
   },
   {
+    id: 3,
     name: 'Done',
     tasks: []
   }
@@ -38,19 +49,13 @@ const selectOptions = [
 ]
 
 const currentDate = new Date()
-const formattedDate = `${('0' + currentDate.getDate()).slice(-2)}-${(
-  '0' +
-  (currentDate.getMonth() + 1)
-).slice(-2)}-${currentDate.getFullYear()}`
+const formattedDate = `${('0' + currentDate.getDate()).slice(-2)}-${('0' + (currentDate.getMonth() + 1)).slice(-2)}-${currentDate.getFullYear()}`
 
 // Initialize newTask with default values
 const newTask = ref({
   title: '',
   author: '',
-  created_at: `${('0' + new Date().getDate()).slice(-2)}-${(
-    '0' +
-    (new Date().getMonth() + 1)
-  ).slice(-2)}-${new Date().getFullYear()}`,
+  created_at: `${('0' + new Date().getDate()).slice(-2)}-${('0' + (new Date().getMonth() + 1)).slice(-2)}-${new Date().getFullYear()}`,
   level: 'Low Level'
 })
 
@@ -61,21 +66,32 @@ const openModal = (lane) => {
   showModal.value = true
   currentLane.value = lane
 }
+
 const addTask = () => {
   if (newTask.value.title !== '') {
     currentLane.value.tasks.push({ ...newTask.value })
     newTask.value = {
       title: '',
       author: '',
-      created_at: `${('0' + new Date().getDate()).slice(-2)}-${(
-        '0' +
-        (new Date().getMonth() + 1)
-      ).slice(-2)}-${new Date().getFullYear()}`,
+      created_at: `${('0' + new Date().getDate()).slice(-2)}-${('0' + (new Date().getMonth() + 1)).slice(-2)}-${new Date().getFullYear()}`,
       level: 'Low Level'
     }
     showModal.value = false
   }
 }
+
+// Fetch tasks from boardId and update the lanes
+const fetchTasksAndPopulateLanes = async () => {
+  const tasks = await taskStore.getTasksfromBoardId(boardId)
+  console.log(tasks)
+  lanes.value.forEach((lane) => {
+    lane.tasks = tasks.filter((task) => task.laneId === lane.id)
+  })
+}
+
+// Call the fetchTasksAndPopulateLanes function when the component is mounted
+onMounted(fetchTasksAndPopulateLanes)
+
 </script>
 
 <template>
@@ -131,7 +147,7 @@ const addTask = () => {
         <FormControl v-model="newTask.title" :icon="mdiAccount" placeholder="Task title" />
         <FormControl v-model="newTask.author" placeholder="Task author" :icon="mdiMail" />
       </FormField>
-      <FormField label="Dropdown" class="border rounded w-full py-2 px-3 text-white mt-2">
+      <FormField label="Dropdown">
         <FormControl v-model="newTask.level" :options="selectOptions" />
       </FormField>
 
