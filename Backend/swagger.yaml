@@ -6,6 +6,7 @@ info:
 servers:
   - url: 'http://localhost:4000/api/'
     description: Localhost development server
+  - url: 'https://pm-api-km33.onrender.com/'
 components:
   securitySchemes:
     ApiKeyAuth:
