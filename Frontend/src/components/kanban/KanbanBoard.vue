@@ -54,7 +54,7 @@ const formattedDate = `${('0' + currentDate.getDate()).slice(-2)}-${('0' + (curr
 // Initialize newTask with default values
 const newTask = ref({
   title: '',
-  author: '',
+  description: '',
   created_at: `${('0' + new Date().getDate()).slice(-2)}-${('0' + (new Date().getMonth() + 1)).slice(-2)}-${new Date().getFullYear()}`,
   level: 'Low Level'
 })
@@ -67,16 +67,29 @@ const openModal = (lane) => {
   currentLane.value = lane
 }
 
-const addTask = () => {
+const addTask = async () => {
   if (newTask.value.title !== '') {
-    currentLane.value.tasks.push({ ...newTask.value })
-    newTask.value = {
-      title: '',
-      author: '',
-      created_at: `${('0' + new Date().getDate()).slice(-2)}-${('0' + (new Date().getMonth() + 1)).slice(-2)}-${new Date().getFullYear()}`,
-      level: 'Low Level'
+    const taskData = {
+      boardId: boardId,
+      laneId: currentLane.value.id, // Set the default laneId to 1
+      name: newTask.value.title,
+      description: newTask.value.description
     }
-    showModal.value = false
+    
+    try {
+      await taskStore.createTaskwithBoardId(taskData, boardId)
+      currentLane.value.tasks.push({ ...newTask.value })
+      newTask.value = {
+        title: newTask.value.title,
+        description: newTask.value.description,
+        created_at: `${('0' + new Date().getDate()).slice(-2)}-${('0' + (new Date().getMonth() + 1)).slice(-2)}-${new Date().getFullYear()}`,
+        level: 'Low Level'
+      }
+      showModal.value = false
+    } catch (error) {
+      console.error('Error adding task:', error)
+      // Handle error if needed
+    }
   }
 }
 
@@ -145,7 +158,7 @@ onMounted(fetchTasksAndPopulateLanes)
     >
       <FormField label="Grouped with icons">
         <FormControl v-model="newTask.title" :icon="mdiAccount" placeholder="Task title" />
-        <FormControl v-model="newTask.author" placeholder="Task author" :icon="mdiMail" />
+        <FormControl v-model="newTask.description" placeholder="Task description" :icon="mdiMail" />
       </FormField>
       <FormField label="Dropdown">
         <FormControl v-model="newTask.level" :options="selectOptions" />

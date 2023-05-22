@@ -3,6 +3,8 @@ import { useApiPrivate } from '../services/useApi'
 import { Task, TaskData } from '@/stores/types'
 
 export interface Lane {
+  boardId: string
+  laneId: string
   name: string
   tasks: Task[]
 }
@@ -67,14 +69,18 @@ export const useTaskStore = defineStore('task', {
       try {
         const response = await useApiPrivate().post('/api/task/tasks', taskData)
         const task = response.data
-
-        // Add the task to the "To Do" lane by default
-        const toDoLane = this.lanes.find((lane) => lane.name === 'To Do')
-        if (toDoLane) {
-          toDoLane.tasks.push(task)
-        }
-
         return task
+      } catch (error) {
+        console.error('Error creating task:', error)
+        throw error
+      }
+    },
+    
+    async createTaskwithBoardId(taskData: TaskData, boardId: string) {
+      try {
+        const response = await useApiPrivate().post(`/api/task/tasks/${boardId}`, taskData)
+        console.log(response.data)
+        return response
       } catch (error) {
         console.error('Error creating task:', error)
         throw error

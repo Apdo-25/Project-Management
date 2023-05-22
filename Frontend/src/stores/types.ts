@@ -75,6 +75,8 @@ export interface BoardData {
 
 // Task Data
 export interface TaskData {
+  boardId: string // Board ID
+  laneId: string // Lane ID
   name: string
   description: string
   status: 'In progress' | 'Open' | 'Closed'

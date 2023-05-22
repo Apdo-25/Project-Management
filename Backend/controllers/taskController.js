@@ -38,6 +38,28 @@ async function getTasksByBoardId(req, res) {
   }
 }
 
+// create a new task with board id
+async function createTaskId(req, res) {
+  try {
+    const { laneId, name, description, due_date, assigned_to, creator, status, priority } = req.body;
+    const task = await Task.create({
+      boardId: req.params.id,
+      laneId,
+      name,
+      description,
+      due_date,
+      assigned_to,
+      creator,
+      status,
+      priority,
+    });
+    return res.json(task);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to create task." });
+  }
+}
+
 // Create a new task
 async function createTask(req, res) {
   try {
@@ -127,6 +149,7 @@ module.exports = {
   getTask,
   getTasksByBoardId,
   createTask,
+  createTaskId,
   updateTask,
   deleteTask,
   deleteAllTasks,
