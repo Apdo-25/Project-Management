@@ -8,6 +8,7 @@ const origins = [
   "https://pm-api-km33.onrender.com/",
   "https://pm-api-km33.onrender.com",
   "https://pm-project.onrender.com/",
+  "https://pm-project.onrender.com",
 ];
 
 module.exports = origins;
