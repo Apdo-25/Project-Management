@@ -28,3 +28,7 @@ coverage
 *.sw?
 
 .env
+
+.env.test
+
+.env.development
