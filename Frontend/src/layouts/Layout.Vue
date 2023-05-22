@@ -74,8 +74,7 @@ const menuClick = (event, item) => {
       />
       <slot />
       <FooterBar>
-        Get more with
-        <a href="/" class="text-blue-600">Premium Minnie</a>
+        
       </FooterBar>
     </div>
   </div>
