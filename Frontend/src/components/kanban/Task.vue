@@ -1,9 +1,37 @@
 <script setup>
-import { defineProps } from 'vue'
+import { defineProps, reactive } from 'vue'
+import { useTaskStore } from '@/stores/task'
+import BaseButton from '@/components/BaseButton.vue'
+import { mdiDeleteCircleOutline } from '@mdi/js'
+
+const taskStore = useTaskStore()
 
 const props = defineProps({
   task: Object
 })
+
+const deleteTask = async (lane, task) => {
+  if (!task._id) {
+    console.error('Invalid task ID:', task._id)
+    return
+  }
+
+  try {
+    await taskStore.deleteTask(task._id)
+
+    if (lane.tasks && Array.isArray(lane.tasks)) {
+      const taskIndex = lane.tasks.findIndex((t) => t._id === task._id)
+      if (taskIndex !== -1) {
+        lane.tasks.splice(taskIndex, 1)
+        // Trigger component update
+        lane = reactive(lane)
+      }
+    }
+  } catch (error) {
+    console.error('Error deleting task:', error)
+    // Handle error if needed
+  }
+}
 </script>
 
 <template>
@@ -12,6 +40,14 @@ const props = defineProps({
   >
     <div class="text-gray-400 text">{{ task.description }}, {{ task.author }}</div>
     <div>{{ task.name }}</div>
+    <BaseButton
+      :icon="mdiDeleteCircleOutline"
+      label="Delete"
+      color="info"
+      rounded-full
+      small
+      @click="deleteTask(task.lane, task)"
+    />
     <div class="text-gray-300 flex items-center">
       <svg
         xmlns="http://www.w3.org/2000/svg"
