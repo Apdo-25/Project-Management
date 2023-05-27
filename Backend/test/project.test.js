@@ -53,7 +53,7 @@ describe("Project API", () => {
         .set("Authorization", `${authToken}`)
         .send({
           name: "Kanban Board",
-          descriptopn: "testuser",
+          description: "testuser",
           members: [],
           first_name: "Test",
           priority: "high",
