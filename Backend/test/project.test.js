@@ -55,7 +55,6 @@ describe("Project API", () => {
           name: "Kanban Board",
           description: "testuser",
           members: [],
-          first_name: "Test",
           priority: "high",
           deadline: new Date(),
         });
