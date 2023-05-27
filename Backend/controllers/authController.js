@@ -118,6 +118,7 @@ async function logout(req, res) {
     secure: true,
     maxAge: 24 * 60 * 60 * 1000,
   });
+  
   res.sendStatus(204);
 }
 

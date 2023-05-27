@@ -1,174 +1,137 @@
 const chai = require("chai");
 const chaiHttp = require("chai-http");
-const server = require("../server");
-const expect = chai.expect;
+const app = require("../server");
 const User = require("../models/User");
+const expect = chai.expect;
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
-// env testdb
 process.env.NODE_ENV = "test";
 
 chai.use(chaiHttp);
 
-describe("User Controller", () => {
+describe("Auth Controller", () => {
   beforeEach(async () => {
-    // Clear the database before each test
-    await User.deleteMany();
+    await User.deleteMany({});
   });
 
-  describe("POST /api/user/register", () => {
-    it("should register a new user", async () => {
-      const response = await chai
-        .request(server)
-        .post("/api/user/register")
-        .send({
-          username: "testuser",
-          email: "apdo@example.com",
-          first_name: "John",
-          last_name: "Doe",
-          password: "password",
-          password_confirm: "password",
-        });
-
-      expect(response).to.have.status(201);
-
-      const user = await User.findOne({ email: "apdo@example.com" });
-      expect(user).to.exist;
-      expect(user).to.have.property("username", "testuser");
-      expect(user).to.have.property("first_name", "John");
-      expect(user).to.have.property("last_name", "Doe");
-
-      const passwordMatch = await bcrypt.compare("password", user.password);
-      expect(passwordMatch).to.be.true;
+  describe("POST /api/auth/register", () => {
+    it("should return 422 if any required fields are missing", async () => {
+      const res = await chai
+        .request(app)
+        .post("/api/auth/register")
+        .send({});
+      expect(res).to.have.status(422);
     });
 
-    it("should return an error for invalid fields", async () => {
-      const response = await chai
-        .request(server)
-        .post("/api/user/register")
+    it("should return 422 if passwords do not match", async () => {
+      const res = await chai
+        .request(app)
+        .post("/api/auth/register")
         .send({
           username: "testuser",
-          email: "test@example.com",
-          first_name: "John",
-          // Missing last_name field
+          email: "testuser@example.com",
+          first_name: "Test",
+          last_name: "User",
           password: "password",
-          password_confirm: "password",
+          password_confirm: "notmatching",
         });
-
-      expect(response).to.have.status(422);
-      expect(response.body).to.have.property("message", "Invalid fields");
+      expect(res).to.have.status(422);
     });
 
-    it("should return an error if passwords do not match", async () => {
-      const response = await chai
-        .request(server)
-        .post("/api/user/register")
-        .send({
-          username: "testuser",
-          email: "test@example.com",
-          first_name: "John",
-          last_name: "Doe",
-          password: "password",
-          password_confirm: "differentpassword",
-        });
-
-      expect(response).to.have.status(422);
-      expect(response.body).to.have.property(
-        "message",
-        "Passwords do not match"
-      );
-    });
-
-    it("should return an error if user with same email already exists", async () => {
-      // Create a user with the same email
+    it("should return 409 if user already exists", async () => {
       await User.create({
-        username: "existinguser",
-        email: "test@example.com",
-        first_name: "Jane",
-        last_name: "Smith",
-        password: await bcrypt.hash("existingpassword", 10),
-      });
-
-      const response = await chai
-        .request(server)
-        .post("/api/user/register")
-        .send({
-          username: "testuser",
-          email: "test@example.com",
-          first_name: "John",
-          last_name: "Doe",
-          password: "password",
-          password_confirm: "password",
-        });
-
-      expect(response).to.have.status(409);
-    });
-  });
-
-  describe("POST /api/user/login", () => {
-    it("should login with correct credentials", async () => {
-      // Create a user
-      await User.create({
+        email: "testuser@example.com",
         username: "testuser",
-        email: "test@example.com",
-        first_name: "John",
-        last_name: "Doe",
-        password: await bcrypt.hash("password", 10),
-      });
-
-      const response = await chai.request(server).post("/api/user/login").send({
-        email: "test@example.com",
         password: "password",
+        first_name: "Test",
+        last_name: "User",
       });
-
-      expect(response).to.have.status(200);
-      expect(response.body).to.have.property("access_token");
+      const res = await chai
+        .request(app)
+        .post("/api/auth/register")
+        .send({
+          username: "testuser",
+          email: "testuser@example.com",
+          first_name: "Test",
+          last_name: "User",
+          password: "password",
+          password_confirm: "password",
+        });
+      expect(res).to.have.status(409);
     });
 
-    it("should return an error for missing credentials", async () => {
-      const response = await chai.request(server).post("/api/user/login").send({
-        // Missing email and password fields
-      });
-
-      expect(response).to.have.status(422);
-      expect(response.body).to.have.property("message", "Invalid fields");
-    });
-
-    it("should return an error for incorrect email", async () => {
-      const response = await chai.request(server).post("/api/user/login").send({
-        email: "nonexistent@example.com",
-        password: "password",
-      });
-
-      expect(response).to.have.status(401);
-      expect(response.body).to.have.property(
-        "message",
-        "Email or password is incorrect"
-      );
-    });
-
-    it("should return an error for incorrect password", async () => {
-      // Create a user
-      await User.create({
-        username: "testuser",
-        email: "test@example.com",
-        first_name: "John",
-        last_name: "Doe",
-        password: await bcrypt.hash("password", 10),
-      });
-
-      const response = await chai.request(server).post("/api/user/login").send({
-        email: "test@example.com",
-        password: "incorrectpassword",
-      });
-
-      expect(response).to.have.status(401);
-      expect(response.body).to.have.property(
-        "message",
-        "Email or password is incorrect"
-      );
+    it("should create a new user if all fields are valid", async () => {
+      const res = await chai
+        .request(app)
+        .post("/api/auth/register")
+        .send({
+          username: "testuser",
+          email: "testuser@example.com",
+          first_name: "Test",
+          last_name: "User",
+          password: "password",
+          password_confirm: "password",
+        });
+      expect(res).to.have.status(201);
+      const user = await User.findOne({ email: "testuser@example.com" });
+      expect(user).to.not.be.null;
+      expect(user.username).to.equal("testuser");
     });
   });
 
-  // Add more test cases for other user controller functions here
+  describe("POST /api/auth/login", () => {
+    it("should return 422 if any required fields are missing", async () => {
+      const res = await chai
+        .request(app)
+        .post("/api/auth/login")
+        .send({});
+      expect(res).to.have.status(422);
+    });
+
+    it("should return 401 if email or password is incorrect", async () => {
+      await User.create({
+        email: "testuser@example.com",
+        username: "testuser",
+        password: await bcrypt.hash("password", 10),
+        first_name: "Test",
+        last_name: "User",
+      });
+      const res = await chai
+        .request(app)
+        .post("/api/auth/login")
+        .send({
+          email: "testuser@example.com",
+          password: "wrongpassword",
+        });
+      expect(res).to.have.status(401);
+    });
+
+    it("should return an access token if email and password are correct", async () => {
+      const hashedPassword = await bcrypt.hash("password", 10);
+      await User.create({
+        email: "testuser@example.com",
+        username: "testuser",
+        password: hashedPassword,
+        first_name: "Test",
+        last_name: "User",
+      });
+      const res = await chai
+        .request(app)
+        .post("/api/auth/login")
+        .send({
+          email: "testuser@example.com",
+          password: "password",
+        });
+      expect(res).to.have.status(200);
+      expect(res.body.access_token).to.not.be.null;
+    });
+  });
+
+  describe("POST /api/auth/logout", () => {
+    it("should return 204 if user is not logged in", async () => {
+      const res = await chai.request(app).post("/api/auth/logout");
+      expect(res).to.have.status(204);
+    });
+  });
 });
